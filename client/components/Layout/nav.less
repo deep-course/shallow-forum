@@ -1,0 +1,16 @@
+@baseColor: #667c99;
+@hoverColor: #426799;
+
+.nav{
+  flex: 1;
+  display: flex;
+  margin-left: 20px;
+  .ant-btn-link{
+    padding: 0 13px;
+    font-size: 13px;
+    color: @baseColor;
+    &.current, &:hover{
+      color: @hoverColor;
+    }
+  }
+}

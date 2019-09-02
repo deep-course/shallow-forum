@@ -1,0 +1,66 @@
+@baseColor: #667c99;
+@hoverColor: #426799;
+
+.right{
+  display: flex;
+  align-items: center;
+  .search-input{
+    width: auto;
+    .ant-input{
+      width: 160px;
+      background-color: #e8ecf3;
+      border: none;
+      &::-webkit-input-placeholder {
+        color: @baseColor;
+      }
+      
+      &:focus{
+        width: 270px;
+        background: #ffffff;
+      }
+    }
+    .anticon-search{
+      color: @baseColor;
+    }
+  }
+
+  .user{
+    position: relative;
+    display: flex;
+    align-items: center;
+    margin-left: 20px;
+    padding: 8px 13px;
+    user-select: none;
+    cursor: pointer;
+    .avatar{
+      font-size: 20px;
+      margin-right: 4px;
+    }
+    .name{
+      font-size: 13px;
+      color: @baseColor;
+    }
+    &:hover{
+      background: #c7d2e1;
+      border-radius: 18px;
+    }
+  }
+  .user-btn{
+    padding: 0 8px;
+    margin-left: 10px;
+    font-size: 13px;
+    color: @baseColor;
+    cursor: pointer;
+    &:hover{
+      color: @hoverColor;
+    }
+  }
+}
+
+.user-select{
+  top: 52px!important;
+  .ant-dropdown-menu-item{
+    min-width: 140px;
+    padding: 8px 16px;
+  }
+}
