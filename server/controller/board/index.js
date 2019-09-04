@@ -208,10 +208,19 @@ module.exports = {
            ctx.body = util.retError(3000, "回复错误");
        }
 
-    }
+    },
+getBoardInfo:async function(ctx, next){
 
+},
+getPostInfo:async function(ctx, next){
+
+},
 
 };
+
+
+
+
 //检测post需要的数据，如果正确返回post信息，错误返回false
 async function checkPostContent(ctx) {
     logger.debug("checkPostContent");

@@ -25,4 +25,8 @@ router.post('/board/newpost',middleware.user,boardController.newPost);
 router.post('/board/newlink',middleware.user,boardController.newLink);
 router.post('/board/newcomment',middleware.user,boardController.newComment);
 
+
+//测试
+router.get('/test',middleware.post);
+
 module.exports=router;
