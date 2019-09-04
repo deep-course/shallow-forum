@@ -8,8 +8,8 @@
     "url": "/api"
   },
   "scripts": {
-    "dev": "./node_modules/node-dev/bin/node-dev app.js",
-    "doc": "./node_modules/apidoc/bin/apidoc -e \"(node_modules|public)\" -o public/apidoc",
+    "dev": "node ./node_modules/node-dev/bin/node-dev app.js",
+    "doc": "node ./node_modules/apidoc/bin/apidoc -e \"(node_modules|public)\" -o public/apidoc",
     "prod-test": "NODE_ENV=production ./node_modules/node-dev/bin/node-dev app.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
