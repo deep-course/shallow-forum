@@ -96,7 +96,7 @@ module.exports = {
     addComment: async function (comment, post) {
         logger.debug("addComment :", comment)
         const conn = await promiseMysqlPool.getConnection();
-        let insertcommentid  = 0
+        let insertcommentid = 0
         conn.beginTransaction();
         try {
             //新建回复
@@ -121,10 +121,10 @@ where tag_id in
 (
 select tag_id from board_postintag where post_id=?
 )`, [
-                    comment.addtime,
-                    post.id,
-                    post.id,
-                ]);
+                comment.addtime,
+                post.id,
+                post.id,
+            ]);
 
 
             //更新 user_activity
@@ -155,6 +155,11 @@ select tag_id from board_postintag where post_id=?
     getPostBySlug: async function (slug) {
         const [post] = await promiseMysqlPool.query("select * from board_post where slug=?", [slug]);
         return post[0];
+    },
+    //获取board
+    getBoardBySlug: async function (slug) {
+        const [board] = await promiseMysqlPool.query("select * from board_tag where slug=?", [slug]);
+        return board[0];
     }
 
 }

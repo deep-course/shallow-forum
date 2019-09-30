@@ -24,7 +24,7 @@ const boardController=require("./controller/board");
 router.post('/board/newpost',middleware.user,boardController.newPost);
 router.post('/board/newlink',middleware.user,boardController.newLink);
 router.post('/board/newcomment',middleware.user,boardController.newComment);
-
+router.get('/board/getpost/:postslug',middleware.user,middleware.post,boardController.getPostInfo);
 
 //测试
 router.get('/test',middleware.post);

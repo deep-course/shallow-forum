@@ -5,9 +5,7 @@ const boardService = require("../service/board_service");
 const logger=util.getLogger(__filename);
 module.exports={
     //获取post相关信息,只获取信息,存入到state中
-    post:async function(ctx,next){
-        ctx.response.body=ctx;
-        
+    post:async function(ctx,next){    
         let postslug="";
         if (ctx.params&& ctx.params.postslug)
         {
@@ -28,11 +26,44 @@ module.exports={
         //logger.debug(postslug)
         if (postslug)
         {
-            ctx.state.post=await boardService.getPostBySlug(postslug)
+            const post=await boardService.getPostBySlug(postslug)
+            if (post)
+            {
+                ctx.state.post=post;
+            }
+            ctx.state.post={};
         }
         else
         {
             ctx.state.post={};
+        }
+        await next();
+    },
+    board:async function(ctx,next){
+        let boardslug="";
+        if (ctx.params&& ctx.params.boardslug)
+        {
+            //优先params
+            postslug=ctx.params.boardslug;
+            
+        } else if(ctx.query&&ctx.query.boardslug)
+        {
+            //其次get
+            postslug=ctx.query.boardslug;
+
+        }
+        else if(ctx.body&&ctx.body.boardslug)
+        {
+            //最后post
+            postslug=ctx.body.boardslug;
+        }
+        if (boardslug)
+        {
+            ctx.state.board=await boardService.getBoardBySlug(boardslug)
+        }
+        else
+        {
+            ctx.state.board={};
         }
         await next();
     },

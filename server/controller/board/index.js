@@ -211,8 +211,12 @@ module.exports = {
     },
 getBoardInfo:async function(ctx, next){
 
+    
 },
 getPostInfo:async function(ctx, next){
+    //判断是否有帖子
+    logger.debug(ctx.state)
+    ctx.body=ctx.state
 
 },
 
