@@ -2,7 +2,7 @@
 const moment = require('moment');
 const util = require('../util');
 const userService = require('../service/user_service');
-
+const svgCaptcha = require('svg-captcha')
 
 
 module.exports = {
@@ -89,7 +89,9 @@ module.exports = {
      * @apiVersion  1.0.0
      * 
      * 
-     * @apiParam  {String} paramName description
+     * @apiParam  {String} phone 电话
+     * @apiParam  {String} username 用户名
+     * @apiParam  {String} password 密码
      * 
      * @apiSuccess (200) {type} name description
      * 
@@ -109,6 +111,85 @@ module.exports = {
     register: async function (ctx) {
         ctx.body = ctx.request.body;
         //console.log(ctx.query)
+    },
+    /**
+     * 
+     * @api {get} /captcha 获取验证码，验证码时效5分钟
+     * @apiSampleRequest /api/captcha
+     * @apiName captcha
+     * @apiGroup user
+     * @apiVersion  1.0.0
+     * 
+     * 
+     * 
+     * @apiSuccess (200) {type} name description
+     * 
+     * @apiParamExample  {type} Request-Example:
+     * {
+     *     property : value
+     * }
+     * 
+     * 
+     * @apiSuccessExample {type} Success-Response:
+     * {
+     *     property : value
+     * }
+     * 
+     * 
+     */
+    captcha:async function(ctx){
+       const captcha = svgCaptcha.create({ 
+            size:5,
+            noise: 0,
+            charPreset: '0123456789', 
+            color: true,
+            background:'#f0f0f0',
+            fontSize:30,   
+            width:100,
+            height:40
+          });
+          ctx.session.captcha=captcha.text
+          ctx.response.type = 'image/svg+xml';
+          ctx.body = captcha.data;
+    },
+    /**
+     * 
+     * @api {post} /sendsmscode 发送手机验证码
+     * @apiSampleRequest /api/sendsmscode
+     * @apiName sendsmscode
+     * @apiGroup user
+     * @apiVersion  1.0.0
+     * 
+     * 
+     * @apiParam  {String} phone 电话
+     * @apiParam  {String} captcha 验证码
+     * 
+     * @apiSuccess (200) {type} name description
+     * 
+     * @apiParamExample  {type} Request-Example:
+     * {
+     *     property : value
+     * }
+     * 
+     * 
+     * @apiSuccessExample {type} Success-Response:
+     * {
+     *     property : value
+     * }
+     * 
+     * 
+     */
+    smscode: async function (ctx){
+        const { captcha:captchaInput } = ctx.request.body;
+        const { captcha:captchaSession } = ctx.session;
+        //清除session信息
+        if(captchaSession && captchaInput==captchaSession){
+            ctx.body=util.retOk({});
+        }
+        else{
+            ctx.body=util.retError(-1,"验证码错误");
+        }
+
     },
     logout: async function (ctx) {
 

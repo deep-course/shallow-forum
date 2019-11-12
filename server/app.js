@@ -7,6 +7,7 @@ const path = require('path')
 const db = require('./db')
 const util= require('./util')
 const logger=util.getLogger(__filename);
+const session = require('koa-session');
 //配置文件
 const { setting, env } = require('./config')
 //路由
@@ -18,7 +19,17 @@ const app = new Koa2()
 app.use(middleware.responseTime);
 //TODO : 异常处理放在最前面
 
-
+//session设置
+app.keys = [setting.token.secret];
+app.use(session( {
+  key: 'sf_sess',   //cookie key (default is koa:sess)
+  maxAge: 3600*1000,  // cookie的过期时间 maxAge in ms (default is 1 days)
+  overwrite: true,  //是否可以overwrite    (默认default true)
+  httpOnly: true, //cookie是否只有服务器端可以访问 httpOnly or not (default true)
+  signed: true,   //签名默认true
+  rolling: false,  //在每次请求时强行设置cookie，这将重置cookie过期时间（默认：false）
+  renew: false,  //(boolean) renew session when session is nearly expired,
+}, app));
 
 //开发日志
 if (env === 'development') {

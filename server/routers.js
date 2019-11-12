@@ -15,8 +15,12 @@ router.get('/home', homeController.home);
 router.post('/register', homeController.register);
 
 router.post('/login',homeController.login);
+
+router.get('/captcha',homeController.captcha);
+
+router.post('/sendsmscode',homeController.smscode);
 //用户相关
-const userController=require("./controller/user")
+const userController=require("./controller/user");
 router.get('/user/info',middleware.user,userController.info);
 
 //board相关
@@ -27,6 +31,8 @@ router.post('/board/newcomment',middleware.user,boardController.newComment);
 router.get('/board/getpost/:postslug',middleware.user,middleware.post,boardController.getPostInfo);
 
 //测试
-router.get('/test',middleware.post);
+router.get('/test',function(ctx){
+    ctx.body=ctx.session;
+});
 
 module.exports=router;
