@@ -220,7 +220,7 @@ INSERT INTO `user_group` (`id`, `name`, `color`) VALUES
 DROP TABLE IF EXISTS `user_token`;
 CREATE TABLE IF NOT EXISTS `user_token` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
-  `user_id` int(11) DEFAULT NULL COMMENT '用户的id',
+  `key` varchar(100) DEFAULT NULL COMMENT '用户的id',
   `token` text COMMENT '用户的token',
   `type` varchar(20) DEFAULT NULL COMMENT '类型：认证，邮箱，api',
   `addtime` datetime DEFAULT NULL COMMENT '添加日期',
