@@ -1,10 +1,20 @@
+/**
+ * @apiDefine ReturnCode
+ * @apiSuccess (成功) {Number} err 0表示成功
+ * @apiSuccess (成功) {String} msg 成功永远返回ok
+ * @apiSuccess (成功) {Object} data 服务器端返回结果
+ * @apiError (失败) {Number} err err不为0表示失败
+ * @apiError (失败) {String} msg 失败的错误信息 
+ * @apiError (失败) {Object} data 没有data项
+
+ */
 const crypto = require('crypto');
 const log4js = require('log4js');
 const jwt = require('jsonwebtoken');
 const uuidv1 = require('uuid/v1');
 const url = require('url');
 const { setting, env } = require('./config');
-const logger=log4js.getLogger("util");
+const logger = log4js.getLogger("util");
 module.exports = {
     //hash相关
     hash: function (str, algorithm) {
@@ -58,7 +68,7 @@ module.exports = {
         return uuid.replace(/-/g, "");
     },
     //日志
-    getLogger: function(name){
+    getLogger: function (name) {
         const logger = log4js.getLogger(name);
         if (env == "production") {
             logger.level = log4js.levels.INFO;
@@ -66,14 +76,45 @@ module.exports = {
         else {
             logger.level = log4js.levels.ALL;
         }
-        
+
         return logger;
 
     },
     //url
     parseUrl: function (str) {
         return url.parse(str);
-    }
+    },
+    //生成随机字符串
+    randomString: function (length, chars = false) {
+        let rString = '0123456789'
+        if (chars) {
+            rString = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'
+        }
+        var result = '';
+        for (var i = length; i > 0; --i)
+            result += rString[Math.floor(Math.random() * rString.length)];
+        return result;
+    },
+    //验证手机号
+    checkPhone: function (phone) {
+        if ((/^1(3|4|5|6|7|8|9)\d{9}$/.test(phone))) {
+            return true;
+        }
+        else {
+            return false;
+        }
+    },
+    //判断用户名,只能包含数字，字母和中文字
+    checkUsername: function (username) {
+        if (/[a-zA-Z0-9\u4e00-\u9fa5]+/.test(username)) {
+            return true;
+        } else {
+            return false;
+        }
+
+    },
+
+
 
 
 }

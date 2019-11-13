@@ -2,6 +2,7 @@
 const router = require('koa-router')({prefix: '/api'})
 const middleware = require('./middleware')
 //const controller=require('./controller')
+const u= require('./service/user_service')
 
 //状态
 const status=require('./controller/status')
@@ -32,7 +33,9 @@ router.get('/board/getpost/:postslug',middleware.user,middleware.post,boardContr
 
 //测试
 router.get('/test',function(ctx){
-    ctx.body=ctx.session;
+    //ctx.body=ctx.session;
+    u.genSmsToken('18612733663')
+    ctx.body="test"
 });
 
 module.exports=router;
