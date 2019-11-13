@@ -32,10 +32,11 @@ router.post('/board/newcomment',middleware.user,boardController.newComment);
 router.get('/board/getpost/:postslug',middleware.user,middleware.post,boardController.getPostInfo);
 
 //测试
-router.get('/test',function(ctx){
+router.get('/test',async function(ctx){
     //ctx.body=ctx.session;
-    u.genSmsToken('18612733663')
-    ctx.body="test"
+    const token=await u.getTokenByPhone('18612733663')
+    //console.log(token)
+    ctx.body=token;
 });
 
 module.exports=router;
