@@ -20,8 +20,8 @@ module.exports = {
           logger.debug("middleware-user:hash验证通过");
           //判断是否过期
           const tokenTime= moment.unix(data.iat);
-          logger.debug("7天过期时间:",tokenTime.add(7, 'days'));
-          if (tokenTime.add(7, 'days')>moment()) {
+          logger.debug("30天过期时间:",tokenTime.add(30, 'days'));
+          if (tokenTime.add(30, 'days')>moment()) {
             //token未过期
             ctx.state.user = currentUser;
             //用户分组

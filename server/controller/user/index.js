@@ -20,7 +20,11 @@ module.exports = {
  * 
  * @apiSuccessExample {json} Response:
  * {
- *     property : value
+ *     id : 用户id,
+ *     username:用户名,
+ *     lock:锁定状态,
+ *     activate:激活状态
+ *     
  * }
  * 
  * 
