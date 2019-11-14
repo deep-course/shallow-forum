@@ -113,6 +113,14 @@ module.exports = {
         }
 
     },
+    //获取客户端IP
+    //ctx.req
+    getClientIP:function(req){
+        return req.headers['x-sf-ip'] || // 反向代理传递的数据头
+        req.connection.remoteAddress || // 判断 connection 的远程 IP
+        req.socket.remoteAddress || // 判断后端的 socket 的 IP
+        req.connection.socket.remoteAddress;
+    }
 
 
 

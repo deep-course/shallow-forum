@@ -1,4 +1,5 @@
 //路由文件，先用一个后面在分
+const util=require('./util')
 const router = require('koa-router')({prefix: '/api'})
 const middleware = require('./middleware')
 //const controller=require('./controller')
@@ -13,16 +14,14 @@ router.get('/ping',status.ping);
 const homeController=require("./controller/home")
 router.get('/home', homeController.home);
 
-router.post('/register', homeController.register);
 
-router.post('/login',homeController.login);
-
-router.get('/captcha',homeController.captcha);
-
-router.post('/sendsmscode',homeController.smscode);
 //用户相关
 const userController=require("./controller/user");
 router.get('/user/info',middleware.user,userController.info);
+router.post('/register', userController.register);
+router.post('/login',userController.login);
+router.get('/captcha',userController.captcha);
+router.post('/sendsmscode',userController.smscode);
 
 //board相关
 const boardController=require("./controller/board");
@@ -38,5 +37,7 @@ router.get('/test',async function(ctx){
     //console.log(token)
     ctx.body=token;
 });
+//测试
+
 
 module.exports=router;

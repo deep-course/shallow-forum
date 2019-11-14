@@ -52,12 +52,13 @@ module.exports = {
             approve: 1,
             lock: 0,
             sticky: 0,
-            board_id: newpost.boardid,
+            board_id: newpost.boardid
 
         };
         const content = {
             type: "comment",
             content: newpost.content,
+            ip:util.getClientIP(ctx.req)
         };
         const tags = newpost.taglist;
         const postinfo = await boardService.addPost(post, content, tags);

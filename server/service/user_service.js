@@ -28,18 +28,22 @@ module.exports={
         const [rows,fields]= await promiseMysqlPool.query("select * from user_useringroup where  user_id=?", [id]);
         return rows;
     },
-    updateUserLoginTime:async function(id){
-        const [rows,fields]= await promiseMysqlPool.query("update user_activity set lastlogintime=?,logincount=logincount+1 where user_id=?", [moment().toDate(),id]);
+    updateUserLoginTime:async function(id,ip){
+        const [rows,fields]= await promiseMysqlPool.query("update user_activity set lastlogintime=?,logincount=logincount+1,lastvisitip=? where user_id=?", [moment().toDate(),ip,id]);
         return rows;
     },
-    updateUserActionTime:async function(id){
-        const [rows,fields]= await promiseMysqlPool.query("update user_activity set lastactiontime=? where user_id=?", [moment().toDate(),id]);
+    updateUserActionTime:async function(id,ip){
+        const [rows,fields]= await promiseMysqlPool.query("update user_activity set lastactiontime=?,lastvisitip=? where user_id=?", [moment().toDate(),ip,id]);
         return rows;
     },
-    insertUser:async function(phone,username,password)
+    insertUser:async function(phone,username,password,ip)
     {
         const now= moment();
-        try {
+        const conn = await promiseMysqlPool.getConnection();
+        conn.beginTransaction();
+        let insertuserid = 0 
+        try{
+            logger.debug("insertUser:user_user");
             const insertresult=await promiseMysqlPool.query("insert ignore into user_user set ?",{
                 username:username,
                 email:'',
@@ -48,13 +52,35 @@ module.exports={
                 password:util.sha256(password),
                 jointime:now.toDate(),
                 bio:'',
-                lock:0
+                lock:0,
+                ip:ip
             }); 
-            return insertresult[0]['insertId']
+            insertuserid=insertresult[0].insertId;
+            if (insertuserid == 0) {
+                throw "插入user_suer错误";
+            }
+            logger.debug("insertUser:user_activity");
+            await promiseMysqlPool.query("insert into user_activity set?",{
+                user_id:insertuserid,
+                lastactiontime:now.toDate(),
+                lastlogintime:now.toDate(),
+                logincount:0,
+                postcount:0,
+                commentcount:0,
+                lastvisitip:ip
+            });
+            await conn.commit();
+            logger.debug("insertUser done");
+
         } catch (error) {
             logger.error(error)
-            return 0          
+            conn.rollback();
+            return 0;          
         }
+        finally {
+            conn.release()
+        }
+        return insertuserid;
 
     },
     //生成短信token

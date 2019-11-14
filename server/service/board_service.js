@@ -35,7 +35,7 @@ module.exports = {
                 type: content.type,
                 edituser_id: 0,
                 edittime: post.pubtime,
-                ip: "",
+                ip: content.ip,
                 approve: 1,
             };
             //判断是不是链接
