@@ -11,6 +11,7 @@
     "dev": "node ./node_modules/node-dev/bin/node-dev app.js",
     "doc": "node ./node_modules/apidoc/bin/apidoc -e \"(node_modules|public)\" -o public/apidoc",
     "prod-test": "NODE_ENV=production ./node_modules/node-dev/bin/node-dev app.js",
+    "migrate":"node ./node_modules/migrate/bin/migrate",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
@@ -24,6 +25,7 @@
     "koa-static": "^5.0.0",
     "lodash": "^4.17.13",
     "log4js": "^4.1.1",
+    "migrate": "^1.6.2",
     "moment": "^2.24.0",
     "mysql2": "^1.6.5",
     "svg-captcha": "^1.4.0",
