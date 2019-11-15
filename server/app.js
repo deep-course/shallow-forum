@@ -19,6 +19,11 @@ const app = new Koa2()
 app.use(middleware.responseTime);
 //TODO : 异常处理放在最前面
 
+//暂时增加跨域
+app.use(async (ctx, next) => {
+  ctx.set('Access-Control-Allow-Origin', '*');
+  await next();
+ });
 //session设置
 app.keys = [setting.token.secret];
 app.use(session( {
