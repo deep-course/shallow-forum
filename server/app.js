@@ -5,8 +5,8 @@ const static = require('koa-static');
 const fs = require('fs')
 const path = require('path')
 const db = require('./db')
-const util= require('./util')
-const logger=util.getLogger(__filename);
+const util = require('./util')
+const logger = util.getLogger(__filename);
 const session = require('koa-session');
 //配置文件
 const { setting, env } = require('./config')
@@ -21,9 +21,9 @@ app.use(middleware.responseTime);
 
 //session设置
 app.keys = [setting.token.secret];
-app.use(session( {
+app.use(session({
   key: 'sf_sess',   //cookie key (default is koa:sess)
-  maxAge: 3600*1000,  // cookie的过期时间 maxAge in ms (default is 1 days)
+  maxAge: 3600 * 1000,  // cookie的过期时间 maxAge in ms (default is 1 days)
   overwrite: true,  //是否可以overwrite    (默认default true)
   httpOnly: true, //cookie是否只有服务器端可以访问 httpOnly or not (default true)
   signed: true,   //签名默认true
@@ -43,9 +43,11 @@ if (env === 'development') {
   })
   //开发模式可以跨域
   app.use(async (ctx, next) => {
-  ctx.set('Access-Control-Allow-Origin', '*');
-  await next();
- });
+    ctx.set('Access-Control-Expose-Headers: token');
+    ctx.set('Access-Control-Allow-Headers: Origin, X-Requested-With, Content-Type, Accept, Connection, User-Agent, Cookie, token');
+    ctx.set('Access-Control-Allow-Origin', '*');
+    await next();
+  });
 }
 //静态文件
 app.use(static(
@@ -68,7 +70,7 @@ db.promiseMysqlPool.query("show tables").then((result, err) => {
     loger.error(err)
     process.exit(1)
   }
-  logger.info("tables:"+result[0].length)
+  logger.info("tables:" + result[0].length)
   app.listen(setting.port, setting.host, () => {
     logger.info(`server listen at ${setting.host}:${setting.port}`)
   });
