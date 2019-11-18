@@ -1,29 +1,28 @@
-const fs = require('fs')
-const router = require('koa-router')()
-const controller=require('../controller')
-controller.get("home");
+const fs = require('fs');
+const path=require('path');
+const router = require('koa-router');
+const util=require('../util');
+const logger=util.getLogger(__dirname);
 
 
-/** 自动导入
- * const files = fs.readdirSync(__dirname)
+let rootRoute=router({prefix: '/api'})
+
+//自动导入路由
+const files = fs.readdirSync(__dirname)
 files
     .filter(file => ~file.search(/^[^\.].*\.js$/))
     .forEach(file => {
         const file_name = file.substr(0, file.length - 3);
-        const file_entity = require(path.join(__dirname, file));
+        const router_entity = require(path.join(__dirname, file));
         if (file_name.toLocaleLowerCase() !== 'index') {
-            rootRoute.use(`/${file_name}`, file_entity.routes(), file_entity.allowedMethods())
-            console.log(`/${file_name}`)
+            rootRoute.use(router_entity.routes(), router_entity.allowedMethods())
+            logger.info(`router loaded :`,file)
+            router_entity.stack.forEach(element => {
+                logger.info(element.path,element.methods);        
+            });
+            
         }
     })
-*/  
-//首页相关
-//首页
-//router.use('/',homeController.home);
-//状态
-const status=require('./status')
-router.use('/status',status.routes(), status.allowedMethods())
-//用户
-const user=require('./user')
-router.use('/user',user.routes(), user.allowedMethods())
-module.exports = router
+
+
+module.exports = rootRoute

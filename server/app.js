@@ -11,7 +11,7 @@ const session = require('koa-session');
 //配置文件
 const { setting, env } = require('./config')
 //路由
-const router = require('./routers')
+const router = require('./route')
 //中间件
 const middleware = require('./middleware')
 const app = new Koa2()
@@ -19,11 +19,6 @@ const app = new Koa2()
 app.use(middleware.responseTime);
 //TODO : 异常处理放在最前面
 
-//暂时增加跨域
-app.use(async (ctx, next) => {
-  ctx.set('Access-Control-Allow-Origin', '*');
-  await next();
- });
 //session设置
 app.keys = [setting.token.secret];
 app.use(session( {
@@ -46,6 +41,11 @@ if (env === 'development') {
       logger.warn(`${ctx.method} ${ctx.url} ${ctx.status}  -  end ${ms}ms`)
     })
   })
+  //开发模式可以跨域
+  app.use(async (ctx, next) => {
+  ctx.set('Access-Control-Allow-Origin', '*');
+  await next();
+ });
 }
 //静态文件
 app.use(static(
@@ -56,6 +56,7 @@ app.use(KoaBody());
 
 //路由
 app.use(router.routes(), router.allowedMethods())
+
 //错误处理
 app.on("error", (err, ctx) => {//捕获异常记录错误日志
   logger.error(err)
