@@ -6,7 +6,7 @@ const userService = require('../service/user_service');
 const _3rdService = require('../service/3rd_service');
 
 
-module.exports = {
+const homeController=module.exports = {
 
     async home  (ctx) {
         ctx.body = 'home'

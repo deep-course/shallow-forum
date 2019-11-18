@@ -5,7 +5,7 @@ const _ = require("lodash");
 const moment=require("moment");
 const userService = require('../../service/user_service');
 const svgCaptcha= require('svg-captcha');
-module.exports = {
+const userController=module.exports = {
     async info (ctx, next) {
         logger.debug("state:",ctx.state);
         let ret = {
@@ -30,10 +30,6 @@ module.exports = {
 
         ctx.body = util.retOk(ret);
     },
-    refreshToken(ctx, next) {
-
-    },
-
     async login (ctx) {
         const { username, password } = ctx.request.body;
         const user = await userService.getUserByName(username);

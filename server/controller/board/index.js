@@ -4,10 +4,9 @@ const logger=util.getLogger(__filename);
 const boardService = require("../../service/board_service");
 const _ = require("lodash");
 const moment = require("moment");
+const boardController= module.exports= {
 
-module.exports = {
-
-    newPost: async function (ctx, next) {
+    async  newPost (ctx, next) {
         //验证内容
         if (!await checkPostContent(ctx)) {
             return;

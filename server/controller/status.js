@@ -1,6 +1,6 @@
 
 const os=require('os');
-module.exports={
+const statusController=module.exports={
     async status(ctx,next) {
 
         ctx.body={
