@@ -4,6 +4,7 @@ const logger=util.getLogger(__filename);
 const _ = require("lodash");
 const moment=require("moment");
 const userService = require('../../service/user_service');
+const svgCaptcha= require('svg-captcha');
 module.exports = {
     async info (ctx, next) {
         logger.debug("state:",ctx.state);
@@ -45,7 +46,7 @@ module.exports = {
                 token: ret,
             });
             //更新用户登录状态
-            await userService.updateUserLoginTime(user.id,util.getClientIP(ctx));
+            await userService.updateUserLoginTime(user.id,util.getClientIP(ctx.req));
 
         }
         else {
@@ -139,7 +140,7 @@ module.exports = {
 
             if (token) {
                 //发送
-                await _3rdService.sendSms(token, phone);
+                //await _3rdService.sendSms(token, phone);
                 ctx.body = util.retOk({});
             }
             else {
