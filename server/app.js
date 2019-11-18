@@ -53,8 +53,13 @@ if (env === 'development') {
 app.use(static(
   path.join(__dirname, "public")
 ));
-//koa-body处理文件上传等
-app.use(KoaBody());
+//koa-body处理文件上传等,最大上传5M
+app.use(KoaBody({
+  multipart: true,
+  formidable: {
+      maxFileSize: 10*1024*1024   
+  }
+}));
 
 //路由
 app.use(router.routes(), router.allowedMethods())
