@@ -5,7 +5,7 @@ const _ = require("lodash");
 const moment=require("moment");
 const userService = require('../../service/user_service');
 module.exports = {
-    info:async function (ctx, next) {
+    async info (ctx, next) {
         logger.debug("state:",ctx.state);
         let ret = {
         }
@@ -33,7 +33,7 @@ module.exports = {
 
     },
 
-    login: async function (ctx) {
+    async login (ctx) {
         const { username, password } = ctx.request.body;
         const user = await userService.getUserByName(username);
         if (user && util.sha256(password) == user.password) {
@@ -53,7 +53,7 @@ module.exports = {
         }
     },
 
-    register: async function (ctx) {
+    async register (ctx) {
         const { token, phone, username, password } = ctx.request.body;
         //ctx.body=ctx.request.body;
 
@@ -100,7 +100,7 @@ module.exports = {
 
     },
 
-    captcha: async function (ctx) {
+    async captcha (ctx) {
         const captcha = svgCaptcha.create({
             size: 5,
             noise: 0,
@@ -116,7 +116,7 @@ module.exports = {
         ctx.body = captcha.data;
     },
 
-    smscode: async function (ctx) {
+    async smscode (ctx) {
         const { captcha: captchaInput, phone } = ctx.request.body;
         const { captcha: captchaSession } = ctx.session;
         if (!util.checkPhone(phone)) {
@@ -154,10 +154,10 @@ module.exports = {
 
 
     },
-    logout: async function (ctx) {
+    async logout (ctx) {
 
     },
-    resetPassword: async function (ctx) {
+    async resetPassword (ctx) {
 
     },
 }

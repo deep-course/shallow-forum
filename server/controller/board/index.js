@@ -45,7 +45,7 @@ module.exports = {
 
     },
 
-    newLink: async function (ctx, next) {
+    async newLink (ctx, next) {
         //验证内容
         if (!await checkPostContent(ctx)) {
             return;
@@ -97,7 +97,7 @@ module.exports = {
 
     },
 
-    newComment: async function (ctx, next) {
+    async newComment (ctx, next) {
         //验证内容
         if (!await checkCommentContent(ctx)) {
             return;
@@ -127,11 +127,11 @@ module.exports = {
        }
 
     },
-getBoardInfo:async function(ctx, next){
+    async getBoardInfo(ctx, next){
 
     
 },
-getPostInfo:async function(ctx, next){
+async getPostInfo(ctx, next){
     //判断是否有帖子
     logger.debug(ctx.state)
     ctx.body=ctx.state

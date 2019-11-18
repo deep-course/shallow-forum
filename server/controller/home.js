@@ -8,7 +8,7 @@ const _3rdService = require('../service/3rd_service');
 
 module.exports = {
 
-    home: async function (ctx) {
+    async home  (ctx) {
         ctx.body = 'home'
     },
 

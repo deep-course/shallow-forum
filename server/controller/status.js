@@ -1,7 +1,7 @@
 
 const os=require('os');
 module.exports={
-    status:async function(ctx,next) {
+    async status(ctx,next) {
 
         ctx.body={
             totalmem:os.totalmem(),
@@ -10,7 +10,7 @@ module.exports={
             cpu:os.cpus()
         }
     },
-    ping:async function (ctx,next){
+    async ping (ctx,next){
         ctx.body = 'ok'
     }
 }
