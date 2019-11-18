@@ -15,38 +15,39 @@ const uuidv1 = require('uuid/v1');
 const url = require('url');
 const { setting, env } = require('./config');
 const logger = log4js.getLogger("util");
-module.exports = {
+const rootPath = process.cwd();
+const util = module.exports = {
     //hash相关
-    hash: function (str, algorithm) {
+    hash(str, algorithm) {
         const alg = crypto.createHash(algorithm);
         return alg.update(str).digest('hex');
     },
-    md5: function (str) {
+    md5(str) {
         return this.hash(str, 'md5');
     },
-    sha256: function (str) {
+    sha256(str) {
         return this.hash(str, 'sha256');
     },
     //返回格式统一
-    retOk: function (data) {
+    retOk(data) {
         return {
             err: 0,
             msg: "ok",
             data: data,
         }
     },
-    retError: function (err, msg) {
+    retError(err, msg) {
         return {
             err: err,
             msg: msg,
         }
     },
     //登陆认证的封装
-    getToken: function (data) {
+    getToken(data) {
         logger.debug("getToken:", data)
         return jwt.sign(data, setting.token.secret);//{ expiresIn: '2h' }
     },
-    verifyToken: function (str) {
+    verifyToken(str) {
         try {
             logger.debug("verifyToken:", str)
             if (str && str.length > 0) {
@@ -62,13 +63,14 @@ module.exports = {
 
     },
     //生成uuid
-    getUuid: function () {
+    getUuid() {
         const uuid = uuidv1();
         //替换中划线 
         return uuid.replace(/-/g, "");
     },
     //日志
-    getLogger: function (name) {
+    getLogger(name) {
+        name = name.replace(rootPath, "");
         const logger = log4js.getLogger(name);
         if (env == "production") {
             logger.level = log4js.levels.INFO;
@@ -81,11 +83,11 @@ module.exports = {
 
     },
     //url
-    parseUrl: function (str) {
+    parseUrl(str) {
         return url.parse(str);
     },
     //生成随机字符串
-    randomString: function (length, chars = false) {
+    randomString(length, chars = false) {
         let rString = '0123456789'
         if (chars) {
             rString = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'
@@ -96,7 +98,7 @@ module.exports = {
         return result;
     },
     //验证手机号
-    checkPhone: function (phone) {
+    checkPhone(phone) {
         if ((/^1(3|4|5|6|7|8|9)\d{9}$/.test(phone))) {
             return true;
         }
@@ -105,7 +107,7 @@ module.exports = {
         }
     },
     //判断用户名,只能包含数字，字母和中文字
-    checkUsername: function (username) {
+    checkUsername(username) {
         if (/[a-zA-Z0-9\u4e00-\u9fa5]+/.test(username)) {
             return true;
         } else {
@@ -115,14 +117,11 @@ module.exports = {
     },
     //获取客户端IP
     //ctx.req
-    getClientIP:function(req){
+    getClientIP(req) {
         return req.headers['x-sf-ip'] || // 反向代理传递的数据头
-        req.connection.remoteAddress || // 判断 connection 的远程 IP
-        req.socket.remoteAddress || // 判断后端的 socket 的 IP
-        req.connection.socket.remoteAddress;
-    }
-
-
-
+            req.connection.remoteAddress || // 判断 connection 的远程 IP
+            req.socket.remoteAddress || // 判断后端的 socket 的 IP
+            req.connection.socket.remoteAddress;
+    },
 
 }

@@ -37,6 +37,7 @@ module.exports = {
                 edittime: post.pubtime,
                 ip: content.ip,
                 approve: 1,
+                deleted:content.deleted
             };
             //判断是不是链接
             if (content.type == "link") {

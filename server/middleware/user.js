@@ -6,8 +6,9 @@ const logger=util.getLogger(__filename);
 const userService = require('../service/user_service');
 const moment= require("moment");
 
-module.exports = {
-  user: async function (ctx, next) {
+const userMiddleware=module.exports = {
+  //获取用户信息,只获取信息,存入到state中
+  async user (ctx, next) {
     const data = util.verifyToken(ctx.header.token);
     logger.debug("middleware-user:", data);
     if (data) {

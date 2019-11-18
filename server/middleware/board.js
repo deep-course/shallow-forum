@@ -3,9 +3,9 @@ const {setting,env} = require('../config');
 const util = require('../util');
 const boardService = require("../service/board_service");
 const logger=util.getLogger(__filename);
-module.exports={
+const boardMiddleware=module.exports={
     //获取post相关信息,只获取信息,存入到state中
-    post:async function(ctx,next){    
+    async post(ctx,next){    
         let postslug="";
         if (ctx.params&& ctx.params.postslug)
         {
@@ -39,7 +39,7 @@ module.exports={
         }
         await next();
     },
-    board:async function(ctx,next){
+    async board(ctx,next){
         let boardslug="";
         if (ctx.params&& ctx.params.boardslug)
         {
@@ -69,11 +69,11 @@ module.exports={
     },
  
     //查看权限，在controller后判断
-    viewPost:async function (ctx,next){
+    async viewPost (ctx,next){
 
     },
     //编辑权限，在编辑的controller前
-    editPost:async function(ctx,next){
+    async editPost(ctx,next){
 
     },
     
