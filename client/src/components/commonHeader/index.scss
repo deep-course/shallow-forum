@@ -1,0 +1,107 @@
+$height: 52px;
+$baseColor: #667c99;
+$hoverColor: #426799;
+$width: 1000px;
+
+.common-header{
+  position: relative;
+  height: $height;
+  margin-bottom: 20px;
+  .common-header-wrapper{
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: $height;
+    background: #FFFFFF;
+    border-bottom: 1px solid #e8ecf3;
+    .common-header-content{
+      width: 1000px;
+      height: $height;
+      display: flex;
+      margin: 0 auto;
+      padding: 0 15px;
+      align-items: center;
+      .title{
+        margin-right: 15px;
+        font-size: 18px;
+        color: $hoverColor;
+      }
+      .nav{
+        flex: 1;
+        display: flex;
+        margin-left: 20px;
+        .ant-btn-link{
+          padding: 0 13px;
+          font-size: 14px;
+          color: $baseColor;
+          &.current, &:hover{
+            color: $hoverColor;
+          }
+        }
+      }
+      .right{
+        display: flex;
+        align-items: center;
+        .search-input{
+          width: auto;
+          .ant-input{
+            width: 160px;
+            background-color: #e8ecf3;
+            border: none;
+            &::-webkit-input-placeholder {
+              color: $baseColor;
+            }
+            
+            &:focus{
+              width: 270px;
+              background: #ffffff;
+            }
+          }
+          .anticon-search{
+            color: $baseColor;
+          }
+        }
+        .user{
+          position: relative;
+          display: flex;
+          align-items: center;
+          margin-left: 20px;
+          padding: 8px 13px;
+          user-select: none;
+          cursor: pointer;
+          .avatar{
+            font-size: 20px;
+            margin-right: 4px;
+          }
+          .name{
+            font-size: 13px;
+            color: $baseColor;
+          }
+          &:hover{
+            background: #c7d2e1;
+            border-radius: 18px;
+          }
+        }
+        .user-btn{
+          padding: 0 8px;
+          margin-left: 10px;
+          font-size: 14px;
+          color: $baseColor;
+          user-select: none;
+          cursor: pointer;
+          &:hover{
+            color: $hoverColor;
+          }
+        }
+      }
+    }
+  }
+}
+.user-select{
+  top: 52px!important;
+  .ant-dropdown-menu-item{
+    min-width: 140px;
+    padding: 8px 16px;
+  }
+}

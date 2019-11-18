@@ -1,0 +1,34 @@
+.login{
+  width: 300px;
+  padding-top: 200px;
+  margin: 0 auto;
+  .submit{
+    margin-bottom: 10px;
+    text-align: center;
+    .ant-btn{
+      width: 300px;
+    }
+  }
+  .ant-input-search-button{
+    width: 112px;
+  }
+  .footer{
+    text-align: center;
+  }
+}
+.captcha-modal{
+  .ant-input{
+    width: 250px;
+    vertical-align: middle;
+    border-radius: 0;
+  }
+  .captcha-img{
+    width: 100px;
+    height: 40px;
+    vertical-align: middle;
+  }
+  .get-smscode{
+    text-align: center;
+    margin-top: 20px;
+  }
+}
