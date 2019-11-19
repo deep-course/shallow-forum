@@ -43,8 +43,8 @@ if (env === 'development') {
   })
   //开发模式可以跨域
   app.use(async (ctx, next) => {
-    ctx.set('Access-Control-Expose-Headers: token');
-    ctx.set('Access-Control-Allow-Headers: Origin, X-Requested-With, Content-Type, Accept, Connection, User-Agent, Cookie, token');
+    ctx.set('Access-Control-Expose-Headers','token');
+    ctx.set('Access-Control-Allow-Headers','Origin, X-Requested-With, Content-Type, Accept, Connection, User-Agent, Cookie, token');
     ctx.set('Access-Control-Allow-Origin', '*');
     await next();
   });
