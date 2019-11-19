@@ -34,6 +34,7 @@ module.exports.up =  async function (next) {
     \`lock\` tinyint(4) unsigned NOT NULL COMMENT '锁定',
     \`sticky\` tinyint(4) unsigned NOT NULL COMMENT '置顶',
     \`board_id\` int(10) unsigned NOT NULL COMMENT '板块id，暂时没用',
+    \`image\` VARCHAR(100) NOT NULL COMMENT '主图的hash',
     \`deleted\` tinyint(4) unsigned NOT NULL COMMENT '逻辑删除标识',
     PRIMARY KEY (\`id\`),
     UNIQUE KEY \`slug\` (\`slug\`)
@@ -54,8 +55,9 @@ module.exports.up =  async function (next) {
   logger.info("board_postimage");
   await promiseMysqlPool.query('DROP TABLE IF EXISTS `board_postimage`;');
   await promiseMysqlPool.query(`CREATE TABLE IF NOT EXISTS \`board_postimage\` (
-    \`id\` int(10) unsigned NOT NULL,
-    \`hash\` char(50) NOT NULL COMMENT '图片的hash值',
+    \`id\` int(10) unsigned NOT NULL AUTO_INCREMENT,
+    \`filename\` VARCHAR(100) NOT NULL COMMENT '加后缀的文件名',
+    \`hash\` CHAR(32) NOT NULL COMMENT '图片的md5值',
     \`post_id\` int(10) unsigned NOT NULL,
     \`user_id\` int(10) unsigned NOT NULL,
     \`addtime\` datetime NOT NULL,

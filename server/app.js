@@ -57,7 +57,8 @@ app.use(static(
 app.use(KoaBody({
   multipart: true,
   formidable: {
-      maxFileSize: 10*1024*1024   
+      maxFileSize: 10*1024*1024,
+      uploadDir :"./upload/" 
   }
 }));
 
@@ -81,3 +82,5 @@ db.promiseMysqlPool.query("show tables").then((result, err) => {
   });
   logger.info("server start!");
 });
+
+

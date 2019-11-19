@@ -1,10 +1,13 @@
 const { promiseMysqlPool } = require("../db");
 const util = require("../util");
 const logger = util.getLogger(__filename);
-module.exports = {
+const _ = require('lodash');
+const _3rd_service = require("./3rd_service");
+const moment = require("moment");
+const boardService = module.exports = {
     //添加post内容，link和comment
-    addPost: async function (post, content, tags) {
-        logger.debug("addPost :", post, content, tags);
+    async addPost(post, content, tags, imagelist) {
+        logger.debug("addPost :", post, content, tags, imagelist);
         const conn = await promiseMysqlPool.getConnection()
         const slug = util.getUuid();
         let insertpostid = 0;
@@ -37,17 +40,25 @@ module.exports = {
                 edittime: post.pubtime,
                 ip: content.ip,
                 approve: 1,
-                deleted:content.deleted
+                deleted: content.deleted
             };
             //判断是不是链接
             if (content.type == "link") {
-                delete content.type;
-                commentcontent.content = JSON.stringify(content);
+                const linkcontent=_.pick(content,['content','url']);
+                commentcontent.content = JSON.stringify(linkcontent);
             } else {
                 commentcontent.content = content.content;
             }
             //TODO: 如何确认重复
             const commentresult = await conn.query("insert ignore into board_comment set ?", commentcontent);
+            //更改图片关联信息
+            for (let index = 0; index < imagelist.length; index++) {
+                const element = imagelist[index];
+                await conn.query("update board_postimage set post_id=? where post_id=0 and filename=? and user_id=?", [
+                    postinsertid, element, post.user_id
+                ]);
+
+            }
             //更新 board_post commentid
             await conn.query("update board_post set comment_id=? where id=?", [commentresult[0].insertId, postinsertid]);
             //tag列表在验证时已经确认了，所以不需要再次验证
@@ -89,12 +100,12 @@ module.exports = {
 
     },
     //根据slug获取tag列表
-    getTagListByName: async function (slugs) {
+    async getTagListByName(slugs) {
         const [taglist] = await promiseMysqlPool.query("select * from board_tag where slug in (?)", [slugs]);
         return taglist;
     },
     //添加评论内容
-    addComment: async function (comment, post) {
+    async addComment(comment, post) {
         logger.debug("addComment :", comment)
         const conn = await promiseMysqlPool.getConnection();
         let insertcommentid = 0
@@ -153,14 +164,80 @@ select tag_id from board_postintag where post_id=?
 
     },
     //获取post
-    getPostBySlug: async function (slug) {
+    async getPostBySlug(slug) {
         const [post] = await promiseMysqlPool.query("select * from board_post where slug=?", [slug]);
         return post[0];
     },
+    async getPostById(id) {
+        const [post] = await promiseMysqlPool.query("select * from board_post where id=?", [id]);
+        return post[0];
+    },
     //获取board
-    getBoardBySlug: async function (slug) {
+    async getBoardBySlug(slug) {
         const [board] = await promiseMysqlPool.query("select * from board_tag where slug=?", [slug]);
         return board[0];
+    },
+    //保存上传的文件
+    async saveFile(filepath, format, userid, postid) {
+        const filename = util.getUuid() + "." + format;
+        const hash = util.getFileMd5(filepath);
+        //保存文件
+        saveresult = await _3rd_service.saveFile(filepath, filename);
+        logger.debug("save to store done");
+        if (saveresult) {
+            await promiseMysqlPool.query("insert into board_postimage set ?", {
+                filename: saveresult,
+                hash: hash,
+                post_id: postid,
+                user_id: userid,
+                addtime: moment().toDate()
+            });
+            logger.debug("save to db done");
+
+        }
+        else {
+            logger.error("saveFile error : ", filename);
+
+        }
+        logger.debug("return:", saveresult);
+        return saveresult;
+
+    },
+    async getAllFile(userid, postid) {
+        const result = await promiseMysqlPool.query("select * from board_postimage where user_id=? and post_id=?",
+            [userid, postid]);
+        let retresult = [];
+        result[0].forEach(element => {
+            retresult.push(element["filename"]);
+        });
+        return retresult;
+    },
+    async getImageInfo(fileurl) {
+        logger.debug("getImageInfo:", fileurl);
+        const [result] = await await promiseMysqlPool.query("select * from board_postimage where filename=?",
+            [fileurl]);
+        return result[0];
+    },
+    async deleteFile(fileinfo) {
+        logger.debug("deleteFile:", fileinfo);
+        //删除文件
+        const result = await _3rd_service.deleteFile(fileinfo["filename"]);
+        if (result) {
+            try {
+                await promiseMysqlPool.query("delete from board_postimage where id=?", [
+                    fileinfo["id"]
+                ]);
+                return true;
+            } catch (error) {
+                logger.error("deleteFile error: ", error);
+                return false;
+            }
+
+        }
+        else {
+            return false;
+        }
+
     }
 
 }

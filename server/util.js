@@ -6,8 +6,15 @@
  * @apiError (失败) {Number} err err不为0表示失败
  * @apiError (失败) {String} msg 失败的错误信息 
  * @apiError (失败) {Object} data 没有data项
-
  */
+/**
+ * @apiDefine HeaderToken
+ * @apiHeader (用于验证的HTTP头) {String} token 认证的token
+ * 
+ * 
+ */
+
+
 const crypto = require('crypto');
 const log4js = require('log4js');
 const jwt = require('jsonwebtoken');
@@ -15,6 +22,7 @@ const uuidv1 = require('uuid/v1');
 const url = require('url');
 const { setting, env } = require('./config');
 const logger = log4js.getLogger("util");
+const fs = require('fs');
 const rootPath = process.cwd();
 const util = module.exports = {
     //hash相关
@@ -123,5 +131,10 @@ const util = module.exports = {
             req.socket.remoteAddress || // 判断后端的 socket 的 IP
             req.connection.socket.remoteAddress;
     },
+    //获取文件的md5
+    getFileMd5(filepath){
+        const  buffer = fs.readFileSync(filepath);
+        return this.hash(buffer,"md5");
+    }
 
 }

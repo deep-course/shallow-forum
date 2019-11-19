@@ -1,36 +1,34 @@
 //需要登陆后才可以使用
 const util = require("../../util");
-const logger=util.getLogger(__filename);
+const logger = util.getLogger(__filename);
 const _ = require("lodash");
-const moment=require("moment");
+const moment = require("moment");
 const userService = require('../../service/user_service');
-const svgCaptcha= require('svg-captcha');
-const userController=module.exports = {
-    async info (ctx, next) {
-        logger.debug("state:",ctx.state);
+const svgCaptcha = require('svg-captcha');
+const userController = module.exports = {
+    async info(ctx, next) {
+        logger.debug("state:", ctx.state);
         let ret = {
         }
-        const {user:currentuser,group}=ctx.state;
-        if (currentuser)
-        {
-            const userindb=await userService.getUserById(currentuser.id);
-            if (userindb)
-            {
-            ret.user=_.pick(currentuser, ["id", "username", "lock", "activate"]);
-            ret.group=group;
-            await userService.updateUserActionTime(currentuser.id,util.getClientIP(ctx.req));
-            let token=util.getToken({
-                id: currentuser.id,
-                hash:util.md5(`${currentuser.id}|${currentuser.password}`)
-            });
-            logger.debug("user-info:",token);
-            ctx.set("X-SetToken",token);
+        const { user: currentuser, group } = ctx.state;
+        if (currentuser) {
+            const userindb = await userService.getUserById(currentuser.id);
+            if (userindb) {
+                ret.user = _.pick(currentuser, ["id", "username", "lock", "activate"]);
+                ret.group = group;
+                await userService.updateUserActionTime(currentuser.id, util.getClientIP(ctx.req));
+                let token = util.getToken({
+                    id: currentuser.id,
+                    hash: util.md5(`${currentuser.id}|${currentuser.password}`)
+                });
+                logger.debug("user-info:", token);
+                ctx.set("X-SetToken", token);
             }
         }
 
         ctx.body = util.retOk(ret);
     },
-    async login (ctx) {
+    async login(ctx) {
         const { username, password } = ctx.request.body;
         const user = await userService.getUserByName(username);
         if (user && util.sha256(password) == user.password) {
@@ -42,7 +40,7 @@ const userController=module.exports = {
                 token: ret,
             });
             //更新用户登录状态
-            await userService.updateUserLoginTime(user.id,util.getClientIP(ctx.req));
+            await userService.updateUserLoginTime(user.id, util.getClientIP(ctx.req));
 
         }
         else {
@@ -50,7 +48,7 @@ const userController=module.exports = {
         }
     },
 
-    async register (ctx) {
+    async register(ctx) {
         const { token, phone, username, password } = ctx.request.body;
         //ctx.body=ctx.request.body;
 
@@ -83,7 +81,7 @@ const userController=module.exports = {
             ctx.body = util.retError(-5, "用户名已存在");
             return;
         }
-        const iid = await userService.insertUser(phone, username, password,util.getClientIP(ctx.req))
+        const iid = await userService.insertUser(phone, username, password, util.getClientIP(ctx.req))
         if (iid) {
             ctx.body = util.retOk({ id: iid });
 
@@ -97,7 +95,7 @@ const userController=module.exports = {
 
     },
 
-    async captcha (ctx) {
+    async captcha(ctx) {
         const captcha = svgCaptcha.create({
             size: 5,
             noise: 0,
@@ -113,7 +111,7 @@ const userController=module.exports = {
         ctx.body = captcha.data;
     },
 
-    async smscode (ctx) {
+    async smscode(ctx) {
         const { captcha: captchaInput, phone } = ctx.request.body;
         const { captcha: captchaSession } = ctx.session;
         if (!util.checkPhone(phone)) {
@@ -136,14 +134,20 @@ const userController=module.exports = {
 
             if (token) {
                 //发送
-                //await _3rdService.sendSms(token, phone);
-                ctx.body = util.retOk({});
+                const text = `您正在注册验证，验证码 ${token}，请在30分钟提交，切勿将验证码泄露于他人。`;
+                const sendresult = await _3rdService.sendSms(phone, token);
+                if (sendresult) {
+                    ctx.body = util.retOk({});
+                }
+                else {
+                    ctx.body = util.retOk(3,"验证码发送错误，请稍后再试");
+                }
             }
             else {
                 ctx.body = util.retError(2, "生成短信验证码错误");
             }
 
-            
+
         }
         else {
             ctx.body = util.retError(-2, "验证码错误");
@@ -151,10 +155,10 @@ const userController=module.exports = {
 
 
     },
-    async logout (ctx) {
+    async logout(ctx) {
 
     },
-    async resetPassword (ctx) {
+    async resetPassword(ctx) {
 
     },
 }

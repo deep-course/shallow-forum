@@ -5,11 +5,10 @@ const middleware = require('../middleware')
  * 
  * @api {get} /user/info 获取用户信息
  * @apiSampleRequest /api/user/info
- * @apiHeader (Response Headers) {String} token 认证的token
  * @apiName user/info
  * @apiGroup user
  * @apiVersion  1.0.0
- * 
+ * @apiUse HeaderToken
  * 
  * 
  * 

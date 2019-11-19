@@ -4,6 +4,7 @@ const logger = util.getLogger(__filename);
 const boardService = require("../../service/board_service");
 const _ = require("lodash");
 const moment = require("moment");
+const sharp = require("sharp")
 const boardController = module.exports = {
     async newPost(ctx, next) {
         //验证内容
@@ -13,6 +14,39 @@ const boardController = module.exports = {
         logger.debug("checkPostContent检测通过");
         logger.debug("newPost", ctx.state.newpost);
         const { newpost, user } = ctx.state;
+        let { mainimage, imagelist } = ctx.request.body;
+        logger.debug("检测图片");
+        imagelist = imagelist ? imagelist : [];
+        if (mainimage) {
+            //有主图，判断主图是否包含在列表中
+            if (imagelist.indexOf(mainimage) >= 0) { }
+            else {
+                //不包含
+                ctx.body = util.retError(-1, "图片匹对错误");
+                return;
+            }
+
+        }
+        else{
+            mainimage="";
+        }
+        //判断图片是否在数据库中
+
+        for (let index = 0; index < imagelist.length; index++) {
+            const element = imagelist[index];
+            const urlindb = await boardService.getImageInfo(element);
+            if (_.isEmpty(urlindb)) {
+                ctx.body = util.retError(-2, "只能使用已上传图片");
+                return;
+            } else if (urlindb['user_id'] != user["id"]) {
+                ctx.body = util.retError(-3, "只能使用自己的图片");
+                return;
+            } else if (urlindb['post_id'] != 0) {
+                ctx.body = util.retError(-4, "只能使用新上传图片");
+                return;
+            }
+        }
+
         const now = moment();
         const post = {
             title: newpost.title,
@@ -24,17 +58,19 @@ const boardController = module.exports = {
             lock: 0,
             sticky: 0,
             board_id: newpost.boardid,
+            image: mainimage,
             deleted: 0
 
         };
         const content = {
-            type: "comment",
+            type: "post",
             content: newpost.content,
+            approve: 1,
             ip: util.getClientIP(ctx.req),
             deleted: 0
         };
         const tags = newpost.taglist;
-        const postinfo = await boardService.addPost(post, content, tags);
+        const postinfo = await boardService.addPost(post, content, tags, imagelist);
         logger.debug("新建帖子返回:", postinfo)
         if (postinfo.id > 0) {
             ctx.body = util.retOk({ slug: postinfo.slug });
@@ -78,6 +114,7 @@ const boardController = module.exports = {
             lock: 0,
             sticky: 0,
             board_id: newpost.boardid,
+            image: "",
             deleted: 0
 
         };
@@ -85,10 +122,12 @@ const boardController = module.exports = {
             type: "link",
             content: newpost.content,
             url: newpost.url,
+            approve: 1,
+            ip: util.getClientIP(ctx.req),
             deleted: 0
         };
         const tags = newpost.taglist;
-        const linkinfo = await boardService.addPost(post, content, tags);
+        const linkinfo = await boardService.addPost(post, content, tags, []);
         logger.debug("新建链接返回:", linkinfo)
         if (linkinfo.id > 0) {
             ctx.body = util.retOk({ slug: linkinfo.slug });
@@ -116,9 +155,9 @@ const boardController = module.exports = {
             content: newcomment.content,
             edittime: now.toDate(),
             edituser_id: 0,
-            ip: "",
+            ip: util.getClientIP(ctx.req),
             approve: 1,
-            delete: 0
+            deleted: 0
         };
         const commentinfo = await boardService.addComment(comment, commentpost);
         logger.debug("新回复返回:", commentinfo)
@@ -141,14 +180,111 @@ const boardController = module.exports = {
 
     },
     async uploadAttachments(ctx, next) {
+        logger.debug('uploadAttachments')
+        //验证用户
+        if (!checkUser(ctx)) {
+            return;
+        }
+
+        const file = ctx.request.files.file;
+        if (!file) {
+            ctx.body = util.retError(-1, "未找到文件");
+            return;
+        }
+        let format = "";
+        try {
+            const metadata = await sharp(file.path).metadata();
+            logger.debug("format: ", metadata.format)
+            format = metadata.format;
+
+        } catch (error) {
+            logger.error("upload error: ", error);
+            ctx.body = util.retError(-2, "format error");
+            return;
+        }
+        const { user, post } = ctx.state;
+        //判断post是否是用户发帖
+        let postid = 0;
+        if (post) {
+            if (post["user_id"] != user["id"]) {
+                ctx.body = util.retError(-3, "参数错误");
+                return;
+            }
+            postid = post["id"]
+        }
+        const fileurl = await boardService.saveFile(file.path, format, user["id"], postid);
+        if (fileurl) {
+            ctx.body = util.retOk({ url: fileurl });
+
+        }
+        else {
+            ctx.body = util.retError(-4, "文件上传错误");
+        }
+
 
     },
+    async showattachments(ctx, next) {
+        logger.debug('showattachments')
+        //验证用户
+        if (!checkUser(ctx)) {
+            return;
+        }
+        const { user, post } = ctx.state;
+        //判断post是否是用户发帖
+        let postid = 0;
+        if (post) {
+            if (post["user_id"] != user["id"]) {
+                ctx.body = util.retError(-3, "参数错误");
+                return;
+            }
+            postid = post["id"]
+        }
+        const filelist = await boardService.getAllFile(user["id"], postid);
+        ctx.body = util.retOk(filelist);
+
+    },
+    async removeattachments(ctx, next) {
+        logger.debug('removeattachments')
+        //验证用户
+        if (!checkUser(ctx)) {
+            return;
+        }
+        const { fileurl } = ctx.request.body;
+        const { user } = ctx.state;
+        if (fileurl) {
+            const imageinfo = await boardService.getImageInfo(fileurl);
+            if (_.isEmpty(imageinfo)) {
+                ctx.body = util.retError(-2, "未找到文件");
+            } else {
+                if (user["id"] == imageinfo["user_id"]) {
+                    const result = await boardService.deleteFile(imageinfo);
+                    if (result) {
+                        ctx.body = util.retOk();
+                    } else {
+                        ctx.body = util.retError(-3, "删除错误");
+                    }
+
+
+                }
+                else {
+                    ctx.body = util.retError(-2, "文件不正确");
+                }
+
+            }
+
+        }
+        else {
+            ctx.body = util.retError(-1, "参数不正确");
+
+        }
+
+    }
 
 };
 
 
 
-
+//---------------------------------------------------------
 //检测post需要的数据，如果正确返回post信息，错误返回false
 async function checkPostContent(ctx) {
     logger.debug("checkPostContent");

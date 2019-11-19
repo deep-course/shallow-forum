@@ -31,12 +31,8 @@ const boardMiddleware=module.exports={
             {
                 ctx.state.post=post;
             }
-            ctx.state.post={};
         }
-        else
-        {
-            ctx.state.post={};
-        }
+
         await next();
     },
     async board(ctx,next){
@@ -60,10 +56,6 @@ const boardMiddleware=module.exports={
         if (boardslug)
         {
             ctx.state.board=await boardService.getBoardBySlug(boardslug)
-        }
-        else
-        {
-            ctx.state.board={};
         }
         await next();
     },
