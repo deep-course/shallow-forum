@@ -21,7 +21,7 @@ const boardController = require("../controller/board");
  * 
  * 
  */
-router.post('/newpost', middleware.user, middleware.addPost,boardController.newPost);
+router.post('/newpost', middleware.getUser, middleware.addPost,boardController.newPost);
 /**
  * 
  * @api {post} /board/newlink 发连接
@@ -42,7 +42,7 @@ router.post('/newpost', middleware.user, middleware.addPost,boardController.newP
  * 
  * 
  */
-router.post('/newlink', middleware.user, boardController.newLink);
+router.post('/newlink', middleware.getUser, boardController.newLink);
 /**
  * 
  * @api {post} /board/newcomment 新建回复
@@ -71,7 +71,7 @@ router.post('/newlink', middleware.user, boardController.newLink);
  * 
  * 
  */
-router.post('/newcomment', middleware.user, boardController.newComment);
+router.post('/newcomment', middleware.getUser, boardController.newComment);
 /**
  * 
  * @api {post} /board/uploadattachments 上传图片附件
@@ -104,7 +104,7 @@ router.post('/newcomment', middleware.user, boardController.newComment);
  * 
  * 
  */
-router.post('/uploadattachments',middleware.user, middleware.post,boardController.uploadAttachments);
+router.post('/uploadattachments',middleware.getUser, middleware.getPost,boardController.uploadAttachment);
 /**
  * 
  * @api {get} /board/showattachments 显示图片附件
@@ -134,7 +134,7 @@ router.post('/uploadattachments',middleware.user, middleware.post,boardControlle
  * 
  * 
  */
-router.get('/showattachments',middleware.user, middleware.post,boardController.showattachments);
+router.get('/showattachments',middleware.getUser, middleware.getPost,boardController.showAttachment);
 /**
  * 
  * @api {post} /board/removeattachments 删除图片附件
@@ -158,7 +158,7 @@ router.get('/showattachments',middleware.user, middleware.post,boardController.s
  * 
  * 
  */
-router.post('/removeattachments',middleware.user, middleware.post,boardController.removeattachments);
+router.post('/removeattachments',middleware.getUser, middleware.getPost,boardController.removeAttachment);
 
 /**
  * 
@@ -183,7 +183,7 @@ router.post('/removeattachments',middleware.user, middleware.post,boardControlle
  * 
  * 
  */
-router.get('/getpost', middleware.user, middleware.post, boardController.getPostInfo,middleware.viewPost);
+router.get('/getpost', middleware.getUser, middleware.getPost, boardController.getPostInfo,middleware.viewPost);
 /**
  * 
  * @api {post} /board/editpost 编辑帖子
@@ -270,9 +270,9 @@ router.post('/uppost',ret);
 
 /**
  *
- * @api {get} /board/list  列表筛选
- * @apiSampleRequest /api/board/list
- * @apiName list
+ * @api {get} /board/postlist  列表筛选
+ * @apiSampleRequest /api/board/postlist
+ * @apiName postlist
  * @apiGroup board-todo
  * @apiVersion  1.0.0
  * @apiDescription 
@@ -284,7 +284,24 @@ router.post('/uppost',ret);
  * @apiParam  {String} sort 排序 1，最新（默认），2最热
  * @apiParam  {Number} page  分页，默认第一页
  */
-router.get('/list', ret);
+router.get('/postlist', ret);
+/**
+ *
+ * @api {get} /board/commentlist  列表筛选
+ * @apiSampleRequest /api/board/commentlist
+ * @apiName commentlist
+ * @apiGroup board-todo
+ * @apiVersion  1.0.0
+ * @apiDescription 
+ * 获取帖子列表
+ * 这个是有条件的
+ * @apiUse ReturnCode
+ * @apiUse HeaderToken
+ * @apiParam  {String} postslug  tag标识
+ * @apiParam  {Number} page  分页，默认第一页
+ */
+router.get('/commentlist', ret);
+
 module.exports = router
 function ret(ctx,next){
     ctx.body=

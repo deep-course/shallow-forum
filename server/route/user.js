@@ -25,7 +25,7 @@ const middleware = require('../middleware')
  * 
  * 
  */
-router.get('/user/info', middleware.user, userController.info);
+router.get('/user/info', middleware.getUser,userController.userInfo);
 /**
  * 
  * @api {post} /register 用户注册
