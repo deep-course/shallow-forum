@@ -21,7 +21,7 @@ const boardController = require("../controller/board");
  * 
  * 
  */
-router.post('/newpost', middleware.user, boardController.newPost);
+router.post('/newpost', middleware.user, middleware.addPost,boardController.newPost);
 /**
  * 
  * @api {post} /board/newlink 发连接
@@ -159,5 +159,137 @@ router.get('/showattachments',middleware.user, middleware.post,boardController.s
  * 
  */
 router.post('/removeattachments',middleware.user, middleware.post,boardController.removeattachments);
-router.get('/getpost/:postslug', middleware.user, middleware.post, boardController.getPostInfo);
+
+/**
+ * 
+ * @api {get} /board/getpost 获取帖子信息
+ * @apiName getpost
+ * @apiGroup board
+ * @apiVersion  1.0.0
+ * 
+ * @apiSampleRequest /api/board/getpost
+ * @apiUse HeaderToken
+ * @apiUse ReturnCode
+ * @apiDescription 获取单个帖子信息
+ * 
+ * postslug获取帖子信息和帖子内容
+ * 
+ * 
+ * @apiParam  {String} postslug 帖子slug
+ * 
+ * 
+ * 
+ * 
+ * 
+ * 
+ */
+router.get('/getpost', middleware.user, middleware.post, boardController.getPostInfo,middleware.viewPost);
+/**
+ * 
+ * @api {post} /board/editpost 编辑帖子
+ * @apiName board-todo
+ * @apiGroup board
+ * @apiVersion  1.0.0
+ * @apiSampleRequest /api/board/editpost
+ * @apiUse ReturnCode
+ * @apiUse HeaderToken
+ * @apiDescription  编辑帖子
+ * @apiParam  {String} postslug slug
+ * @apiParam  {String} title 帖子标题
+ * @apiParam  {String} content 帖子内容
+ * @apiParam  {Number} lableid 标签id
+ * @apiParam  {String} [mainimage] 主图地址
+ * @apiParam  {String[]} [imagelist[]] 图片列表 注意这个带中括号
+ * 
+ * 
+ */
+router.post('/editpost',ret)
+//router.post('/editpost',middleware.user, middleware.post,middleware.editPost,boardController.editPost)
+
+
+/**
+ * 
+ * @api {post} /board/editcomment 编辑回复
+ * @apiName editcomment
+ * @apiGroup board-todo
+ * @apiVersion  1.0.0
+ * @apiSampleRequest /api/board/editcomment
+ * @apiUse ReturnCode
+ * @apiUse HeaderToken
+ * @apiDescription  编辑回复
+ * @apiParam  {String} commentid 回复id
+ * @apiParam  {String} content 回复内容
+ * 
+ */
+router.post('/editcomment',ret);
+
+/**
+ * 
+ * @api {post} /board/deletecomment 删除回复
+ * @apiName deletecomment
+ * @apiGroup board-todo
+ * @apiVersion  1.0.0
+ * @apiSampleRequest /api/board/deletecomment
+ * @apiUse ReturnCode
+ * @apiUse HeaderToken
+ * @apiDescription  删除回复
+ * @apiParam  {String} commentid 回复id
+ * 
+ */
+router.post('/deletecomment',ret);
+
+/**
+ * 
+ * @api {post} /board/deletepost 删除帖子
+ * @apiName deletepost
+ * @apiGroup board-todo
+ * @apiVersion  1.0.0
+ * @apiSampleRequest /api/board/deletepost
+ * @apiUse ReturnCode
+ * @apiUse HeaderToken
+ * @apiDescription  删除帖子
+ * @apiParam  {String} postslug  post标识
+ * 
+ */
+router.post('/deletepost',ret);
+
+/**
+ * 
+ * @api {post} /board/uppost 顶贴
+ * @apiName uppost
+ * @apiGroup board-todo
+ * @apiVersion  1.0.0
+ * @apiSampleRequest /api/board/uppost
+ * @apiUse ReturnCode
+ * @apiUse HeaderToken
+ * @apiDescription  顶贴后，再次请求取消顶贴
+ * @apiParam  {String} postslug  post标识
+ * 
+ */
+router.post('/uppost',ret);
+
+/**
+ *
+ * @api {get} /list  列表筛选
+ * @apiSampleRequest /api/list
+ * @apiName list
+ * @apiGroup board-todo
+ * @apiVersion  1.0.0
+ * @apiDescription 
+ * 获取帖子列表
+ * 这个是有条件的
+ * @apiUse ReturnCode
+ * @apiUse HeaderToken
+ * @apiParam  {String} tag  tag标识
+ * @apiParam  {String} sort 排序 1，最新（默认），2最热
+ * @apiParam  {Number} page  分页，默认第一页
+ */
+router.get('/list', ret);
 module.exports = router
+function ret(ctx,next){
+    ctx.body=
+        {
+            err: 0,
+            msg: "ok"
+        }
+}

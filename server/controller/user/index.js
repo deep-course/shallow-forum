@@ -39,6 +39,11 @@ const userController = module.exports = {
             ctx.body = util.retOk({
                 token: ret,
             });
+            if(user['lock']==1)
+            {
+                ctx.body = util.retError(-1,"用户已锁定")
+                return;
+            }
             //更新用户登录状态
             await userService.updateUserLoginTime(user.id, util.getClientIP(ctx.req));
 

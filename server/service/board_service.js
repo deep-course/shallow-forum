@@ -5,6 +5,11 @@ const _ = require('lodash');
 const _3rd_service = require("./3rd_service");
 const moment = require("moment");
 const boardService = module.exports = {
+    //更新post
+    async editPost(post, content) {
+
+    },
+
     //添加post内容，link和comment
     async addPost(post, content, tags, imagelist) {
         logger.debug("addPost :", post, content, tags, imagelist);
@@ -44,7 +49,7 @@ const boardService = module.exports = {
             };
             //判断是不是链接
             if (content.type == "link") {
-                const linkcontent=_.pick(content,['content','url']);
+                const linkcontent = _.pick(content, ['content', 'url']);
                 commentcontent.content = JSON.stringify(linkcontent);
             } else {
                 commentcontent.content = content.content;
@@ -52,13 +57,16 @@ const boardService = module.exports = {
             //TODO: 如何确认重复
             const commentresult = await conn.query("insert ignore into board_comment set ?", commentcontent);
             //更改图片关联信息
-            for (let index = 0; index < imagelist.length; index++) {
-                const element = imagelist[index];
-                await conn.query("update board_postimage set post_id=? where post_id=0 and filename=? and user_id=?", [
-                    postinsertid, element, post.user_id
-                ]);
+            if (imagelist) {
+                for (let index = 0; index < imagelist.length; index++) {
+                    const element = imagelist[index];
+                    await conn.query("update board_postimage set post_id=? where post_id=0 and filename=? and user_id=?", [
+                        postinsertid, element, post.user_id
+                    ]);
 
+                }
             }
+
             //更新 board_post commentid
             await conn.query("update board_post set comment_id=? where id=?", [commentresult[0].insertId, postinsertid]);
             //tag列表在验证时已经确认了，所以不需要再次验证
@@ -238,6 +246,12 @@ select tag_id from board_postintag where post_id=?
             return false;
         }
 
+    },
+    async getCommentById(id) {
+        logger.debug("getCommentById:", id);
+        const [result] = await await promiseMysqlPool.query("select * from board_comment where id=?",
+            [id]);
+        return result[0];
     }
 
 }

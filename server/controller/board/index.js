@@ -2,6 +2,7 @@
 const util = require("../../util");
 const logger = util.getLogger(__filename);
 const boardService = require("../../service/board_service");
+const userService = require("../../service/user_service");
 const _ = require("lodash");
 const moment = require("moment");
 const sharp = require("sharp")
@@ -14,39 +15,11 @@ const boardController = module.exports = {
         logger.debug("checkPostContent检测通过");
         logger.debug("newPost", ctx.state.newpost);
         const { newpost, user } = ctx.state;
-        let { mainimage, imagelist } = ctx.request.body;
-        logger.debug("检测图片");
-        imagelist = imagelist ? imagelist : [];
-        if (mainimage) {
-            //有主图，判断主图是否包含在列表中
-            if (imagelist.indexOf(mainimage) >= 0) { }
-            else {
-                //不包含
-                ctx.body = util.retError(-1, "图片匹对错误");
-                return;
-            }
-
+        //检测图片
+        if (!await checkUploadFile(ctx)) {
+            return;
         }
-        else{
-            mainimage="";
-        }
-        //判断图片是否在数据库中
-
-        for (let index = 0; index < imagelist.length; index++) {
-            const element = imagelist[index];
-            const urlindb = await boardService.getImageInfo(element);
-            if (_.isEmpty(urlindb)) {
-                ctx.body = util.retError(-2, "只能使用已上传图片");
-                return;
-            } else if (urlindb['user_id'] != user["id"]) {
-                ctx.body = util.retError(-3, "只能使用自己的图片");
-                return;
-            } else if (urlindb['post_id'] != 0) {
-                ctx.body = util.retError(-4, "只能使用新上传图片");
-                return;
-            }
-        }
-
+        const { mainimage, imagelist } = ctx.request.body;
         const now = moment();
         const post = {
             title: newpost.title,
@@ -58,7 +31,7 @@ const boardController = module.exports = {
             lock: 0,
             sticky: 0,
             board_id: newpost.boardid,
-            image: mainimage,
+            image: mainimage ? mainimage : "",
             deleted: 0
 
         };
@@ -72,7 +45,7 @@ const boardController = module.exports = {
         const tags = newpost.taglist;
         const postinfo = await boardService.addPost(post, content, tags, imagelist);
         logger.debug("新建帖子返回:", postinfo)
-        if (postinfo.id > 0) {
+        if (!_.isEmpty(postinfo) && postinfo.id > 0) {
             ctx.body = util.retOk({ slug: postinfo.slug });
         }
         else {
@@ -129,7 +102,7 @@ const boardController = module.exports = {
         const tags = newpost.taglist;
         const linkinfo = await boardService.addPost(post, content, tags, []);
         logger.debug("新建链接返回:", linkinfo)
-        if (linkinfo.id > 0) {
+        if (!_.isEmpty(linkinfo) && linkinfo.id > 0) {
             ctx.body = util.retOk({ slug: linkinfo.slug });
         }
         else {
@@ -161,7 +134,7 @@ const boardController = module.exports = {
         };
         const commentinfo = await boardService.addComment(comment, commentpost);
         logger.debug("新回复返回:", commentinfo)
-        if (commentinfo.id > 0) {
+        if (!_.isEmpty(commentinfo) && commentinfo.id > 0) {
             ctx.body = util.retOk(commentinfo);
         }
         else {
@@ -176,7 +149,36 @@ const boardController = module.exports = {
     async getPostInfo(ctx, next) {
         //判断是否有帖子
         logger.debug(ctx.state)
-        ctx.body = ctx.state
+        let { post } = ctx.state;
+        const { user_id, comment_id } = post;
+        let user = await userService.getUserById(user_id);
+        //发帖用户
+        if (!user || _.isEmpty(user)) {
+            ctx.body = util.retError(-1, "获取帖子信息错误");
+            return;
+        }
+        //发帖内容
+        let comment = await boardService.getCommentById(comment_id);
+        if (!comment || _.isEmpty(comment)) {
+            ctx.body = util.retError(-2, "获取帖子内容错误");
+            return;
+        }
+        //编辑用户
+        if (comment['edituser_id'] > 0) {
+            const edituser = await userService.getUserById(comment['edituser_id']);
+            if (!edituser || _.isEmpty(edituser)) {
+                ctx.body = util.retError(-3, "获取帖子内容错误");
+                return;
+            }
+            comment["edituser"] = edituser['username'];
+        } else {
+            comment["edituser"] = "";
+        }
+        post["comment"] = comment;
+        post["user"] = user;
+        ctx.state.post = post;
+        await next();
+
 
     },
     async uploadAttachments(ctx, next) {
@@ -213,7 +215,7 @@ const boardController = module.exports = {
             postid = post["id"]
         }
         const fileurl = await boardService.saveFile(file.path, format, user["id"], postid);
-        if (fileurl) {
+        if (fileurl && !_.isEmpty(fileurl)) {
             ctx.body = util.retOk({ url: fileurl });
 
         }
@@ -277,6 +279,48 @@ const boardController = module.exports = {
             ctx.body = util.retError(-1, "参数不正确");
 
         }
+
+    },
+    async editPost(ctx, next) {
+        ctx.body=util.retOk();
+        return;
+        logger.debug("editPost", ctx.state);
+        //验证内容
+        if (!await checkEditContent(ctx)) {
+            return;
+        }
+        //验证图片
+        if (!await checkUploadFile(ctx)){
+            return;
+        }
+        const { mainimage, imagelist } = ctx.request.body;
+        const {editpost}=ctx.state;
+        const now = moment();
+        const post = {
+            title: editpost.title,
+            comment_id: 0,
+            label: editpost.lableid,
+            image: mainimage ? mainimage : ""
+
+        };
+        const content = {
+            type: "post",
+            content: editpost.content,
+            ip: util.getClientIP(ctx.req),
+            edittime:now.toDate(),
+            edituser_id:user["id"]
+        };
+        const tags = newpost.taglist;
+        const postinfo = await boardService.editPost(post, content, tags, imagelist);
+        logger.debug("新建帖子返回:", postinfo)
+        if (!_.isEmpty(postinfo) && postinfo.id > 0) {
+            ctx.body = util.retOk({ slug: postinfo.slug });
+        }
+        else {
+            ctx.body = util.retError(3000, "发帖错误");
+        }
+
+
 
     }
 
@@ -366,7 +410,7 @@ async function checkCommentContent(ctx) {
     //判断用户post是否存在和post的状态
     const post = await boardService.getPostBySlug(postslug);
     logger.debug("post信息:", post);
-    if (!post) {
+    if (_.isEmpty(post)) {
         ctx.body = util.retError(2000, "未找到帖子");
         return false
     }
@@ -382,3 +426,65 @@ async function checkCommentContent(ctx) {
     ctx.state.commentpost = post;
     return true;
 }
+async function checkUploadFile(ctx) {
+    logger.debug("checkUploadFile");
+    let { mainimage, imagelist } = ctx.request.body;
+    const {user}=ctx.state;
+    imagelist = imagelist ? imagelist : [];
+    if (mainimage) {
+        //有主图，判断主图是否包含在列表中
+        if (imagelist.indexOf(mainimage) >= 0) { }
+        else {
+            //不包含
+            ctx.body = util.retError(-1, "图片匹对错误");
+            return false;
+        }
+
+    }
+    else {
+        mainimage = "";
+    }
+    //判断图片是否在数据库中
+
+    for (let index = 0; index < imagelist.length; index++) {
+        const element = imagelist[index];
+        const urlindb = await boardService.getImageInfo(element);
+        if (_.isEmpty(urlindb)) {
+            ctx.body = util.retError(-2, "只能使用已上传图片");
+            return false;
+        } else if (urlindb['user_id'] != user["id"]) {
+            ctx.body = util.retError(-3, "只能使用自己的图片");
+            return false;
+        } else if (urlindb['post_id'] != 0 || urlindb['user_id']!=user['id']) {
+            ctx.body = util.retError(-4, "只能使用新上传图片");
+            return false;
+        }
+    }
+    return true;
+
+}
+
+async function checkEditContent(ctx) {
+    logger.debug("checkEditContent");
+    if (!checkUser(ctx)) {
+        return false;
+    }
+    //判断内容
+    const { title, content,lableid} = ctx.request.body;
+    if (!title || !content) {
+        ctx.body = util.retError(2000, "标题，内容和类别不能为空");
+        return false
+    }
+    if (title.length > 80) {
+        ctx.body = util.retError(2000, "标题最多80个字");
+        return false;
+    }
+    
+    ctx.state.editpost = {
+        title: title,
+        content: content,
+        lableid,lableid
+    }
+    return true;
+
+};
