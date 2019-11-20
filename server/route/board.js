@@ -270,8 +270,8 @@ router.post('/uppost',ret);
 
 /**
  *
- * @api {get} /list  列表筛选
- * @apiSampleRequest /api/list
+ * @api {get} /board/list  列表筛选
+ * @apiSampleRequest /api/board/list
  * @apiName list
  * @apiGroup board-todo
  * @apiVersion  1.0.0

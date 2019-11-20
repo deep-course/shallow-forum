@@ -120,7 +120,7 @@ router.post('/sendsmscode', userController.smscode);
 router.post('/resetpassword', ret);
 /**
  * 
- * @api {post} /user/detail 获取用户信息
+ * @api {get} /user/detail 获取用户信息
  * @apiSampleRequest /api/user/detail
  * @apiName user/detail
  * @apiGroup user-todo
@@ -132,7 +132,7 @@ router.post('/resetpassword', ret);
  * 
  * 
  */
-router.post('/user/detail', ret);
+router.get('/user/detail', ret);
 /**
  * 
  * @api {post} /user/updatepassword 更新密码
@@ -168,7 +168,7 @@ router.post('/user/updatepassword', ret);
 router.post('/user/updatedetail', ret);
 /**
  * 
- * @api {post} /user/home 用户首页列表
+ * @api {get} /user/home 用户首页列表
  * @apiSampleRequest /api/user/home
  * @apiName user/home
  * @apiGroup user-todo
@@ -182,10 +182,10 @@ router.post('/user/updatedetail', ret);
  * @apiParam  {String} type post发帖，up点赞
  * 
  */
-router.post('/user/home', ret);
+router.get('/user/home', ret);
 /**
  * 
- * @api {post} /user/homeinfo 用户首页信息
+ * @api {get} /user/homeinfo 用户首页信息
  * @apiSampleRequest /api/user/homeinfo
  * @apiName user/homeinfo
  * @apiGroup user-todo
@@ -201,7 +201,7 @@ router.post('/user/home', ret);
  * @apiParam  {String} type info用户详细信息，activity用户活动数（点赞总数，发帖数，加入时间等）
  * 
  */
-router.post('/user/homeinfo', ret);
+router.get('/user/homeinfo', ret);
 
 module.exports = router
 function ret(ctx,next){
