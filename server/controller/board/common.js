@@ -7,17 +7,13 @@ const moment = require("moment");
 const sharp = require("sharp")
 
 async function newComment(ctx, next) {
-    //验证内容
-    if (!await checkCommentContent(ctx)) {
-        return;
-    }
-    logger.debug("checkCommentContentContent检测通过");
+
     logger.debug("newComment", ctx.state.newcomment);
-    const { newcomment, commentpost, user } = ctx.state;
+    const { newcomment, currentuser,post } = ctx.state;
     const now = moment();
     const comment = {
         post_id: newcomment.postid,
-        user_id: user.id,
+        user_id: currentuser.id,
         addtime: now.toDate(),
         type: "comment",
         content: newcomment.content,
@@ -27,7 +23,7 @@ async function newComment(ctx, next) {
         approve: 1,
         deleted: 0
     };
-    const commentinfo = await boardService.addComment(comment, commentpost);
+    const commentinfo = await boardService.addComment(comment, post);
     logger.debug("新回复返回:", commentinfo)
     if (!_.isEmpty(commentinfo) && commentinfo.id > 0) {
         ctx.body = util.retOk(commentinfo);

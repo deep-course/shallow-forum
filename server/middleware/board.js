@@ -2,6 +2,7 @@ const jwt = require('jsonwebtoken');
 const { setting, env } = require('../config');
 const util = require('../util');
 const boardService = require("../service/board_service");
+const userService = require("../service/user_service");
 const _ = require("lodash")
 const logger = util.getLogger(__filename);
 
@@ -50,100 +51,183 @@ async function getBoard(ctx, next) {
     }
     await next();
 }
-async function viewPost(ctx, next) {
-    //TODO：增加权限管理和管理员管理
-    logger.debug("viewPost:", ctx.state);
-    const { post, user } = ctx.state
-    let retpost = _.assign({}, post);
-    //删帖不显示
-    if (retpost['deleted'] == 1) {
-        ctx.body = util.retError(1, '无法找到内容');
+async function getPostDetail(ctx, next) {
+    const { post } = ctx.state;
+    const { user_id, comment_id } = post;
+    let postuser = await userService.getUserById(user_id);
+    //发帖用户
+    if (!postuser || _.isEmpty(postuser)) {
+        ctx.body = util.retError(-10, "获取帖子信息错误");
         return;
     }
-    //账号锁定不显示
-    if (user && user['lock'] == 1) {
-        ctx.body = util.retError(2, '用户已锁定');
+    ctx.state.postuser = postuser;
+    //发帖内容
+    const comment = await boardService.getCommentById(comment_id);
+    if (!comment || _.isEmpty(comment)) {
+        ctx.body = util.retError(-11, "获取帖子内容错误");
         return;
     }
-
-    delete retpost['id'];
-    delete retpost['user_id'];
-    delete retpost['comment_id'];
-    delete retpost['approve'];
-    delete retpost['deleted'];
-    if (retpost['comment']['edituser_id'] == 0) {
-        delete retpost['comment']['edituser'];
-        delete retpost['comment']['edittime'];
+    ctx.state.comment = comment;
+    //编辑用户
+    if (comment['edituser_id'] > 0) {
+        const edituser = await userService.getUserById(comment['edituser_id']);
+        if (!edituser || _.isEmpty(edituser)) {
+            ctx.body = util.retError(-12, "获取帖子内容错误");
+            return;
+        }
+        ctx.state.edituser = edituser;
     }
-    retpost['comment'] = _.pick(retpost['comment'], ['addtime', 'type', 'content', 'edituser', 'edittime']);
-
-    retpost['user'] = _.pick(retpost['user'], ['username', 'lock', 'activate']);
-    ctx.body = util.retOk(retpost);
+    await next();
 
 }
 async function editPost(ctx, next) {
-    logger.debug("editPost:",ctx.state);
-    const {user,post}=ctx.state;
-    if (!user || _.isEmpty(user))
-    {
-        ctx.body=util.retError(-1,"请先登录")
+    logger.debug("editPost:", ctx.state);
+    const { user, post } = ctx.state;
+    if (!user || _.isEmpty(user)) {
+        ctx.body = util.retError(-1, "请先登录")
         return;
     }
-    if (user['lock']==1)
-    {
-        ctx.body=util.retError(-12,"用户已被锁定")
+    if (user['lock'] == 1) {
+        ctx.body = util.retError(-12, "用户已被锁定")
         return;
     }
-    if (!post || _.isEmpty(post))
-    {
-        ctx.body=util.retError(-2,"未找到信息")
+    if (!post || _.isEmpty(post)) {
+        ctx.body = util.retError(-2, "未找到信息")
         return;
     }
     //判断权限
-    if (post["user_id"]!=user["id"])
-    {
-        ctx.body=util.retError(-3,"没有编辑权限")
+    if (post["user_id"] != user["id"]) {
+        ctx.body = util.retError(-3, "没有编辑权限")
         return;
     }
     await next()
 }
 async function addPost(ctx, next) {
-    logger.debug("addPost:",ctx.state);
+    logger.debug("addPost:", ctx.state);
     //TODO:添加权限判断
 
-    //判断用户
-    const {user}=ctx.state;
-    if (!user || _.isEmpty(user))
-    {
-        ctx.body=util.retError(-11,"请先登录")
+
+    //判断内容
+    const { title, content, tags, boardid, lableid, url, mainimage, imagelist } = ctx.request.body;
+    if (!title || !content) {
+        ctx.body = util.retError(-20, "标题，内容和类别不能为空");
         return;
     }
-    if (user['lock']==1)
-    {
-        ctx.body=util.retError(-12,"用户已被锁定")
+    if (title.length > 80) {
+        ctx.body = util.retError(-21, "标题最多80个字");
         return;
+    }
+    if (!tags) {
+        ctx.body = util.retError(-22, "请选择至少1个标签");
+        return;
+    }
+    const taglist = tags.split(",");
+    if (taglist.length > 2) {
+        ctx.body = util.retError(-23, "最多只能选择2个标签");
+        return;
+    }
+    const tagsindb = await boardService.getTagListByName(taglist);
+    if (tagsindb.length != taglist.length) {
+        logger.debug(`tag数与数据库不符:${tagsindb.length}-${taglist.length}`);
+        ctx.body = util.retError(-24, "tag数量不符");
+        return;
+    }
+    ctx.state.newpost = {
+        title: title,
+        content: content,
+        taglist: tagsindb,
+        boardid: boardid || 0,
+        lableid: lableid || 0,
+        url: url,
+    }
+    //验证图片
+    //ctx.state= imagelist ? imagelist : [];
+    if (mainimage) {
+        //有主图，判断主图是否包含在列表中
+        if (imagelist && imagelist.indexOf(mainimage) >= 0) {
+            ctx.state.newpost.mainimage = mainimage;
+        }
+        else {
+            //不包含
+            ctx.body = util.retError(-30, "图片匹对错误");
+            return;
+        }
+
+    }
+    else {
+        ctx.state.newpost.mainimage = "";
     }
 
+    if (imagelist) {
+        //判断图片是否在数据库中
+        for (let index = 0; index < imagelist.length; index++) {
+            const element = imagelist[index];
+            const urlindb = await boardService.getImageInfo(element);
+            if (_.isEmpty(urlindb)) {
+                ctx.body = util.retError(-32, "只能使用已上传图片");
+                return;
+            } else if (urlindb['user_id'] != currentuser["id"]) {
+                ctx.body = util.retError(-33, "只能使用自己的图片");
+                return;
+            } else if (urlindb['post_id'] != 0 || urlindb['user_id'] != currentuser['id']) {
+                ctx.body = util.retError(-34, "只能使用新上传图片");
+                return;
+            }
+        }
+        ctx.state.imagelist = imagelist;
+    }
+    else {
+        ctx.state.imagelist = [];
+    }
     await next()
 }
-async function addComment(ctx,next){
+async function addComment(ctx, next) {
+    logger.debug("addComment:", ctx.state);
+    //TODO:添加权限判断
 
+    //判断内容
+    const { content} = ctx.request.body;
+    if (!content) {
+        ctx.body = util.retError(2000, "回复内容不能为空");
+        return false
+    }
+    //判断用户post是否存在和post的状态
+    
+    logger.debug("post信息:", post);
+    if (!post || _.isEmpty(post)) {
+        ctx.body = util.retError(2000, "未找到帖子");
+        return false
+    }
+    if (post.lock) {
+        ctx.body = util.retError(2000, "锁定，不能回复");
+        return false
+    }
+
+    ctx.state.newcomment = {
+        postid: post.id,
+        content: content
+    };
+    await next();
 }
-async function editComment(ctx,next){
+async function editComment(ctx, next) {
 
 }
 module.exports = {
     //从请求中获取post信息存入到state中
     getPost,
-    //判断查看权限
-    //在controller之后最最后的判断
-    viewPost,
+
+    //在getPost之后，获取post的的详细信息
+    //认为getPost后ctx.state.post信息正确
+    //controller只做权限和是否显示和显示内容的整理
+    getPostDetail,
+
     //添加新的post时的判断
     //在user和getpost之后
     //1、解析请求信息，验证
     //2、发帖权限的判断
     //3、图片整理，保证ctx.state中为验证后的格式
     addPost,
+
     //修改post时判断
     //在user和getpost之后
     //1、解析请求信息，验证
@@ -151,11 +235,13 @@ module.exports = {
     //3、图片整理，保证ctx.state中为验证后的格式
     //4、图片验证还包括删除后的判断
     editPost,
+
     //添加comment时判断
     //在user和getpost之后
     //1、解析请求信息，验证
     //2、根据当前post和user做权限的判断
     addComment,
+
     //添加comment时判断
     //在user和getpost之后
     //1、解析请求信息，验证

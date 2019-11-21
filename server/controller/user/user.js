@@ -9,7 +9,7 @@ async function userInfo(ctx, next) {
     logger.debug("state:", ctx.state);
     let ret = {
     }
-    const { user: currentuser, group } = ctx.state;
+    const { currentuser, group } = ctx.state;
     if (currentuser) {
         const userindb = await userService.getUserById(currentuser.id);
         if (userindb) {

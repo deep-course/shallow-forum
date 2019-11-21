@@ -9,18 +9,20 @@ async function login(ctx) {
     const { username, password } = ctx.request.body;
     const user = await userService.getUserByName(username);
     if (user && util.sha256(password) == user.password) {
+        const hash=util.md5(`${user.id}|${user.password}`);
         let ret = util.getToken({
             id: user.id,
-            hash: util.md5(`${user.id}|${user.password}`)
+            hash: hash
         });
-        ctx.body = util.retOk({
-            token: ret,
-        });
+        logger.debug("hash:",hash);
         if(user['lock']==1)
         {
             ctx.body = util.retError(-1,"用户已锁定")
             return;
         }
+        ctx.body = util.retOk({
+            token: ret,
+        });
         //更新用户登录状态
         await userService.updateUserLoginTime(user.id, util.getClientIP(ctx.req));
 

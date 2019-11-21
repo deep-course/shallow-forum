@@ -21,7 +21,11 @@ const boardController = require("../controller/board");
  * 
  * 
  */
-router.post('/newpost', middleware.getUser, middleware.addPost,boardController.newPost);
+router.post('/newpost',
+    middleware.getUser,
+    middleware.checkUser,
+    middleware.addPost,
+    boardController.newPost);
 /**
  * 
  * @api {post} /board/newlink 发连接
@@ -42,7 +46,11 @@ router.post('/newpost', middleware.getUser, middleware.addPost,boardController.n
  * 
  * 
  */
-router.post('/newlink', middleware.getUser, boardController.newLink);
+router.post('/newlink',
+    middleware.getUser,
+    middleware.checkUser,
+    middleware.addPost,
+    boardController.newLink);
 /**
  * 
  * @api {post} /board/newcomment 新建回复
@@ -71,7 +79,12 @@ router.post('/newlink', middleware.getUser, boardController.newLink);
  * 
  * 
  */
-router.post('/newcomment', middleware.getUser, boardController.newComment);
+router.post('/newcomment',
+    middleware.getUser,
+    middleware.getPost,
+    middleware.checkUser,
+    middleware.addComment,
+    boardController.newComment);
 /**
  * 
  * @api {post} /board/uploadattachments 上传图片附件
@@ -104,7 +117,11 @@ router.post('/newcomment', middleware.getUser, boardController.newComment);
  * 
  * 
  */
-router.post('/uploadattachments',middleware.getUser, middleware.getPost,boardController.uploadAttachment);
+router.post('/uploadattachments',
+    middleware.getUser,
+    middleware.getPost,
+    middleware.checkUser,
+    boardController.uploadAttachment);
 /**
  * 
  * @api {get} /board/showattachments 显示图片附件
@@ -134,7 +151,11 @@ router.post('/uploadattachments',middleware.getUser, middleware.getPost,boardCon
  * 
  * 
  */
-router.get('/showattachments',middleware.getUser, middleware.getPost,boardController.showAttachment);
+router.get('/showattachments',
+    middleware.getUser,
+    middleware.getPost,
+    middleware.checkUser,
+    boardController.showAttachment);
 /**
  * 
  * @api {post} /board/removeattachments 删除图片附件
@@ -158,7 +179,11 @@ router.get('/showattachments',middleware.getUser, middleware.getPost,boardContro
  * 
  * 
  */
-router.post('/removeattachments',middleware.getUser, middleware.getPost,boardController.removeAttachment);
+router.post('/removeattachments',
+    middleware.getUser,
+    middleware.getPost,
+    middleware.checkUser,
+    boardController.removeAttachment);
 
 /**
  * 
@@ -183,7 +208,11 @@ router.post('/removeattachments',middleware.getUser, middleware.getPost,boardCon
  * 
  * 
  */
-router.get('/getpost', middleware.getUser, middleware.getPost, boardController.getPostInfo,middleware.viewPost);
+router.get('/getpost',
+    middleware.getUser,
+    middleware.getPost,
+    middleware.getPostDetail,
+    boardController.showPost);
 /**
  * 
  * @api {post} /board/editpost 编辑帖子
@@ -203,7 +232,7 @@ router.get('/getpost', middleware.getUser, middleware.getPost, boardController.g
  * 
  * 
  */
-router.post('/editpost',ret)
+router.post('/editpost', ret)
 //router.post('/editpost',middleware.user, middleware.post,middleware.editPost,boardController.editPost)
 
 
@@ -221,7 +250,7 @@ router.post('/editpost',ret)
  * @apiParam  {String} content 回复内容
  * 
  */
-router.post('/editcomment',ret);
+router.post('/editcomment', ret);
 
 /**
  * 
@@ -236,7 +265,7 @@ router.post('/editcomment',ret);
  * @apiParam  {String} commentid 回复id
  * 
  */
-router.post('/deletecomment',ret);
+router.post('/deletecomment', ret);
 
 /**
  * 
@@ -251,7 +280,7 @@ router.post('/deletecomment',ret);
  * @apiParam  {String} postslug  post标识
  * 
  */
-router.post('/deletepost',ret);
+router.post('/deletepost', ret);
 
 /**
  * 
@@ -266,7 +295,7 @@ router.post('/deletepost',ret);
  * @apiParam  {String} postslug  post标识
  * 
  */
-router.post('/uppost',ret);
+router.post('/uppost', ret);
 
 /**
  *
@@ -303,8 +332,8 @@ router.get('/postlist', ret);
 router.get('/commentlist', ret);
 
 module.exports = router
-function ret(ctx,next){
-    ctx.body=
+function ret(ctx, next) {
+    ctx.body =
         {
             err: 0,
             msg: "ok"

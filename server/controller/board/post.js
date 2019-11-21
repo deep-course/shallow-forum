@@ -7,30 +7,20 @@ const moment = require("moment");
 const sharp = require("sharp")
 
 async function newPost(ctx, next) {
-    //验证内容
-    if (!await checkPostContent(ctx)) {
-        return;
-    }
-    logger.debug("checkPostContent检测通过");
-    logger.debug("newPost", ctx.state.newpost);
-    const { newpost, user } = ctx.state;
-    //检测图片
-    if (!await checkUploadFile(ctx)) {
-        return;
-    }
-    const { mainimage, imagelist } = ctx.request.body;
+    logger.debug("newPost", ctx.state);
+    const {newpost,imagelist,currentuser}= ctx.state;
     const now = moment();
     const post = {
         title: newpost.title,
         pubtime: now.toDate(),
-        user_id: user.id,
+        user_id: currentuser.id,
         comment_id: 0,
         label: newpost.lableid,
         approve: 1,
         lock: 0,
         sticky: 0,
         board_id: newpost.boardid,
-        image: mainimage ? mainimage : "",
+        image: newpost.mainimage,
         deleted: 0
 
     };
@@ -53,32 +43,28 @@ async function newPost(ctx, next) {
 
 }
 async function newLink(ctx, next) {
-    //验证内容
-    if (!await checkPostContent(ctx)) {
-        return;
-    }
-    logger.debug("checkPostContent检测通过");
-    logger.debug("newLink", ctx.state.newpost);
-    const { newpost, user } = ctx.state;
+
+    logger.debug("newLink", ctx.state);
+    const { newpost, currentuser } = ctx.state;
     if (!newpost.url) {
         ctx.body = util.retError(2000, "链接不能为空");
-        return false;
+        return;
     }
     const objurl = util.parseUrl(newpost.url);
     logger.debug(objurl);
     if (!objurl.hostname) {
         ctx.body = util.retError(2000, "链接格式不正确");
-        return false;
+        return ;
     }
     if (newpost.content.length > 140) {
         ctx.body = util.retError(2000, "链接介绍最多140字");
-        return false;
+        return;
     }
     const now = moment();
     const post = {
         title: newpost.title,
         pubtime: now.toDate(),
-        user_id: user.id,
+        user_id: currentuser.id,
         comment_id: 0,
         label: newpost.lableid,
         approve: 1,
@@ -108,43 +94,35 @@ async function newLink(ctx, next) {
     }
 
 }
-async function getPostInfo(ctx, next) {
-    //判断是否有帖子
-    logger.debug(ctx.state)
-    let { post } = ctx.state;
-    const { user_id, comment_id } = post;
-    let user = await userService.getUserById(user_id);
-    //发帖用户
-    if (!user || _.isEmpty(user)) {
-        ctx.body = util.retError(-1, "获取帖子信息错误");
+async function showPost(ctx, next) {
+    logger.debug("showPost:", ctx.state)
+    //TODO：增加权限管理和管理员管理
+    const { currentuser,post, postuser,comment,edituser} = ctx.state
+    let retpost = _.pick(post,["slug","title","pubtime","label","sticky","lock","image"]);
+    //删帖不显示
+    if (post['deleted'] == 1) {
+        ctx.body = util.retError(10, '无法找到内容');
         return;
     }
-    //发帖内容
-    let comment = await boardService.getCommentById(comment_id);
-    if (!comment || _.isEmpty(comment)) {
-        ctx.body = util.retError(-2, "获取帖子内容错误");
+    //账号锁定不显示
+    if (currentuser && currentuser['lock'] == 1) {
+        ctx.body = util.retError(11, '用户已锁定');
         return;
     }
-    //编辑用户
-    if (comment['edituser_id'] > 0) {
-        const edituser = await userService.getUserById(comment['edituser_id']);
-        if (!edituser || _.isEmpty(edituser)) {
-            ctx.body = util.retError(-3, "获取帖子内容错误");
-            return;
-        }
-        comment["edituser"] = edituser['username'];
-    } else {
-        comment["edituser"] = "";
+    retpost["comment"]=comment;
+    retpost['comment'] = _.pick(comment, ['addtime', 'type', 'content']);
+    //是否被编辑过
+    if (edituser) {
+       retpost['comment']['edituser']=edituser["username"];
+       retpost['comment']['edittime']=comment["edittime"];
     }
-    post["comment"] = comment;
-    post["user"] = user;
-    ctx.state.post = post;
-    await next();
+    retpost['user'] = _.pick(postuser, ['username', 'lock', 'activate']);
+    ctx.body = util.retOk(retpost);
 
 
 }
 async function editPost(ctx, next) {
-    ctx.body=util.retOk();
+    ctx.body = util.retOk();
     return;
     logger.debug("editPost", ctx.state);
     //验证内容
@@ -152,11 +130,11 @@ async function editPost(ctx, next) {
         return;
     }
     //验证图片
-    if (!await checkUploadFile(ctx)){
+    if (!await checkUploadFile(ctx)) {
         return;
     }
     const { mainimage, imagelist } = ctx.request.body;
-    const {editpost}=ctx.state;
+    const { editpost } = ctx.state;
     const now = moment();
     const post = {
         title: editpost.title,
@@ -169,8 +147,8 @@ async function editPost(ctx, next) {
         type: "post",
         content: editpost.content,
         ip: util.getClientIP(ctx.req),
-        edittime:now.toDate(),
-        edituser_id:user["id"]
+        edittime: now.toDate(),
+        edituser_id: user["id"]
     };
     const tags = newpost.taglist;
     const postinfo = await boardService.editPost(post, content, tags, imagelist);
@@ -185,9 +163,9 @@ async function editPost(ctx, next) {
 
 
 }
-module.exports={
+module.exports = {
     newPost,
     newLink,
-    getPostInfo,
+    showPost,
     editPost
 };
