@@ -122,42 +122,30 @@ async function showPost(ctx, next) {
 
 }
 async function editPost(ctx, next) {
-    ctx.body = util.retOk();
-    return;
-    logger.debug("editPost", ctx.state);
-    //验证内容
-    if (!await checkEditContent(ctx)) {
-        return;
-    }
-    //验证图片
-    if (!await checkUploadFile(ctx)) {
-        return;
-    }
-    const { mainimage, imagelist } = ctx.request.body;
-    const { editpost } = ctx.state;
+    logger.debug   ("editPost:",ctx.state);
+    //ctx.body = util.retOk(ctx.state);
+    //return;
+    const { imagelist } = ctx.request.body;
+    const { editpost ,currentuser} = ctx.state;
     const now = moment();
     const post = {
         title: editpost.title,
-        comment_id: 0,
         label: editpost.lableid,
-        image: mainimage ? mainimage : ""
+        image: editpost.mainimage,
 
     };
     const content = {
-        type: "post",
         content: editpost.content,
-        ip: util.getClientIP(ctx.req),
         edittime: now.toDate(),
-        edituser_id: user["id"]
+        edituser_id: currentuser["id"]
     };
-    const tags = newpost.taglist;
-    const postinfo = await boardService.editPost(post, content, tags, imagelist);
-    logger.debug("新建帖子返回:", postinfo)
+    const postinfo = await boardService.editPost(post, content,imagelist);
+    logger.debug("修改帖子返回:", postinfo)
     if (!_.isEmpty(postinfo) && postinfo.id > 0) {
         ctx.body = util.retOk({ slug: postinfo.slug });
     }
     else {
-        ctx.body = util.retError(3000, "发帖错误");
+        ctx.body = util.retError(3000, "修改错误");
     }
 
 

@@ -7,6 +7,7 @@ const _ = require("lodash")
 const logger = util.getLogger(__filename);
 
 async function getPost(ctx, next) {
+    logger.debug("getPost");
     let postslug = "";
     if (ctx.params && ctx.params.postslug) {
         //优先params
@@ -80,29 +81,79 @@ async function getPostDetail(ctx, next) {
     await next();
 
 }
-async function editPost(ctx, next) {
-    logger.debug("editPost:", ctx.state);
-    const { user, post } = ctx.state;
-    if (!user || _.isEmpty(user)) {
-        ctx.body = util.retError(-1, "请先登录")
+async function checkEditPost(ctx, next) {
+    logger.debug("checkEditPost:", ctx.state);
+    const{post,currentuser}=ctx.state;
+    if (!post) {
+        ctx.body = util.retError(-20, "未找到信息")
         return;
     }
-    if (user['lock'] == 1) {
-        ctx.body = util.retError(-12, "用户已被锁定")
-        return;
-    }
-    if (!post || _.isEmpty(post)) {
-        ctx.body = util.retError(-2, "未找到信息")
+    if (comment["type"]!="post"){
+        ctx.body = util.retError(-21, "不支持修改")
         return;
     }
     //判断权限
-    if (post["user_id"] != user["id"]) {
-        ctx.body = util.retError(-3, "没有编辑权限")
+    if (post["user_id"] != currentuser["id"]) {
+        ctx.body = util.retError(-22, "没有编辑权限")
         return;
     }
+    //判断内容
+    const { title, content, lableid,mainimage, imagelist } = ctx.request.body;
+    if (!title || !content) {
+        ctx.body = util.retError(-23, "标题，内容和类别不能为空");
+        return;
+    }
+    if (title.length > 80) {
+        ctx.body = util.retError(-24, "标题最多80个字");
+        return;
+    }
+    ctx.state.editpost = {
+        title: title,
+        content: content,
+        lableid: lableid || 0,
+
+    }
+    
+    //检查图片
+    //上传图片必须带postid，所以不会有postid=0的情况
+    if (mainimage) {
+        //有主图，判断主图是否包含在列表中
+        if (imagelist && imagelist.indexOf(mainimage) >= 0) {
+            ctx.state.editpost.mainimage = mainimage;
+        }
+        else {
+            //不包含
+            ctx.body = util.retError(-30, "图片匹对错误");
+            return;
+        }
+
+    }
+    else {
+        ctx.state.editpost.mainimage = "";
+    }
+    
+    if (imagelist) {
+        //判断图片是否在数据库中
+        for (let index = 0; index < imagelist.length; index++) {
+            const element = imagelist[index];
+            const urlindb = await boardService.getImageInfo(element);
+            if (_.isEmpty(urlindb)) {
+                ctx.body = util.retError(-32, "只能使用已上传图片");
+                return;
+            } else if (urlindb['post_id'] != post["id"]) {
+                ctx.body = util.retError(-34, "只能使用本贴图片");
+                return;
+            }
+        }
+        ctx.state.imagelist = imagelist;
+    }
+    else {
+        ctx.state.imagelist = [];
+    }
+
     await next()
 }
-async function addPost(ctx, next) {
+async function checkAddPost(ctx, next) {
     logger.debug("addPost:", ctx.state);
     //TODO:添加权限判断
 
@@ -181,8 +232,8 @@ async function addPost(ctx, next) {
     }
     await next()
 }
-async function addComment(ctx, next) {
-    logger.debug("addComment:", ctx.state);
+async function checkAddComment(ctx, next) {
+    logger.debug("checkAddComment:", ctx.state);
     //TODO:添加权限判断
 
     //判断内容
@@ -209,6 +260,7 @@ async function addComment(ctx, next) {
     };
     await next();
 }
+
 async function editComment(ctx, next) {
 
 }
@@ -226,7 +278,7 @@ module.exports = {
     //1、解析请求信息，验证
     //2、发帖权限的判断
     //3、图片整理，保证ctx.state中为验证后的格式
-    addPost,
+    checkAddPost,
 
     //修改post时判断
     //在user和getpost之后
@@ -234,13 +286,13 @@ module.exports = {
     //2、根据user，当前post编辑权限的判断
     //3、图片整理，保证ctx.state中为验证后的格式
     //4、图片验证还包括删除后的判断
-    editPost,
+    checkEditPost,
 
     //添加comment时判断
     //在user和getpost之后
     //1、解析请求信息，验证
     //2、根据当前post和user做权限的判断
-    addComment,
+    checkAddComment,
 
     //添加comment时判断
     //在user和getpost之后

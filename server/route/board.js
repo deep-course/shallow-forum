@@ -24,7 +24,7 @@ const boardController = require("../controller/board");
 router.post('/newpost',
     middleware.getUser,
     middleware.checkUser,
-    middleware.addPost,
+    middleware.checkAddPost,
     boardController.newPost);
 /**
  * 
@@ -49,7 +49,7 @@ router.post('/newpost',
 router.post('/newlink',
     middleware.getUser,
     middleware.checkUser,
-    middleware.addPost,
+    middleware.checkAddPost,
     boardController.newLink);
 /**
  * 
@@ -83,7 +83,7 @@ router.post('/newcomment',
     middleware.getUser,
     middleware.getPost,
     middleware.checkUser,
-    middleware.addComment,
+    middleware.checkAddComment,
     boardController.newComment);
 /**
  * 
@@ -232,7 +232,14 @@ router.get('/getpost',
  * 
  * 
  */
-router.post('/editpost', ret)
+router.post('/editpost',
+    middleware.getUser,
+    middleware.getPost,
+    middleware.getPostDetail,
+    middleware.checkUser,
+    middleware.checkEditPost,
+    boardController.editPost
+    );
 //router.post('/editpost',middleware.user, middleware.post,middleware.editPost,boardController.editPost)
 
 

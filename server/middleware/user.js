@@ -47,6 +47,7 @@ async function checkUser(ctx, next) {
         ctx.body = util.retError(-12, "用户已被锁定")
         return;
     }
+    await next();
 }
 module.exports = {
   //从header中获取相应的token并且判断

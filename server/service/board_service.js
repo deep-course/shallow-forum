@@ -6,8 +6,22 @@ const _3rd_service = require("./3rd_service");
 const moment = require("moment");
 const boardService = module.exports = {
     //更新post
-    async editPost(post, content) {
+    async editPost(post, content,imagelist) {
+        logger.debug("addPost :", post, content,  imagelist);
+        const conn = await promiseMysqlPool.getConnection();
+        try {
+            await conn.beginTransaction();
+            //更新post
+            await conn.query("update `board_post` set title=?,", post);
+            //更新comment
+            //更新tag状态
+            //更新用户状态
 
+            //TODO：检查图片，是否存在，不存在的要删掉
+
+        } catch (error) {
+            
+        }
     },
 
     //添加post内容，link和comment
