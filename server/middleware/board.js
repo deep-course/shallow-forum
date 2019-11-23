@@ -108,9 +108,11 @@ async function checkEditPost(ctx, next) {
         return;
     }
     ctx.state.editpost = {
+        slug: post["slug"],
         title: title,
         content: content,
-        lableid: lableid || 0,
+        comment_id=post["comment_id"],
+        lableid: lableid || 0
 
     }
     

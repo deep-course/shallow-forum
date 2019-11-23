@@ -129,6 +129,7 @@ async function editPost(ctx, next) {
     const { editpost ,currentuser} = ctx.state;
     const now = moment();
     const post = {
+        slug : editpost.slug,
         title: editpost.title,
         label: editpost.lableid,
         image: editpost.mainimage,
@@ -137,12 +138,13 @@ async function editPost(ctx, next) {
     const content = {
         content: editpost.content,
         edittime: now.toDate(),
-        edituser_id: currentuser["id"]
+        edituser_id: currentuser["id"],
+        comment_id:editpost.comment_id
     };
-    const postinfo = await boardService.editPost(post, content,imagelist);
+    const result = await boardService.editPost(post, content,imagelist);
     logger.debug("修改帖子返回:", postinfo)
-    if (!_.isEmpty(postinfo) && postinfo.id > 0) {
-        ctx.body = util.retOk({ slug: postinfo.slug });
+    if (result) {
+        ctx.body = util.retOk();
     }
     else {
         ctx.body = util.retError(3000, "修改错误");

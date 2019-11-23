@@ -7,20 +7,39 @@ const moment = require("moment");
 const boardService = module.exports = {
     //更新post
     async editPost(post, content,imagelist) {
-        logger.debug("addPost :", post, content,  imagelist);
+        logger.debug("editPost :", post, content,  imagelist);
         const conn = await promiseMysqlPool.getConnection();
         try {
+            
             await conn.beginTransaction();
             //更新post
-            await conn.query("update `board_post` set title=?,", post);
-            //更新comment
-            //更新tag状态
-            //更新用户状态
+            await conn.query("update `board_post` set `title`=?,`label`=?,`mainimage`=? where slug=?", 
+            [
+                post["title"],
+                post["label"],
+                post["mainimage"],
+                post["slug"]
+            ]);
+            //更新comment 
+            await conn.query("update `board_comment` set content=?,edituser_id=?,edittime=? where id=?", [
+                content["content"],
+                content["edittime"],
+                content["edituser_id"],
+                content["comment_id"]  
+            ]);           
+
 
             //TODO：检查图片，是否存在，不存在的要删掉
+            await conn.commit();
+            return true;
 
         } catch (error) {
-            
+            logger.error("editPost error:",error);
+            return false;
+        }
+        finally{
+            await conn.release()
+
         }
     },
 
