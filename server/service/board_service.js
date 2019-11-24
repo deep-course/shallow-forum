@@ -204,6 +204,17 @@ select tag_id from board_postintag where post_id=?
 
 
     },
+    //更新comment
+    async updateComment(comment){
+        logger.debug("updateComment :", comment);
+        const result= promiseMysqlPool.execute("update board_comment set content=?,edittime=?,edituser_id=? where id=?",[
+            comment["id"],
+            comment["content"],
+            comment["edituser"],
+            comment["edittime"]
+        ]);
+        return true;
+    },
     //获取post
     async getPostBySlug(slug) {
         const [post] = await promiseMysqlPool.query("select * from board_post where slug=?", [slug]);

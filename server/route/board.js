@@ -247,7 +247,7 @@ router.post('/editpost',
  * 
  * @api {post} /board/editcomment 编辑回复
  * @apiName editcomment
- * @apiGroup board-todo
+ * @apiGroup board
  * @apiVersion  1.0.0
  * @apiSampleRequest /api/board/editcomment
  * @apiUse ReturnCode
@@ -257,13 +257,17 @@ router.post('/editpost',
  * @apiParam  {String} content 回复内容
  * 
  */
-router.post('/editcomment', ret);
+router.post('/editcomment',   
+middleware.getUser,
+middleware.checkUser,
+middleware.checkEditCommont,
+boardController.editComment);
 
 /**
  * 
  * @api {post} /board/deletecomment 删除回复
  * @apiName deletecomment
- * @apiGroup board-todo
+ * @apiGroup board-todu
  * @apiVersion  1.0.0
  * @apiSampleRequest /api/board/deletecomment
  * @apiUse ReturnCode

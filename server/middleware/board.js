@@ -111,7 +111,7 @@ async function checkEditPost(ctx, next) {
         slug: post["slug"],
         title: title,
         content: content,
-        comment_id=post["comment_id"],
+        comment_id:post["comment_id"],
         lableid: lableid || 0
 
     }
@@ -263,8 +263,39 @@ async function checkAddComment(ctx, next) {
     await next();
 }
 
-async function editComment(ctx, next) {
+async function checkEditComment(ctx, next) {
+    logger.debug("checkEditComment:", ctx.state);
+    //TODO:添加权限判断
 
+    //判断内容
+    const { content,commentid} = ctx.request.body;
+    const {currentuser} =ctx.request.state;
+    if (!content) {
+        ctx.body = util.retError(2000, "回复内容不能为空");
+        return ;
+    }
+    //判断comment是否存在
+    const comment=boardService.getCommentById(commentid);
+    logger.debug("comment信息:", comment);
+    if (!comment || _.isEmpty(comment)) {
+        ctx.body = util.retError(2000, "未找到回复");
+        return;
+    }
+    if (comment["type"]!="comment"){
+        ctx.body = util.retError(2000, "不能编辑");
+        return;
+    }
+    if (comment["user_id"]!=currentuser["id"]) {
+        ctx.body = util.retError(2000, "不能编辑");
+        return;
+    }
+
+    ctx.state.editcomment = {
+        id: comment["id"],
+        content: content,
+        edituser:currentuser["id"],
+    };
+    await next();
 }
 module.exports = {
     //从请求中获取post信息存入到state中
@@ -300,5 +331,5 @@ module.exports = {
     //在user和getpost之后
     //1、解析请求信息，验证
     //2、根据当前post，当前的comment和user做权限的判断
-    editComment,
+    checkEditComment,
 }
