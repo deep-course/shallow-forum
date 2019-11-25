@@ -115,4 +115,11 @@ module.exports={
         return rows[0];
 
     },
+    //获取根据用户ids获取列表
+    getUserInfoByIds:async function(ids)
+    {
+        const [rows,fields]= await promiseMysqlPool.query("select * from user_user where id in(?)", [ids]);
+        return rows;
+
+    },
 }

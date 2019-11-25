@@ -106,7 +106,7 @@ module.exports.up =  async function (next) {
   logger.info("board_useruppost");
   await promiseMysqlPool.query('DROP TABLE IF EXISTS `board_useruppost`;');
   await promiseMysqlPool.query(`CREATE TABLE IF NOT EXISTS \`board_useruppost\` (
-    \`id\` int(10) unsigned NOT NULL,
+    \`id\` int(10) unsigned NOT NULL AUTO_INCREMENT,
     \`user_id\` int(10) unsigned NOT NULL,
     \`post_id\` int(10) unsigned NOT NULL,
     \`addtime\` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,

@@ -236,6 +236,7 @@ async function checkAddPost(ctx, next) {
 }
 async function checkAddComment(ctx, next) {
     logger.debug("checkAddComment:", ctx.state);
+    const {post}=ctx.state;
     //TODO:添加权限判断
 
     //判断内容
@@ -269,13 +270,13 @@ async function checkEditComment(ctx, next) {
 
     //判断内容
     const { content,commentid} = ctx.request.body;
-    const {currentuser} =ctx.request.state;
+    const {currentuser} =ctx.state;
     if (!content) {
         ctx.body = util.retError(2000, "回复内容不能为空");
         return ;
     }
     //判断comment是否存在
-    const comment=boardService.getCommentById(commentid);
+    const comment=await boardService.getCommentById(commentid);
     logger.debug("comment信息:", comment);
     if (!comment || _.isEmpty(comment)) {
         ctx.body = util.retError(2000, "未找到回复");

@@ -260,14 +260,14 @@ router.post('/editpost',
 router.post('/editcomment',   
 middleware.getUser,
 middleware.checkUser,
-middleware.checkEditCommont,
+middleware.checkEditComment,
 boardController.editComment);
 
 /**
  * 
  * @api {post} /board/deletecomment 删除回复
  * @apiName deletecomment
- * @apiGroup board-todu
+ * @apiGroup board
  * @apiVersion  1.0.0
  * @apiSampleRequest /api/board/deletecomment
  * @apiUse ReturnCode
@@ -276,13 +276,16 @@ boardController.editComment);
  * @apiParam  {String} commentid 回复id
  * 
  */
-router.post('/deletecomment', ret);
+router.post('/deletecomment', 
+middleware.getUser,
+middleware.checkUser,
+boardController.deleteComment);
 
 /**
  * 
  * @api {post} /board/deletepost 删除帖子
  * @apiName deletepost
- * @apiGroup board-todo
+ * @apiGroup board
  * @apiVersion  1.0.0
  * @apiSampleRequest /api/board/deletepost
  * @apiUse ReturnCode
@@ -291,13 +294,19 @@ router.post('/deletecomment', ret);
  * @apiParam  {String} postslug  post标识
  * 
  */
-router.post('/deletepost', ret);
+router.post('/deletepost',
+middleware.getUser,
+middleware.checkUser,
+middleware.getPost,
+boardController.deletePost
+
+);
 
 /**
  * 
  * @api {post} /board/uppost 顶贴
  * @apiName uppost
- * @apiGroup board-todo
+ * @apiGroup board
  * @apiVersion  1.0.0
  * @apiSampleRequest /api/board/uppost
  * @apiUse ReturnCode
@@ -306,14 +315,19 @@ router.post('/deletepost', ret);
  * @apiParam  {String} postslug  post标识
  * 
  */
-router.post('/uppost', ret);
+router.post('/uppost', 
+middleware.getUser,
+middleware.checkUser,
+middleware.getPost,
+boardController.upPost
+);
 
 /**
  *
- * @api {get} /board/postlist  列表筛选
+ * @api {get} /board/postlist  帖子列表筛选
  * @apiSampleRequest /api/board/postlist
  * @apiName postlist
- * @apiGroup board-todo
+ * @apiGroup board
  * @apiVersion  1.0.0
  * @apiDescription 
  * 获取帖子列表
@@ -321,16 +335,19 @@ router.post('/uppost', ret);
  * @apiUse ReturnCode
  * @apiUse HeaderToken
  * @apiParam  {String} tag  tag标识
- * @apiParam  {String} sort 排序 1，最新（默认），2最热
+ * @apiParam  {String} sort 排序 1，最新发布（默认），2最新回帖，3最新热（暂时不要）
  * @apiParam  {Number} page  分页，默认第一页
  */
-router.get('/postlist', ret);
+router.get('/postlist', 
+middleware.getUser,
+boardController.getPostList
+);
 /**
  *
- * @api {get} /board/commentlist  列表筛选
+ * @api {get} /board/commentlist  回复列表
  * @apiSampleRequest /api/board/commentlist
  * @apiName commentlist
- * @apiGroup board-todo
+ * @apiGroup board
  * @apiVersion  1.0.0
  * @apiDescription 
  * 获取帖子列表
@@ -340,13 +357,10 @@ router.get('/postlist', ret);
  * @apiParam  {String} postslug  tag标识
  * @apiParam  {Number} page  分页，默认第一页
  */
-router.get('/commentlist', ret);
+router.get('/commentlist', 
+middleware.getUser,
+middleware.getPost,
+boardController.getCommentList
+);
 
 module.exports = router
-function ret(ctx, next) {
-    ctx.body =
-        {
-            err: 0,
-            msg: "ok"
-        }
-}

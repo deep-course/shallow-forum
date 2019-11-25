@@ -9,7 +9,7 @@ const _3rdService = require('../service/3rd_service');
 const homeController=module.exports = {
 
     async home  (ctx) {
-        ctx.body = 'home'
+        ctx.body = 'home使用getpost过滤'
     },
 
 

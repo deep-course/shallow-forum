@@ -6,27 +6,27 @@ const _3rd_service = require("./3rd_service");
 const moment = require("moment");
 const boardService = module.exports = {
     //更新post
-    async editPost(post, content,imagelist) {
-        logger.debug("editPost :", post, content,  imagelist);
+    async editPost(post, content, imagelist) {
+        logger.debug("editPost :", post, content, imagelist);
         const conn = await promiseMysqlPool.getConnection();
         try {
-            
+
             await conn.beginTransaction();
             //更新post
-            await conn.query("update `board_post` set `title`=?,`label`=?,`mainimage`=? where slug=?", 
-            [
-                post["title"],
-                post["label"],
-                post["mainimage"],
-                post["slug"]
-            ]);
+            await conn.query("update `board_post` set `title`=?,`label`=?,`mainimage`=? where slug=?",
+                [
+                    post["title"],
+                    post["label"],
+                    post["mainimage"],
+                    post["slug"]
+                ]);
             //更新comment 
             await conn.query("update `board_comment` set content=?,edituser_id=?,edittime=? where id=?", [
                 content["content"],
                 content["edittime"],
                 content["edituser_id"],
-                content["comment_id"]  
-            ]);           
+                content["comment_id"]
+            ]);
 
 
             //TODO：检查图片，是否存在，不存在的要删掉
@@ -34,10 +34,10 @@ const boardService = module.exports = {
             return true;
 
         } catch (error) {
-            logger.error("editPost error:",error);
+            logger.error("editPost error:", error);
             return false;
         }
-        finally{
+        finally {
             await conn.release()
 
         }
@@ -205,14 +205,15 @@ select tag_id from board_postintag where post_id=?
 
     },
     //更新comment
-    async updateComment(comment){
+    async updateComment(comment) {
         logger.debug("updateComment :", comment);
-        const result= promiseMysqlPool.execute("update board_comment set content=?,edittime=?,edituser_id=? where id=?",[
-            comment["id"],
+        const result = await promiseMysqlPool.execute("update board_comment set content=?,edittime=?,edituser_id=? where id=?", [
             comment["content"],
+            comment["edittime"],
             comment["edituser"],
-            comment["edittime"]
+            comment["id"]
         ]);
+        //logger.debug(result)
         return true;
     },
     //获取post
@@ -293,9 +294,87 @@ select tag_id from board_postintag where post_id=?
     },
     async getCommentById(id) {
         logger.debug("getCommentById:", id);
-        const [result] = await await promiseMysqlPool.query("select * from board_comment where id=?",
+        const [result] = await promiseMysqlPool.query("select * from board_comment where id=?",
             [id]);
         return result[0];
+    },
+    async deleteComment(id) {
+        //逻辑删除
+        const result = await promiseMysqlPool.query("update board_comment set deleted=1 where id=?", [id]);
+        return true;
+
+        //TODO:更新board_postacticity
+
+    },
+    async  deletePost(id) {
+        const result = await promiseMysqlPool.execute("update board_post set deleted=1 where id=?", [id]);
+        return true;
+    },
+    async checkUpHistory(pid, uid) {
+        const [result] = await promiseMysqlPool.query("select count(*) as c from board_useruppost where user_id=? and post_id=?", [
+            uid, pid
+        ]);
+        logger.debug(result[0]);
+        return result[0]["c"] > 0 ? true : false;
+
+    },
+    async upPost(pid, uid) {
+        logger.debug("upPost:");
+        const conn = await promiseMysqlPool.getConnection();
+        await conn.beginTransaction();
+        try {
+            //更新对应关系
+            await conn.query("insert ignore into `board_useruppost` set ?", {
+                user_id: uid,
+                post_id: pid,
+                addtime: moment().toDate()
+            });
+            //更新帖子
+            await conn.query("update `board_postacticity` set `upcount`=`upcount`+1, `lastuptime`=?where `post_id`=? ", [
+                moment().toDate(),
+                pid
+            ]);
+            await conn.commit();
+            return true;
+
+        } catch (error) {
+            logger.error("upPost:", error);
+            await conn.rollback();
+            return false;
+
+        }
+        finally {
+            await conn.release();
+        }
+
+    },
+    async getCommentListByPostId(postid, page) {
+        logger.debug("getCommentListByPostId:", postid);
+        const offset = (page - 1) * 20;
+        const [result] = await promiseMysqlPool.query("select * from board_comment where post_id=? and `deleted`=0 and `approve`=1 and `type`='comment' order by  id desc limit ?,20",
+            [
+                postid, offset
+            ])
+        return result;
+    },
+    async getPostListbyTagId(tagid, page, sort) {
+        logger.debug("getPostListbyTags:", tagid, page, sort);
+        const offset = (page - 1) * 20;
+        const sql = `SELECT p.*,a.* FROM board_post AS p 
+        LEFT JOIN board_postintag AS t ON p.id = t.post_id 
+        LEFT JOIN board_postacticity AS a ON p.id=a.post_id 
+        WHERE t.tag_id=?  and p.deleted=0
+        order by ${sort == 1 ? "p.id" : "a.lastcommenttime"} desc
+        limit ?,20 
+        `;
+        const [postlist]= await promiseMysqlPool.query(sql,[
+            tagid,
+            offset
+        ]);
+        return postlist;
+
     }
+
+
 
 }
