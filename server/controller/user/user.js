@@ -27,7 +27,19 @@ async function userInfo(ctx, next) {
 
     ctx.body = util.retOk(ret);
 }
+async function changePassword(ctx) {
+    const { currentuser } = ctx.state;
+    const { oldpass, newpass } = ctx.request.body;
+    if (util.sha256(oldpass) != currentuser.password) {
+        ctx.body = util.retError(1000, "密码不正确");
+        return;
+
+    }
+    await userService.changePassword(currentuser["id"],util.sha256(newpass));
+    ctx.body=util.retOk();
+}
 
 module.exports = {
     userInfo,
+    changePassword,
 }

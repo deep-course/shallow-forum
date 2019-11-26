@@ -25,7 +25,9 @@ const middleware = require('../middleware')
  * 
  * 
  */
-router.get('/user/info', middleware.getUser,userController.userInfo);
+router.get('/user/info', 
+middleware.getUser,
+userController.userInfo);
 /**
  * 
  * @api {post} /register 用户注册
@@ -105,8 +107,8 @@ router.post('/sendsmscode', userController.smscode);
  * 
  * @api {post} /resetpassword 找回密码
  * @apiSampleRequest /api/resetpassword
- * @apiName sendsmscode
- * @apiGroup user-todo
+ * @apiName resetpassword
+ * @apiGroup user
  * @apiVersion  1.0.0
  * @apiUse ReturnCode
  * @apiDescription 通过手机找回密码，会清空session
@@ -117,7 +119,25 @@ router.post('/sendsmscode', userController.smscode);
  * 
  * 
  */
-router.post('/resetpassword', ret);
+router.post('/resetpassword', userController.resetPassword);
+/**
+ * 
+ * @api {post} /resetpassword2 找回密码
+ * @apiSampleRequest /api/resetpassword2
+ * @apiName resetpassword2
+ * @apiGroup user
+ * @apiVersion  1.0.0
+ * @apiUse ReturnCode
+ * @apiDescription 提交token，修改密码
+ *
+ * @apiParam  {String} phone 手机号 
+ * @apiParam  {String} token 短信验证码
+ * @apiParam  {String} password 修改的密码
+ * 
+ * 
+ * 
+ */
+router.post('/resetpassword2', userController.resetPassword2);
 /**
  * 
  * @api {get} /user/detail 获取用户信息
@@ -138,7 +158,7 @@ router.get('/user/detail', ret);
  * @api {post} /user/updatepassword 更新密码
  * @apiSampleRequest /api/user/updatepassword
  * @apiName user/updatepassword
- * @apiGroup user-todo
+ * @apiGroup user
  * @apiVersion  1.0.0
  * @apiUse ReturnCode
  * @apiUse HeaderToken
@@ -149,7 +169,11 @@ router.get('/user/detail', ret);
  * 
  * 
  */
-router.post('/user/updatepassword', ret);
+router.post('/user/updatepassword', 
+middleware.getUser,
+middleware.checkUser,
+userController.changePassword
+);
 /**
  * 
  * @api {post} /user/updatedetail 更新用户信息
@@ -171,27 +195,26 @@ router.post('/user/updatedetail', ret);
  * @api {get} /user/home 用户首页列表
  * @apiSampleRequest /api/user/home
  * @apiName user/home
- * @apiGroup user-todo
+ * @apiGroup user
  * @apiVersion  1.0.0
  * @apiUse ReturnCode
- * @apiUse HeaderToken
  * @apiDescription 用户首页的列表
  * 用户发帖，用户点赞
  * 
  * @apiParam  {String} userslug 用户的slug
+ * @apiParam  {String} page 分页
  * @apiParam  {String} type post发帖，up点赞
  * 
  */
-router.get('/user/home', ret);
+router.get('/user/home', userController.getHomeList);
 /**
  * 
  * @api {get} /user/homeinfo 用户首页信息
  * @apiSampleRequest /api/user/homeinfo
  * @apiName user/homeinfo
- * @apiGroup user-todo
+ * @apiGroup user
  * @apiVersion  1.0.0
  * @apiUse ReturnCode
- * @apiUse HeaderToken
  * @apiDescription 用户首页的信息
  * 个人说明
  * 
@@ -201,7 +224,7 @@ router.get('/user/home', ret);
  * @apiParam  {String} type info用户详细信息，activity用户活动数（点赞总数，发帖数，加入时间等）
  * 
  */
-router.get('/user/homeinfo', ret);
+router.get('/user/homeinfo', userController.getHomeUser);
 
 module.exports = router
 function ret(ctx,next){

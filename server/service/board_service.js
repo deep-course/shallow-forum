@@ -373,6 +373,36 @@ select tag_id from board_postintag where post_id=?
         ]);
         return postlist;
 
+    },
+    async  getPostListByUserId(postid,page){
+        const offset = (page - 1) * 20;
+        const [result] = await promiseMysqlPool.query(`
+        SELECT p.*,a.* FROM board_post AS p
+        LEFT JOIN board_postacticity AS a ON p.id=a.post_id
+        WHERE p.user_id=? and p.deleted=0
+        order by p.id desc
+        limit ?,20
+        `,
+            [
+                postid, offset
+            ])
+        return result;
+
+    },
+    async  getPostListByUserUp(postid,page){
+        const offset = (page - 1) * 20;
+        const [result] = await promiseMysqlPool.query(`
+        SELECT p.*,a.* FROM board_post AS p
+        LEFT JOIN board_postacticity AS a ON p.id=a.post_id
+        inner JOIN board_useruppost u ON p.id=u.user_id
+        WHERE p.user_id=? and p.deleted=0
+        order by p.id desc
+        limit ?,20
+        `,
+            [
+                postid, offset
+            ])
+        return result; 
     }
 
 

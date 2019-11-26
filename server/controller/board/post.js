@@ -227,6 +227,7 @@ async function getPostList(ctx, next) {
 
 
 }
+
 module.exports = {
     newPost,
     newLink,
@@ -234,5 +235,5 @@ module.exports = {
     editPost,
     deletePost,
     upPost,
-    getPostList
+    getPostList,
 };

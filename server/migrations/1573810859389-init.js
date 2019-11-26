@@ -158,6 +158,7 @@ module.exports.up =  async function (next) {
   await promiseMysqlPool.query('DROP TABLE IF EXISTS `user_user`;');
   await promiseMysqlPool.query(`CREATE TABLE IF NOT EXISTS \`user_user\` (
     \`id\` int(10) unsigned NOT NULL AUTO_INCREMENT,
+    \`slug\` VARCHAR(50) NOT NULL,
     \`username\` varchar(50) NOT NULL COMMENT '用户名',
     \`email\` varchar(100) NOT NULL COMMENT '邮件',
     \`phone\` varchar(50) NOT NULL COMMENT '电话',
@@ -168,6 +169,7 @@ module.exports.up =  async function (next) {
     \`lock\` tinyint(4) NOT NULL COMMENT '锁定',
     \`ip\` varchar(20) NOT NULL,
     PRIMARY KEY (\`id\`)
+    UNIQUE INDEX \`slug\` (\`slug\`)
   ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COMMENT='用户表';`)
   logger.info("user_userinfo");
   await promiseMysqlPool.query('DROP TABLE IF EXISTS `user_userinfo`;');

@@ -8,6 +8,14 @@ module.exports={
         const [rows,fields]= await promiseMysqlPool.query("select * from user_user where username=?", [username]);
         return rows[0];
     },
+    getUserActivityById:async function(id){
+        const [rows,fields]= await promiseMysqlPool.query("select * from user_activity where user_id=?", [id]);
+        return rows[0];
+    },
+    getUserBySlug:async function(slug){
+        const [rows,fields]= await promiseMysqlPool.query("select * from user_user where slug=?", [slug]);
+        return rows[0];
+    },
     getUserById:async function(id){
         const [rows,fields]= await promiseMysqlPool.query("select * from user_user where id=?", [id]);
         return rows[0];
@@ -46,6 +54,7 @@ module.exports={
             logger.debug("insertUser:user_user");
             const insertresult=await promiseMysqlPool.query("insert ignore into user_user set ?",{
                 username:username,
+                slug:util.getUuid(),
                 email:'',
                 phone:phone,
                 activate:1,
@@ -84,7 +93,7 @@ module.exports={
 
     },
     //生成短信token
-    genSmsToken:async function (phone)
+    genSmsToken:async function (phone,type)
     {        
         //token,30分钟内有效
         const token=util.randomString(6);
@@ -94,7 +103,7 @@ module.exports={
             const insertresult=await promiseMysqlPool.query("insert into user_token set ?",{
                 key:phone,
                 token:token,
-                type:'sms',
+                type:type,
                 addtime:now.toDate(),
                 expirestime:now.add(30,'m').toDate()
             }); 
@@ -108,10 +117,11 @@ module.exports={
 
     },
     //查找数据库中的token，并返回
-    getTokenByPhone:async function(phone)
+    getTokenByPhone:async function(phone,type)
     {
         const expirestime= moment().toDate();
-        const [rows,fields]= await promiseMysqlPool.query("select * from user_token where `key`=? and `type`='sms' and expirestime>=? order by id desc limit 1", [phone,expirestime]);
+        const [rows,fields]= await promiseMysqlPool.query("select * from user_token where `key`=? and `type`=? and expirestime>=? order by id desc limit 1",
+         [phone,type,expirestime]);
         return rows[0];
 
     },
@@ -122,4 +132,11 @@ module.exports={
         return rows;
 
     },
+    //更新用户信息
+    changePassword:async function(uid,password){
+        await promiseMysqlPool.execute("update user_user set password=? where id=?",[
+            password,
+            uid
+        ]);
+    }
 }
