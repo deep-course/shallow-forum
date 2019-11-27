@@ -1,0 +1,101 @@
+.detail-wrapper{
+  position: relative;
+  padding: 24px;
+  background: #ffffff;
+  .detail-action{
+    position: absolute;
+    margin-left: -90px;
+    .anticon{
+      font-size: 24px;
+    }
+    .ant-badge-count{
+      top: -6px;
+      right: -8px;
+    }
+    .detail-action-like, .detail-action-comment{
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #ffffff;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      margin-bottom: 20px;
+      .userCursor;
+    }
+  }
+  .detail-info{
+    margin-bottom: 20px;
+    .detail-user{
+      display: flex;
+      font-size: 0;
+      margin-bottom: 20px;
+      .detail-user-img{
+        width: 40px;
+        height: 40px;
+        margin-right: 12px;
+      }
+      .detail-user-info{
+        .detail-user-name{
+          font-size: 14px;
+          font-weight: 700;
+          color: #333;
+        }
+        .detail-user-date{
+          font-size: 12px;
+          color: #909090;
+          .detail-user-read{
+            margin-left: 10px;
+          }
+        }
+      }
+    }
+    .detail-cover{
+      margin-bottom: 20px;
+      font-size: 0;
+      img{
+        width: 100%;
+      }
+    }
+    .detail-title{
+      font-weight: bold;
+      font-size: 32px;
+    }
+  }
+  .detail-content{
+    
+  }
+  .detail-comment{
+    .detail-comment-title{
+      padding: 40px 0 10px;
+      text-align: center;
+      color: @listColor;
+      font-size: 16px;
+    }
+    .detail-comment-self{
+      background: #fafbfc;
+      padding: 12px 20px 12px 12px;
+      .detail-comment-self-content{
+        display: flex;
+        .detail-comment-self-content-user{
+          width: 32px;
+          height: 32px;
+          margin-right: 10px;
+        }
+        .detail-comment-self-content-areatext{
+          resize: none;
+        }
+      }
+      .detail-comment-self-submit{
+        margin-top: 10px;
+        text-align: right;
+      }
+    }
+    .detail-comment-list{
+      padding: 0 20px 20px 54px;
+    }
+    .detail-comment-loadmore{
+      text-align: center;
+    }
+  }
+}
