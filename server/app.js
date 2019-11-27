@@ -43,8 +43,8 @@ if (env === 'development') {
   })
   //开发模式可以跨域
   app.use(async (ctx, next) => {
-    ctx.set('Access-Control-Expose-Headers: token');
-    ctx.set('Access-Control-Allow-Headers: Origin, X-Requested-With, Content-Type, Accept, Connection, User-Agent, Cookie, token');
+    ctx.set('Access-Control-Expose-Headers','token');
+    ctx.set('Access-Control-Allow-Headers','Origin, X-Requested-With, Content-Type, Accept, Connection, User-Agent, Cookie, token');
     ctx.set('Access-Control-Allow-Origin', '*');
     await next();
   });
@@ -53,8 +53,14 @@ if (env === 'development') {
 app.use(static(
   path.join(__dirname, "public")
 ));
-//koa-body处理文件上传等
-app.use(KoaBody());
+//koa-body处理文件上传等,最大上传5M
+app.use(KoaBody({
+  multipart: true,
+  formidable: {
+      maxFileSize: 10*1024*1024,
+      uploadDir :"./upload/" 
+  }
+}));
 
 //路由
 app.use(router.routes(), router.allowedMethods())
@@ -76,3 +82,5 @@ db.promiseMysqlPool.query("show tables").then((result, err) => {
   });
   logger.info("server start!");
 });
+
+

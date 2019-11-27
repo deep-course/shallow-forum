@@ -1,11 +1,11 @@
 'use strict'
-const { promiseMysqlPool } = require("../db");
+const {promiseMysqlPool } = require("../db");
 const util = require("../util");
 const logger=util.getLogger(__filename);
-module.exports.up = async function (next) {
+module.exports.up =  async function (next) {
   logger.info("board_comment");
-  promiseMysqlPool.query('DROP TABLE IF EXISTS `board_comment`;');
-  promiseMysqlPool.query(`CREATE TABLE IF NOT EXISTS \`board_comment\` (
+  await promiseMysqlPool.query('DROP TABLE IF EXISTS `board_comment`;');
+  await promiseMysqlPool.query(`CREATE TABLE IF NOT EXISTS \`board_comment\` (
     \`id\` int(10) unsigned NOT NULL AUTO_INCREMENT,
     \`post_id\` int(10) unsigned NOT NULL COMMENT 'postid',
     \`user_id\` int(10) unsigned NOT NULL COMMENT '用户id',
@@ -21,8 +21,8 @@ module.exports.up = async function (next) {
   ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='评论表';
   `);
   logger.info("board_post");
-  promiseMysqlPool.query('DROP TABLE IF EXISTS `board_post`;');
-  promiseMysqlPool.query(`CREATE TABLE IF NOT EXISTS \`board_post\` (
+  await promiseMysqlPool.query('DROP TABLE IF EXISTS `board_post`;');
+  await promiseMysqlPool.query(`CREATE TABLE IF NOT EXISTS \`board_post\` (
     \`id\` int(11) unsigned NOT NULL AUTO_INCREMENT,
     \`slug\` char(32) NOT NULL COMMENT '唯一标示',
     \`title\` varchar(80) NOT NULL COMMENT '标题',
@@ -34,14 +34,15 @@ module.exports.up = async function (next) {
     \`lock\` tinyint(4) unsigned NOT NULL COMMENT '锁定',
     \`sticky\` tinyint(4) unsigned NOT NULL COMMENT '置顶',
     \`board_id\` int(10) unsigned NOT NULL COMMENT '板块id，暂时没用',
+    \`image\` VARCHAR(100) NOT NULL COMMENT '主图的hash',
     \`deleted\` tinyint(4) unsigned NOT NULL COMMENT '逻辑删除标识',
     PRIMARY KEY (\`id\`),
     UNIQUE KEY \`slug\` (\`slug\`)
   ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='帖子';
   `)
   logger.info("board_postacticity");
-  promiseMysqlPool.query('DROP TABLE IF EXISTS `board_postacticity`;');
-  promiseMysqlPool.query(`CREATE TABLE IF NOT EXISTS \`board_postacticity\` (
+  await promiseMysqlPool.query('DROP TABLE IF EXISTS `board_postacticity`;');
+  await promiseMysqlPool.query(`CREATE TABLE IF NOT EXISTS \`board_postacticity\` (
     \`post_id\` int(11) unsigned NOT NULL,
     \`lastcommentuser_id\` int(11) unsigned NOT NULL COMMENT '最后回复的用户id',
     \`lastcomment_id\` int(11) unsigned NOT NULL COMMENT '最后回复的id',
@@ -52,18 +53,19 @@ module.exports.up = async function (next) {
     PRIMARY KEY (\`post_id\`)
   ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='帖子信息';`)
   logger.info("board_postimage");
-  promiseMysqlPool.query('DROP TABLE IF EXISTS `board_postimage`;');
-  promiseMysqlPool.query(`CREATE TABLE IF NOT EXISTS \`board_postimage\` (
-    \`id\` int(10) unsigned NOT NULL,
-    \`hash\` char(50) NOT NULL COMMENT '图片的hash值',
+  await promiseMysqlPool.query('DROP TABLE IF EXISTS `board_postimage`;');
+  await promiseMysqlPool.query(`CREATE TABLE IF NOT EXISTS \`board_postimage\` (
+    \`id\` int(10) unsigned NOT NULL AUTO_INCREMENT,
+    \`filename\` VARCHAR(100) NOT NULL COMMENT '加后缀的文件名',
+    \`hash\` CHAR(32) NOT NULL COMMENT '图片的md5值',
     \`post_id\` int(10) unsigned NOT NULL,
     \`user_id\` int(10) unsigned NOT NULL,
     \`addtime\` datetime NOT NULL,
     PRIMARY KEY (\`id\`)
   ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='图片';`)
   logger.info("board_postintag");
-  promiseMysqlPool.query('DROP TABLE IF EXISTS `board_postintag`;');
-  promiseMysqlPool.query(`CREATE TABLE IF NOT EXISTS \`board_postintag\` (
+  await promiseMysqlPool.query('DROP TABLE IF EXISTS `board_postintag`;');
+  await promiseMysqlPool.query(`CREATE TABLE IF NOT EXISTS \`board_postintag\` (
     \`id\` int(11) unsigned NOT NULL AUTO_INCREMENT,
     \`post_id\` int(11) unsigned DEFAULT NULL,
     \`tag_id\` int(11) unsigned DEFAULT NULL,
@@ -71,16 +73,16 @@ module.exports.up = async function (next) {
     UNIQUE KEY \`post_id_tag_id\` (\`post_id\`,\`tag_id\`)
   ) ENGINE=InnoDB DEFAULT CHARSET=utf8;`)
   logger.info("board_setting");
-  promiseMysqlPool.query('DROP TABLE IF EXISTS `board_setting`;');
-  promiseMysqlPool.query(`CREATE TABLE IF NOT EXISTS \`board_setting\` (
+  await promiseMysqlPool.query('DROP TABLE IF EXISTS `board_setting`;');
+  await promiseMysqlPool.query(`CREATE TABLE IF NOT EXISTS \`board_setting\` (
     \`id\` int(10) unsigned NOT NULL AUTO_INCREMENT,
     \`key\` varchar(100) NOT NULL,
     \`value\` text NOT NULL,
     PRIMARY KEY (\`id\`)
   ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='配置表，配置在初始化的时候写入json文件，定期更新';`)
   logger.info("board_tag");
-  promiseMysqlPool.query('DROP TABLE IF EXISTS `board_tag`;');
-  promiseMysqlPool.query(`CREATE TABLE IF NOT EXISTS \`board_tag\` (
+  await promiseMysqlPool.query('DROP TABLE IF EXISTS `board_tag`;');
+  await promiseMysqlPool.query(`CREATE TABLE IF NOT EXISTS \`board_tag\` (
     \`id\` int(11) unsigned NOT NULL AUTO_INCREMENT,
     \`name\` varchar(50) NOT NULL COMMENT '名称',
     \`type\` varchar(50) NOT NULL COMMENT 'tag的类型，主tag，附加tag',
@@ -91,8 +93,8 @@ module.exports.up = async function (next) {
     UNIQUE KEY \`slug\` (\`slug\`)
   ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COMMENT='标签';`)
   logger.info("board_tagactivity");
-  promiseMysqlPool.query('DROP TABLE IF EXISTS `board_tagactivity`;');
-  promiseMysqlPool.query(`CREATE TABLE IF NOT EXISTS \`board_tagactivity\` (
+  await promiseMysqlPool.query('DROP TABLE IF EXISTS `board_tagactivity`;');
+  await promiseMysqlPool.query(`CREATE TABLE IF NOT EXISTS \`board_tagactivity\` (
     \`tag_id\` int(11) unsigned NOT NULL,
     \`lastdposttime\` datetime NOT NULL COMMENT '最后发布的时间',
     \`lastcommenttime\` datetime NOT NULL COMMENT '最后评论的时间',
@@ -102,9 +104,9 @@ module.exports.up = async function (next) {
     PRIMARY KEY (\`tag_id\`)
   ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='标签相关的活动';`)
   logger.info("board_useruppost");
-  promiseMysqlPool.query('DROP TABLE IF EXISTS `board_useruppost`;');
-  promiseMysqlPool.query(`CREATE TABLE IF NOT EXISTS \`board_useruppost\` (
-    \`id\` int(10) unsigned NOT NULL,
+  await promiseMysqlPool.query('DROP TABLE IF EXISTS `board_useruppost`;');
+  await promiseMysqlPool.query(`CREATE TABLE IF NOT EXISTS \`board_useruppost\` (
+    \`id\` int(10) unsigned NOT NULL AUTO_INCREMENT,
     \`user_id\` int(10) unsigned NOT NULL,
     \`post_id\` int(10) unsigned NOT NULL,
     \`addtime\` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -112,8 +114,8 @@ module.exports.up = async function (next) {
     UNIQUE KEY \`user_id_post_id\` (\`user_id\`,\`post_id\`)
   ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='用户点赞表';`)
   logger.info("user_activity");
-  promiseMysqlPool.query('DROP TABLE IF EXISTS `user_activity`;');
-  promiseMysqlPool.query(`CREATE TABLE IF NOT EXISTS \`user_activity\` (
+  await promiseMysqlPool.query('DROP TABLE IF EXISTS `user_activity`;');
+  await promiseMysqlPool.query(`CREATE TABLE IF NOT EXISTS \`user_activity\` (
     \`user_id\` int(11) unsigned NOT NULL,
     \`lastactiontime\` datetime NOT NULL COMMENT '最后活动时间',
     \`lastlogintime\` datetime NOT NULL COMMENT '最后登陆时间',
@@ -124,8 +126,8 @@ module.exports.up = async function (next) {
     PRIMARY KEY (\`user_id\`)
   ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='用户活动';`)
   logger.info("user_author");
-  promiseMysqlPool.query('DROP TABLE IF EXISTS `user_author`;');
-  promiseMysqlPool.query(`CREATE TABLE IF NOT EXISTS \`user_author\` (
+  await promiseMysqlPool.query('DROP TABLE IF EXISTS `user_author`;');
+  await promiseMysqlPool.query(`CREATE TABLE IF NOT EXISTS \`user_author\` (
     \`user_id\` int(11) unsigned NOT NULL,
     \`slug\` varchar(50) NOT NULL COMMENT 'url',
     \`active\` int(11) NOT NULL COMMENT '是否激活',
@@ -134,16 +136,16 @@ module.exports.up = async function (next) {
     PRIMARY KEY (\`user_id\`)
   ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='用户作者表，在这个表里面的是公众号等自媒体';`)
   logger.info("user_group");
-  promiseMysqlPool.query('DROP TABLE IF EXISTS `user_group`;');
-  promiseMysqlPool.query(`CREATE TABLE IF NOT EXISTS \`user_group\` (
+  await promiseMysqlPool.query('DROP TABLE IF EXISTS `user_group`;');
+  await promiseMysqlPool.query(`CREATE TABLE IF NOT EXISTS \`user_group\` (
     \`id\` int(11) unsigned NOT NULL AUTO_INCREMENT,
     \`name\` varchar(50) NOT NULL COMMENT '组名',
     \`color\` char(7) NOT NULL COMMENT '显示颜色',
     PRIMARY KEY (\`id\`)
   ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COMMENT='用户组，没有组的都是普通用户';`)
   logger.info("user_token");
-  promiseMysqlPool.query('DROP TABLE IF EXISTS `user_token`;');
-  promiseMysqlPool.query(`CREATE TABLE IF NOT EXISTS \`user_token\` (
+  await promiseMysqlPool.query('DROP TABLE IF EXISTS `user_token`;');
+  await promiseMysqlPool.query(`CREATE TABLE IF NOT EXISTS \`user_token\` (
     \`id\` int(11) unsigned NOT NULL AUTO_INCREMENT,
     \`key\` varchar(100) DEFAULT NULL COMMENT 'key根据类型不同而不同，可能是手机，邮箱，甚至用户id',
     \`token\` text COMMENT '用户的token',
@@ -153,9 +155,10 @@ module.exports.up = async function (next) {
     PRIMARY KEY (\`id\`)
   ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COMMENT='用户token表，自动清除过期的';`)
   logger.info("user_user");
-  promiseMysqlPool.query('DROP TABLE IF EXISTS `user_user`;');
-  promiseMysqlPool.query(`CREATE TABLE IF NOT EXISTS \`user_user\` (
+  await promiseMysqlPool.query('DROP TABLE IF EXISTS `user_user`;');
+  await promiseMysqlPool.query(`CREATE TABLE IF NOT EXISTS \`user_user\` (
     \`id\` int(10) unsigned NOT NULL AUTO_INCREMENT,
+    \`slug\` VARCHAR(50) NOT NULL,
     \`username\` varchar(50) NOT NULL COMMENT '用户名',
     \`email\` varchar(100) NOT NULL COMMENT '邮件',
     \`phone\` varchar(50) NOT NULL COMMENT '电话',
@@ -166,18 +169,19 @@ module.exports.up = async function (next) {
     \`lock\` tinyint(4) NOT NULL COMMENT '锁定',
     \`ip\` varchar(20) NOT NULL,
     PRIMARY KEY (\`id\`)
+    UNIQUE INDEX \`slug\` (\`slug\`)
   ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COMMENT='用户表';`)
   logger.info("user_userinfo");
-  promiseMysqlPool.query('DROP TABLE IF EXISTS `user_userinfo`;');
-  promiseMysqlPool.query(`CREATE TABLE IF NOT EXISTS \`user_userinfo\` (
+  await promiseMysqlPool.query('DROP TABLE IF EXISTS `user_userinfo`;');
+  await promiseMysqlPool.query(`CREATE TABLE IF NOT EXISTS \`user_userinfo\` (
     \`user_id\` int(10) unsigned NOT NULL,
     \`key\` varchar(50) NOT NULL,
     \`value\` varchar(200) NOT NULL,
     PRIMARY KEY (\`user_id\`)
   ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='用户信息，以用户属性的KV的形式存储';`)
   logger.info("user_useringroup");
-  promiseMysqlPool.query('DROP TABLE IF EXISTS `user_useringroup`;');
-  promiseMysqlPool.query(`CREATE TABLE IF NOT EXISTS \`user_useringroup\` (
+  await promiseMysqlPool.query('DROP TABLE IF EXISTS `user_useringroup`;');
+  await promiseMysqlPool.query(`CREATE TABLE IF NOT EXISTS \`user_useringroup\` (
     \`id\` int(10) unsigned NOT NULL AUTO_INCREMENT,
     \`user_id\` int(10) unsigned NOT NULL,
     \`group_id\` int(10) unsigned NOT NULL,
@@ -189,7 +193,7 @@ module.exports.up = async function (next) {
 
 
 
-  next()
+
 }
 
 module.exports.down = function (next) {
