@@ -168,8 +168,8 @@ module.exports.up =  async function (next) {
     \`bio\` text NOT NULL COMMENT '个人介绍',
     \`lock\` tinyint(4) NOT NULL COMMENT '锁定',
     \`ip\` varchar(20) NOT NULL,
-    PRIMARY KEY (\`id\`)
-    UNIQUE INDEX \`slug\` (\`slug\`)
+    PRIMARY KEY (\`id\`),
+    UNIQUE KEY \`slug\` (\`slug\`)
   ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COMMENT='用户表';`)
   logger.info("user_userinfo");
   await promiseMysqlPool.query('DROP TABLE IF EXISTS `user_userinfo`;');
