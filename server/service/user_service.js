@@ -29,7 +29,7 @@ module.exports={
         return rows[0];
     },
     getUserInfoById:async function(id){
-        const [rows,fields]= await promiseMysqlPool.query("select * from user_userinfo where id=?", [id]);
+        const [rows,fields]= await promiseMysqlPool.query("select * from user_userinfo where user_id=?", [id]);
         return rows;
     },
     getUserGroup:async function(id){
@@ -136,6 +136,12 @@ module.exports={
     changePassword:async function(uid,password){
         await promiseMysqlPool.execute("update user_user set password=? where id=?",[
             password,
+            uid
+        ]);
+    },
+    updateUserBio:async function(uid,bio){
+        await promiseMysqlPool.execute("update user_user set bio=? where id=?",[
+            bio,
             uid
         ]);
     }

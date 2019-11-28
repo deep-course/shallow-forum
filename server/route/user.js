@@ -140,10 +140,10 @@ router.post('/resetpassword', userController.resetPassword);
 router.post('/resetpassword2', userController.resetPassword2);
 /**
  * 
- * @api {get} /user/detail 获取用户信息
+ * @api {get} /user/detail 获取用户详细信息
  * @apiSampleRequest /api/user/detail
  * @apiName user/detail
- * @apiGroup user-todo
+ * @apiGroup user
  * @apiVersion  1.0.0
  * @apiUse ReturnCode
  * @apiUse HeaderToken
@@ -152,7 +152,12 @@ router.post('/resetpassword2', userController.resetPassword2);
  * 
  * 
  */
-router.get('/user/detail', ret);
+router.get('/user/detail', 
+middleware.getUser,
+middleware.checkUser,
+userController.getUserDetail
+
+);
 /**
  * 
  * @api {post} /user/updatepassword 更新密码
@@ -179,17 +184,21 @@ userController.changePassword
  * @api {post} /user/updatedetail 更新用户信息
  * @apiSampleRequest /api/user/updatedetail
  * @apiName user/updatedetail
- * @apiGroup user-todo
+ * @apiGroup user
  * @apiVersion  1.0.0
  * @apiUse ReturnCode
  * @apiUse HeaderToken
  * @apiDescription 更新用户详细信息
- * 以KV的形式更新
- * 
+ * 目前只更新Bio
+ * @apiParam  {String} bio 用户信息
  * 
  * 
  */
-router.post('/user/updatedetail', ret);
+router.post('/user/updatedetail', 
+middleware.getUser,
+middleware.checkUser,
+userController.updateUserDetail
+);
 /**
  * 
  * @api {get} /user/home 用户首页列表
