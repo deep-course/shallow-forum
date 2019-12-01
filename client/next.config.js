@@ -28,40 +28,46 @@ if (typeof require !== 'undefined') {
   require.extensions['.css'] = file => {}
 }
 
-module.exports = withCss(withLess({
-  webpack: config => {
-    config.node = {
-      fs: 'empty'
+module.exports = {
+  generateBuildId: async () => {
+    // For example get the latest git commit hash here
+    return 'deephub'
+  },
+  ...withCss(withLess({
+    webpack: config => {
+      config.node = {
+        fs: 'empty'
+      }
+      // if (config.module.rules[2].use.length > 1) {
+      //   console.log(config.module.rules[2].use)
+      //   config.module.rules[2].use[4].options = {
+      //     javascriptEnabled: true,
+      //     modifyVars: themeVariables, // make your antd custom effective
+      //   }
+      // }
+      config.module.rules[2].use.push({
+        loader: 'less-loader',
+        options: {
+          javascriptEnabled: true,
+          modifyVars: themeVariables, 
+        }
+      })
+      config.module.rules[2].use.push({
+        loader: 'sass-resources-loader',
+        options: {
+          resources: [
+            path.resolve(__dirname, './assets/global.less'),
+          ]
+        }
+      })
+      return config
     }
-    // if (config.module.rules[2].use.length > 1) {
-    //   console.log(config.module.rules[2].use)
-    //   config.module.rules[2].use[4].options = {
-    //     javascriptEnabled: true,
-    //     modifyVars: themeVariables, // make your antd custom effective
-    //   }
+    // lessLoaderOptions: {
+    //   javascriptEnabled: true,
+    //   modifyVars: themeVariables, // make your antd custom effective
+    //   resources: [
+    //     path.resolve(__dirname, './assets/global.less'),
+    //   ]
     // }
-    config.module.rules[2].use.push({
-      loader: 'less-loader',
-      options: {
-        javascriptEnabled: true,
-        modifyVars: themeVariables, 
-      }
-    })
-    config.module.rules[2].use.push({
-      loader: 'sass-resources-loader',
-      options: {
-        resources: [
-          path.resolve(__dirname, './assets/global.less'),
-        ]
-      }
-    })
-    return config
-  }
-  // lessLoaderOptions: {
-  //   javascriptEnabled: true,
-  //   modifyVars: themeVariables, // make your antd custom effective
-  //   resources: [
-  //     path.resolve(__dirname, './assets/global.less'),
-  //   ]
-  // }
-}));
+  }))
+}
