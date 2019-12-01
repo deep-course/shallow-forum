@@ -38,8 +38,24 @@ async function changePassword(ctx) {
     await userService.changePassword(currentuser["id"],util.sha256(newpass));
     ctx.body=util.retOk();
 }
-
+async function getUserDetail(ctx){
+    const { currentuser } = ctx.state;
+    const bio=currentuser["bio"];
+    //const result= await userService.getUserInfoById(currentuser["id"]);
+    const userinfo={
+        bio
+    };
+    ctx.body=util.retOk(userinfo);
+}
+async function updateUserDetail(ctx){
+    const { currentuser } = ctx.state;
+    const {bio}= ctx.request.body
+    await userService.updateUserBio(currentuser["id"],bio);
+    ctx.body=util.retOk();
+}
 module.exports = {
     userInfo,
     changePassword,
+    getUserDetail,
+    updateUserDetail,
 }
