@@ -33,20 +33,28 @@ module.exports = withCss(withLess({
     config.node = {
       fs: 'empty'
     }
-    if (config.module.rules[2].use.length > 1) {
-      config.module.rules[2].use[4].options = {
+    // if (config.module.rules[2].use.length > 1) {
+    //   console.log(config.module.rules[2].use)
+    //   config.module.rules[2].use[4].options = {
+    //     javascriptEnabled: true,
+    //     modifyVars: themeVariables, // make your antd custom effective
+    //   }
+    // }
+    config.module.rules[2].use.push({
+      loader: 'less-loader',
+      options: {
         javascriptEnabled: true,
-        modifyVars: themeVariables, // make your antd custom effective
+        modifyVars: themeVariables, 
       }
-      config.module.rules[2].use[5] = {
-        loader: 'sass-resources-loader',
-        options: {
-          resources: [
-            path.resolve(__dirname, './assets/global.less'),
-          ]
-        }
+    })
+    config.module.rules[2].use.push({
+      loader: 'sass-resources-loader',
+      options: {
+        resources: [
+          path.resolve(__dirname, './assets/global.less'),
+        ]
       }
-    }
+    })
     return config
   }
   // lessLoaderOptions: {
