@@ -1,13 +1,3 @@
-// module.exports = {
-//   webpack: config => {
-//     // Fixes npm packages that depend on `fs` module
-//     config.node = {
-//       fs: 'empty'
-//     }
-//     return config
-//   }
-// }
-/* eslint-disable */
 const withLess = require('@zeit/next-less');
 const withCss = require('@zeit/next-css');
 const path = require('path');
@@ -28,6 +18,11 @@ module.exports = {
     return 'deephub'
   },
   ...withCss(withLess({
+    cssModules: true,
+    cssLoaderOptions: {
+      importLoaders: 1,
+      localIdentName: "[local]___[hash:base64:5]",
+    },
     webpack: config => {
       config.node = {
         fs: 'empty'
@@ -51,6 +46,7 @@ module.exports = {
           ]
         }
       })
+      console.log(config.module.rules[2].use)
 
       // antd 按需加载样式报错解决
       config.plugins.push(

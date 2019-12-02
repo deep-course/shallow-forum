@@ -1,6 +1,7 @@
 {
   "presets": ["next/babel"],
   "plugins": [
+    // ["module-alias", { "src": "./src", "expose": "@", "pagestyle": "./assets/pageStyle" }],
     ["@babel/plugin-proposal-decorators", { "legacy": true }],
     ["@babel/plugin-proposal-class-properties", { "loose": true }],
     [
