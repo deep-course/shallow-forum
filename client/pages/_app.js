@@ -3,7 +3,7 @@ import App from 'next/app';
 import store from '../store'
 import { Provider } from 'mobx-react'
 import Layout from '../components/Layout'
-import 'antd/dist/antd.css'
+// import 'antd/dist/antd.css'
 
 class MyApp extends App {
   static async getInitialProps ({ Component, ctx }) {

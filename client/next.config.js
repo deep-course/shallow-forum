@@ -10,14 +10,8 @@
 /* eslint-disable */
 const withLess = require('@zeit/next-less');
 const withCss = require('@zeit/next-css');
-const lessToJS = require('less-vars-to-js');
-const fs = require('fs');
 const path = require('path');
-
-// Where your antd-custom.less file lives
-const themeVariables = lessToJS(
-  fs.readFileSync(path.resolve(__dirname, './assets/theme.less'), 'utf8')
-)
+const FilterWarningsPlugin = require('webpack-filter-warnings-plugin')
 
 // fix: prevents error when .less files are required by node
 if (typeof require !== 'undefined') {
@@ -38,20 +32,17 @@ module.exports = {
       config.node = {
         fs: 'empty'
       }
-      // if (config.module.rules[2].use.length > 1) {
-      //   console.log(config.module.rules[2].use)
-      //   config.module.rules[2].use[4].options = {
-      //     javascriptEnabled: true,
-      //     modifyVars: themeVariables, // make your antd custom effective
-      //   }
-      // }
+
+      // less-load 开启javascriptEnabled 并定义antd主题色
       config.module.rules[2].use.push({
         loader: 'less-loader',
         options: {
           javascriptEnabled: true,
-          modifyVars: themeVariables, 
+          modifyVars: { '@primary-color': '#426799' }, 
         }
       })
+
+      // 添加全局less样式  scss也可以
       config.module.rules[2].use.push({
         loader: 'sass-resources-loader',
         options: {
@@ -60,14 +51,31 @@ module.exports = {
           ]
         }
       })
+
+      // antd 按需加载样式报错解决
+      config.plugins.push(
+        new FilterWarningsPlugin({
+            exclude: /mini-css-extract-plugin[^]*Conflicting order between:/,
+        })
+      )
+
+      // 解决antd 按需加载loader问题解决
+      if(config.externals){
+        const includes = [/antd/];
+        config.externals = config.externals.map(external => {
+          if (typeof external !== 'function') return external;
+          return (ctx, req, cb) => {
+            return includes.find(include =>
+              req.startsWith('.')
+                ? include.test(path.resolve(ctx, req))
+                : include.test(req)
+            )
+              ? cb()
+              : external(ctx, req, cb);
+          };
+        });
+      }
       return config
     }
-    // lessLoaderOptions: {
-    //   javascriptEnabled: true,
-    //   modifyVars: themeVariables, // make your antd custom effective
-    //   resources: [
-    //     path.resolve(__dirname, './assets/global.less'),
-    //   ]
-    // }
   }))
 }
