@@ -83,12 +83,12 @@ async function getPostDetail(ctx, next) {
 }
 async function checkEditPost(ctx, next) {
     logger.debug("checkEditPost:", ctx.state);
-    const{post,currentuser}=ctx.state;
+    const { post, currentuser } = ctx.state;
     if (!post) {
         ctx.body = util.retError(-20, "未找到信息")
         return;
     }
-    if (comment["type"]!="post"){
+    if (comment["type"] != "post") {
         ctx.body = util.retError(-21, "不支持修改")
         return;
     }
@@ -98,7 +98,7 @@ async function checkEditPost(ctx, next) {
         return;
     }
     //判断内容
-    const { title, content, lableid,mainimage, imagelist } = ctx.request.body;
+    const { title, content, lableid, mainimage, imagelist } = ctx.request.body;
     if (!title || !content) {
         ctx.body = util.retError(-23, "标题，内容和类别不能为空");
         return;
@@ -111,11 +111,11 @@ async function checkEditPost(ctx, next) {
         slug: post["slug"],
         title: title,
         content: content,
-        comment_id:post["comment_id"],
+        comment_id: post["comment_id"],
         lableid: lableid || 0
 
     }
-    
+
     //检查图片
     //上传图片必须带postid，所以不会有postid=0的情况
     if (mainimage) {
@@ -133,7 +133,7 @@ async function checkEditPost(ctx, next) {
     else {
         ctx.state.editpost.mainimage = "";
     }
-    
+
     if (imagelist) {
         //判断图片是否在数据库中
         for (let index = 0; index < imagelist.length; index++) {
@@ -236,17 +236,17 @@ async function checkAddPost(ctx, next) {
 }
 async function checkAddComment(ctx, next) {
     logger.debug("checkAddComment:", ctx.state);
-    const {post}=ctx.state;
+    const { post } = ctx.state;
     //TODO:添加权限判断
 
     //判断内容
-    const { content} = ctx.request.body;
+    const { content } = ctx.request.body;
     if (!content) {
         ctx.body = util.retError(2000, "回复内容不能为空");
         return false
     }
     //判断用户post是否存在和post的状态
-    
+
     logger.debug("post信息:", post);
     if (!post || _.isEmpty(post)) {
         ctx.body = util.retError(2000, "未找到帖子");
@@ -269,24 +269,24 @@ async function checkEditComment(ctx, next) {
     //TODO:添加权限判断
 
     //判断内容
-    const { content,commentid} = ctx.request.body;
-    const {currentuser} =ctx.state;
+    const { content, commentid } = ctx.request.body;
+    const { currentuser } = ctx.state;
     if (!content) {
         ctx.body = util.retError(2000, "回复内容不能为空");
-        return ;
+        return;
     }
     //判断comment是否存在
-    const comment=await boardService.getCommentById(commentid);
+    const comment = await boardService.getCommentById(commentid);
     logger.debug("comment信息:", comment);
     if (!comment || _.isEmpty(comment)) {
         ctx.body = util.retError(2000, "未找到回复");
         return;
     }
-    if (comment["type"]!="comment"){
+    if (comment["type"] != "comment") {
         ctx.body = util.retError(2000, "不能编辑");
         return;
     }
-    if (comment["user_id"]!=currentuser["id"]) {
+    if (comment["user_id"] != currentuser["id"]) {
         ctx.body = util.retError(2000, "不能编辑");
         return;
     }
@@ -294,7 +294,7 @@ async function checkEditComment(ctx, next) {
     ctx.state.editcomment = {
         id: comment["id"],
         content: content,
-        edituser:currentuser["id"],
+        edituser: currentuser["id"],
     };
     await next();
 }
