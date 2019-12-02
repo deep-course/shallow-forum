@@ -2,11 +2,10 @@ import React from 'react'
 import {observer, inject} from 'mobx-react';
 import PageHead from '../components/PageHead'
 import ListItem from '../components/ListItem'
-import index from '../assets/pageStyle/index.less'
+import '../assets/pageStyle/index.less'
 
-import test from '../assets/pageStyle/test.less'
+import test from '../zhujin/test.less'
 console.log(test)
-console.log(index)
 
 @inject('user', 'search')
 @observer
