@@ -9,7 +9,7 @@
   },
   "scripts": {
     "dev": "node ./node_modules/node-dev/bin/node-dev app.js",
-    "doc": "node ./node_modules/apidoc/bin/apidoc -e \"(node_modules|public)\" -o public/apidoc",
+    "doc": "node ./node_modules/apidoc/bin/apidoc -i doc/ -o public/apidoc",
     "prod-test": "NODE_ENV=production ./node_modules/node-dev/bin/node-dev app.js",
     "migrate": "node ./node_modules/migrate/bin/migrate",
     "test": "echo \"Error: no test specified\" && exit 1"
