@@ -52,49 +52,52 @@ router.post('/editpost',
     middleware.checkUser,
     middleware.checkEditPost,
     boardController.editPost
-    );
+);
 
 
 
-router.post('/editcomment',   
-middleware.getUser,
-middleware.checkUser,
-middleware.checkEditComment,
-boardController.editComment);
+router.post('/editcomment',
+    middleware.getUser,
+    middleware.checkUser,
+    middleware.checkEditComment,
+    boardController.editComment);
 
 
-router.post('/deletecomment', 
-middleware.getUser,
-middleware.checkUser,
-boardController.deleteComment);
+router.post('/deletecomment',
+    middleware.getUser,
+    middleware.checkUser,
+    boardController.deleteComment);
 
 
 router.post('/deletepost',
-middleware.getUser,
-middleware.checkUser,
-middleware.getPost,
-boardController.deletePost
+    middleware.getUser,
+    middleware.checkUser,
+    middleware.getPost,
+    boardController.deletePost
 
 );
 
 
-router.post('/uppost', 
-middleware.getUser,
-middleware.checkUser,
-middleware.getPost,
-boardController.upPost
+router.post('/uppost',
+    middleware.getUser,
+    middleware.checkUser,
+    middleware.getPost,
+    boardController.upPost
 );
 
 
-router.get('/postlist', 
-middleware.getUser,
-boardController.getPostList
+router.get('/postlist',
+    middleware.getUser,
+    boardController.getPostList
 );
 
-router.get('/commentlist', 
-middleware.getUser,
-middleware.getPost,
-boardController.getCommentList
+router.get('/commentlist',
+    middleware.getUser,
+    middleware.getPost,
+    boardController.getCommentList
+);
+router.get('/boardsetting',
+    boardController.getBoardSetting
 );
 
 module.exports = router

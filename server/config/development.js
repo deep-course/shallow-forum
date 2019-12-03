@@ -15,5 +15,8 @@ module.exports = {
     //端口
     port: 3001,
     host: '0.0.0.0',
+    //第三方服务
+    sms:"aliyunsms",
+    file:"aliyunoss"
 
 };

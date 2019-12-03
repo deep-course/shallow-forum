@@ -54,7 +54,7 @@ module.exports = {
   //如果登录正常，用户信息保存到ctx.state.user中
   getUser,
   //判断ctx.state.user中的信息确定用户是否登录
-  //并判断用户状态
+  //并判断用户状态，lock状态的不算登录
   checkUser,
 
 };

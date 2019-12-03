@@ -4,6 +4,7 @@ const _ = require("lodash");
 const moment = require("moment");
 const userService = require('../../service/user_service');
 const boardService = require('../../service/board_service');
+const _3rdService=require('../../service/3rd_service');
 const svgCaptcha = require('svg-captcha');
 
 async function login(ctx) {
@@ -119,7 +120,7 @@ async function smscode(ctx) {
         if (token) {
             //发送
             const text = `您正在注册验证，验证码 ${token}，请在30分钟提交，切勿将验证码泄露于他人。`;
-            const sendresult = await _3rdService.sendSms(phone, token);
+            const sendresult = await _3rdService.sendRegisterSms(phone, token);
             if (sendresult) {
                 ctx.body = util.retOk({});
             }
@@ -164,9 +165,9 @@ async function resetPassword(ctx) {
         const token = captchacode ? captchacode.token : await userService.genSmsToken(phone, "password");
 
         if (token) {
-            //发送
-            const text = `您正在进行找回密码的操作，验证码 ${token}，请在30分钟提交，切勿将验证码泄露于他人。`;
-            const sendresult = await _3rdService.sendSms(phone, token);
+            //发送 
+            //const text = `您正在进行找回密码的操作，验证码 ${token}，请在30分钟提交，切勿将验证码泄露于他人。`;
+            const sendresult = await _3rdService.sendPasswordSms(phone, token );
             if (sendresult) {
                 ctx.body = util.retOk({});
             }
@@ -285,6 +286,5 @@ module.exports = {
     resetPassword,
     resetPassword2,
     getHomeUser,
-    getHomeList,
-
+    getHomeList
 }
