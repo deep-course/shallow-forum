@@ -279,3 +279,16 @@
  * @apiParam  {String} postslug  tag标识
  * @apiParam  {Number} page  分页，默认第一页
  */
+
+ /**
+ *
+ * @api {get} /board/boardsetting  获取论坛设置
+ * @apiSampleRequest /api/board/boardsetting
+ * @apiName boardsetting
+ * @apiGroup board
+ * @apiVersion  1.0.0
+ * @apiDescription 获取论坛设置
+ * taglist 标签列表
+ * laballist 状态列表
+ * @apiUse ReturnCode
+ */

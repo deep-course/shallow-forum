@@ -10,6 +10,22 @@ async function getBoardInfo(ctx, next) {
 
 
 }
+async function getBoardSetting(ctx) {
+    let taglist = {};
+    taglist["test"]="测试tag";
+    taglist["tag1"]="测试1";
+
+    let laballist={};
+    laballist[0]="无";
+    laballist[1]="提问";
+    laballist[2]="已解决";
+
+    ctx.body = util.retOk({
+        taglist,
+        laballist
+    });
+}
 module.exports = {
     getBoardInfo,
+    getBoardSetting
 }

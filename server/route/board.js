@@ -96,5 +96,8 @@ router.get('/commentlist',
     middleware.getPost,
     boardController.getCommentList
 );
+router.get('/boardsetting',
+    boardController.getBoardSetting
+);
 
 module.exports = router
