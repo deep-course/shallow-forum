@@ -4,7 +4,7 @@ import PageHead from '../components/PageHead'
 import ListItem from '../components/ListItem'
 import '../assets/pageStyle/index.less'
 
-import test from '../zhujin/test.less'
+import test from '../zhujin/test.module.less'
 console.log(test)
 
 @inject('user', 'search')
