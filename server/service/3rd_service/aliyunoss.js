@@ -2,7 +2,7 @@
 const util = require('../../util');
 const logger = util.getLogger(__filename);
 const OSS = require('ali-oss');
-const url = require('url')
+const url = require('url');
 const OSS_SETTING={
     region: 'oss-cn-beijing',
     accessKeyId: '',
@@ -16,6 +16,7 @@ async function put(local, oss) {
         return result.url;
     } catch (error) {
         logger.error('OSS put err:', error);
+        return "";
     }
 }
 async function del(oss) {
@@ -27,6 +28,7 @@ async function del(oss) {
         return true;
     } catch (error) {
         logger.error('OSS del err:', error);
+        return false;
     }
 }
 module.exports = {

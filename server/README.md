@@ -23,5 +23,5 @@ npm run doc 生成API DOC
 
 默认文件服务使用阿里云oss：需要安装 npm install ali-oss
 
-
+aws s3的文件支持 需要安装 npm install aws-sdk
 
