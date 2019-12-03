@@ -4,6 +4,7 @@ import store from '../store'
 import { Provider } from 'mobx-react'
 import Layout from '../components/Layout'
 
+
 class MyApp extends App {
   static async getInitialProps ({ Component, ctx }) {
     let pageProps = {};
