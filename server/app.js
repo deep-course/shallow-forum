@@ -46,6 +46,12 @@ if (env === 'development') {
     ctx.set('Access-Control-Expose-Headers','token');
     ctx.set('Access-Control-Allow-Headers','Origin, X-Requested-With, Content-Type, Accept, Connection, User-Agent, Cookie, token');
     ctx.set('Access-Control-Allow-Origin', '*');
+    ctx.set('Access-Control-Allow-Methods', 'PUT, POST, GET, DELETE, OPTIONS');
+    if (ctx.method == 'OPTIONS') {
+      ctx.body = 200; 
+    } else {
+      await next();
+    }
     await next();
   });
 }
