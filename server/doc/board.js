@@ -295,9 +295,9 @@
 
  /**
  * 
- * @api {post} /board/uploadavatar 上传用户头像
+ * @api {post} /user/uploadavatar 上传用户头像
  * @apiName uploadavatar
- * @apiGroup board
+ * @apiGroup user
  * @apiVersion  1.0.0
  * @apiUse HeaderToken
  * @apiUse ReturnCode
@@ -307,7 +307,7 @@
  * curl --header "token: 登录的token"
  * -F "postslug="
  * -F "file=@文件名" 
- * localhost:3001/api/board/uploadavatar
+ * localhost:3001/api/user/uploadavatar
  * 
  * 最后都会转换成100*100的png图像保存
  * 
