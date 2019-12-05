@@ -208,19 +208,20 @@ async function resetPassword2(ctx) {
 }
 async function getHomeUser(ctx) {
     let { userslug, type } = ctx.request.query;
-    const user = await userService.getUserBySlug(userslug);
+    let user = await userService.getUserBySlug(userslug);
     logger.debug(user);
     if (!user || _.isEmpty(user)) {
         ctx.body = util.retError(1000, "未找到用户")
         return;
     }
-
+    user["avatar"]=util.getUseravatar(user["id"]);
     if (type == "info") {
         ctx.body = util.retOk(_.pick(user, [
             "slug",
             "username",
             "jointime",
-            "bio"
+            "bio",
+            "avatar"
         ]));
     }
     else if (type == "activity") {
@@ -259,6 +260,11 @@ async function getHomeList(ctx) {
     else {
         ctx.body=util.retError(2000,"参数错误");
     }
+    if (postlist.length==0)
+    {
+        ctx.body=util.retOk([]);
+        return;
+    }
     let ids = [];
     ids = _.uniq(ids);
     _.forEach(postlist, function (item) {
@@ -274,6 +280,7 @@ async function getHomeList(ctx) {
         const postuser=userlistid[item["user_id"]]
         let post=_.pick(item,["slug","title","pubtime","image","label","lastcommenttime"]);
         post["username"]=postuser ? postuser["username"] : "未知用户",
+        post["useravatar"]=postuser ?  util.getUseravatar(postuser["id"]) : "",
         retpostlist.push(post);
     });
     ctx.body = util.retOk(retpostlist);

@@ -76,6 +76,7 @@ async function getCommentList(ctx, next) {
             content: item["content"],
             username: commentuser ? commentuser["username"] : "未知用户",
             addtime:item["addtime"],
+            useravatar:commentuser ? util.getUseravatar(commentuser["id"]) : "",
         };
         if (item["edituser_id"]!=0){
             newitem["edituser"]={

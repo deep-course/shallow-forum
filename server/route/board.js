@@ -99,5 +99,9 @@ router.get('/commentlist',
 router.get('/boardsetting',
     boardController.getBoardSetting
 );
-
+router.post('/uploadavatar',
+    middleware.getUser,
+    middleware.checkUser,
+    boardController.uploadAvatar
+);
 module.exports = router

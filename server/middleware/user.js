@@ -11,7 +11,7 @@ async function getUser(ctx, next) {
   logger.debug("middleware-user:", data);
   if (data) {
     //用户信息
-    const currentUser = await userService.getUserById(data.id);
+    let currentUser = await userService.getUserById(data.id);
     if (currentUser && !_.isEmpty(currentUser)) {
       const hash = util.md5(`${currentUser.id}|${currentUser.password}`);
       //判断hash是否一致
@@ -23,6 +23,8 @@ async function getUser(ctx, next) {
         logger.debug("30天过期时间:", tokenTime.add(30, 'days'));
         if (tokenTime.add(30, 'days') > moment()) {
           //token未过期
+          //设置用户头像
+          currentUser["avatar"]=util.getUseravatar(currentUser["id"]);
           ctx.state.currentuser = currentUser;
           //用户分组
           const userInGroup = await userService.getUserGroup(data.id);
