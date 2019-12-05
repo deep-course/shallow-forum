@@ -52,7 +52,6 @@ if (env === 'development') {
     } else {
       await next();
     }
-    await next();
   });
 }
 //静态文件
