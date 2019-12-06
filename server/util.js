@@ -119,8 +119,8 @@ const util = module.exports = {
         const  buffer = fs.readFileSync(filepath);
         return this.hash(buffer,"md5");
     },
-    getUseravatar(id){
-        return "/avatar/"+util.md5("avatar-"+id)+".png";
+    getUserAvatar(id){
+        return util.md5("avatar-"+id)+".png";
 
     }
 

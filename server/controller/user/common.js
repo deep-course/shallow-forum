@@ -1,4 +1,7 @@
 const util = require("../../util");
+const path=require("path");
+const sharp=require("sharp");
+const fs=require("fs");
 const logger = util.getLogger(__filename);
 const _ = require("lodash");
 const moment = require("moment");
@@ -214,7 +217,6 @@ async function getHomeUser(ctx) {
         ctx.body = util.retError(1000, "未找到用户")
         return;
     }
-    user["avatar"]=util.getUseravatar(user["id"]);
     if (type == "info") {
         ctx.body = util.retOk(_.pick(user, [
             "slug",
@@ -280,7 +282,7 @@ async function getHomeList(ctx) {
         const postuser=userlistid[item["user_id"]]
         let post=_.pick(item,["slug","title","pubtime","image","label","lastcommenttime"]);
         post["username"]=postuser ? postuser["username"] : "未知用户",
-        post["useravatar"]=postuser ?  util.getUseravatar(postuser["id"]) : "",
+        post["useravatar"]=postuser ?  postuser["avatar"] : "",
         retpostlist.push(post);
     });
     ctx.body = util.retOk(retpostlist);
@@ -294,7 +296,7 @@ async function uploadAvatar(ctx){
         return;
     }
     let format = "";
-    const newfilename=util.md5("avatar-"+currentuser["id"])+".png";
+    const newfilename=util.getUserAvatar(currentuser["id"]);
     const tempfilepath=path.join(process.cwd(), "upload", newfilename);
     logger.debug(tempfilepath);
     try {
@@ -316,6 +318,7 @@ async function uploadAvatar(ctx){
     
     try {
         const url=await _3rdService.saveFile(tempfilepath,"avatar/"+newfilename); 
+        await userService.updateAvatar(currentuser["id"],url);
         ctx.body=util.retOk({url});
     } catch (error) {
         logger.error("uploadAvatar error:",error)

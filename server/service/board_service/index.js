@@ -232,7 +232,7 @@ async function getBoardBySlug(slug) {
 }
 //保存上传的文件
 async function saveFile(filepath, format, userid, postid) {
-    const filename = util.getUuid() + "." + format;
+    const filename = "upload/"+util.getUuid() + "." + format;
     const hash = util.getFileMd5(filepath);
     //保存文件
     saveresult = await _3rd_service.saveFile(filepath, filename);

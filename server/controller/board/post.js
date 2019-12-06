@@ -206,7 +206,7 @@ async function getPostList(ctx, next) {
     page = (!page || page < 1) ? 1 : page;
     const postlist = await boardService.getPostListbyTagId(taginfo[0]["id"], page, sort);
     if (postlist.length == 0) {
-        ctx.body = util.retError(1000, "未找到");
+        ctx.body = util.retOk([]);
         return
     }
     let ids = [];
@@ -225,7 +225,7 @@ async function getPostList(ctx, next) {
         const postuser = userlistid[item["user_id"]]
         let post = _.pick(item, ["slug", "title", "pubtime", "image", "label", "lastcommenttime"]);
         post["username"] = postuser ? postuser["username"] : "未知用户";
-        post["useravatar"] = postuser? util.getUseravatar(postuser["id"]):"";
+        post["useravatar"] = postuser?postuser["avatar"]:"";
         retpostlist.push(post);
     });
     ctx.body = util.retOk(retpostlist);

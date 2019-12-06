@@ -41,7 +41,7 @@ router.get('/user/home', userController.getHomeList);
 
 router.get('/user/homeinfo', userController.getHomeUser);
 
-router.post('/uploadavatar',
+router.post('/user/uploadavatar',
     middleware.getUser,
     middleware.checkUser,
     userController.uploadAvatar

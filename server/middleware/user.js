@@ -24,7 +24,6 @@ async function getUser(ctx, next) {
         if (tokenTime.add(30, 'days') > moment()) {
           //token未过期
           //设置用户头像
-          currentUser["avatar"]=util.getUseravatar(currentUser["id"]);
           ctx.state.currentuser = currentUser;
           //用户分组
           const userInGroup = await userService.getUserGroup(data.id);
