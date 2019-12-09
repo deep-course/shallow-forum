@@ -61,7 +61,8 @@ async function insertUser(phone, username, password, ip) {
             jointime: now.toDate(),
             bio: '',
             lock: 0,
-            ip: ip
+            ip: ip,
+            avatar:"/avatar.png",
         });
         insertuserid = insertresult[0].insertId;
         if (insertuserid == 0) {
@@ -141,7 +142,12 @@ async function updateUserBio(uid, bio) {
         uid
     ]);
 }
-
+async function updateAvatar(uid, url) {
+    await promiseMysqlPool.execute("update user_user set avatar=? where id=?", [
+        url,
+        uid
+    ]);
+}
 module.exports = {
     getUserByName,
     getUserActivityById,
@@ -158,5 +164,6 @@ module.exports = {
     getTokenByPhone,
     getUserInfoByIds,
     changePassword,
-    updateUserBio
+    updateUserBio,
+    updateAvatar
 }

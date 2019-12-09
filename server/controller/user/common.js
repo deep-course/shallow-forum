@@ -1,4 +1,7 @@
 const util = require("../../util");
+const path=require("path");
+const sharp=require("sharp");
+const fs=require("fs");
 const logger = util.getLogger(__filename);
 const _ = require("lodash");
 const moment = require("moment");
@@ -208,19 +211,19 @@ async function resetPassword2(ctx) {
 }
 async function getHomeUser(ctx) {
     let { userslug, type } = ctx.request.query;
-    const user = await userService.getUserBySlug(userslug);
+    let user = await userService.getUserBySlug(userslug);
     logger.debug(user);
     if (!user || _.isEmpty(user)) {
         ctx.body = util.retError(1000, "未找到用户")
         return;
     }
-
     if (type == "info") {
         ctx.body = util.retOk(_.pick(user, [
             "slug",
             "username",
             "jointime",
-            "bio"
+            "bio",
+            "avatar"
         ]));
     }
     else if (type == "activity") {
@@ -259,6 +262,11 @@ async function getHomeList(ctx) {
     else {
         ctx.body=util.retError(2000,"参数错误");
     }
+    if (postlist.length==0)
+    {
+        ctx.body=util.retOk([]);
+        return;
+    }
     let ids = [];
     ids = _.uniq(ids);
     _.forEach(postlist, function (item) {
@@ -274,9 +282,56 @@ async function getHomeList(ctx) {
         const postuser=userlistid[item["user_id"]]
         let post=_.pick(item,["slug","title","pubtime","image","label","lastcommenttime"]);
         post["username"]=postuser ? postuser["username"] : "未知用户",
+        post["useravatar"]=postuser ?  postuser["avatar"] : "",
         retpostlist.push(post);
     });
     ctx.body = util.retOk(retpostlist);
+}
+async function uploadAvatar(ctx){
+    logger.debug('uploadAvatar')
+    const file = ctx.request.files.file;
+    const { currentuser} = ctx.state;
+    if (!file) {
+        ctx.body = util.retError(-1, "未找到文件");
+        return;
+    }
+    let format = "";
+    const newfilename=util.getUserAvatar(currentuser["id"]);
+    const tempfilepath=path.join(process.cwd(), "upload", newfilename);
+    logger.debug(tempfilepath);
+    try {
+        const metadata = await sharp(file.path).metadata();
+        logger.debug("format: ", metadata.format)
+        format = metadata.format;
+        if (format.length>0 && format!="png" ){
+            await sharp(file.path).png().resize(100,100).toFile(tempfilepath);
+        }else
+        {
+            fs.copyFileSync(file.path,tempfilepath);
+        }
+
+    } catch (error) {
+        logger.error("upload error: ", error);
+        ctx.body = util.retError(-2, "format error");
+        return;
+    }
+    
+    try {
+        const url=await _3rdService.saveFile(tempfilepath,"avatar/"+newfilename); 
+        await userService.updateAvatar(currentuser["id"],url);
+        ctx.body=util.retOk({url});
+    } catch (error) {
+        logger.error("uploadAvatar error:",error)
+        ctx.body=util.error(-1,"头像上传错误");
+    }
+    finally{
+        if (fs.existsSync(tempfilepath))
+        {
+            fs.unlinkSync(tempfilepath)
+        }
+    }
+    
+    
 }
 module.exports = {
     login,
@@ -286,5 +341,6 @@ module.exports = {
     resetPassword,
     resetPassword2,
     getHomeUser,
-    getHomeList
+    getHomeList,
+    uploadAvatar
 }

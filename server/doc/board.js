@@ -292,3 +292,35 @@
  * laballist 状态列表
  * @apiUse ReturnCode
  */
+
+ /**
+ * 
+ * @api {post} /user/uploadavatar 上传用户头像
+ * @apiName uploadavatar
+ * @apiGroup user
+ * @apiVersion  1.0.0
+ * @apiUse HeaderToken
+ * @apiUse ReturnCode
+ * @apiDescription
+ * apidoc无法上传文件所以可以使用curl进行测试，代码如下：
+ * 
+ * curl --header "token: 登录的token"
+ * -F "postslug="
+ * -F "file=@文件名" 
+ * localhost:3001/api/user/uploadavatar
+ * 
+ * 最后都会转换成100*100的png图像保存
+ * 
+
+ * 
+ * @apiParam {File} file 用户头像
+ * 
+  * @apiSuccessExample {type} Success-Response:
+ * {
+ *     url : 头像url地址
+ * }
+ * 
+ *
+ * 
+ * 
+ */

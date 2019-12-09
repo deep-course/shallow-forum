@@ -56,6 +56,10 @@ async function getCommentList(ctx, next) {
         return;
     }
     const commentlist = await boardService.getCommentListByPostId(post["id"], page);
+    if (commentlist.length==0){
+        ctx.body=util.retOk([]);
+        return;
+    }
     let ids = [];
     _.forEach(commentlist, function (item) {
         ids.push(item["user_id"]);
@@ -76,6 +80,7 @@ async function getCommentList(ctx, next) {
             content: item["content"],
             username: commentuser ? commentuser["username"] : "未知用户",
             addtime:item["addtime"],
+            useravatar:commentuser ? commentuser["avatar"] : "",
         };
         if (item["edituser_id"]!=0){
             newitem["edituser"]={

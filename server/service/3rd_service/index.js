@@ -29,9 +29,10 @@ async function saveFile(filepath, filename) {
         }
         else {
             //默认存本地
-            const savepath = path.join(process.cwd(), "upload", filename);
-            fs.renameSync(filepath, savepath);
-            return "/upload/" + filename;
+            //const savepath = path.join(process.cwd(), "upload", filename);
+            //fs.renameSync(filepath, savepath);
+            //return "/" + filename;
+            return "";
         }
 
     } catch (error) {
@@ -52,12 +53,12 @@ async function deleteFile(filepath) {
         }
         else {
             //默认本地删除
-            const localpath = path.join(process.cwd(), filepath);
-            logger.debug(localpath);
-            if (fs.existsSync(localpath)) {
-                fs.unlinkSync(localpath);
-            }
-            return true;
+            //const localpath = path.join(process.cwd(), filepath);
+            //logger.debug(localpath);
+            //if (fs.existsSync(localpath)) {
+            //    fs.unlinkSync(localpath);
+            //}
+            return false;
         }
     } catch (error) {
         logger.error("deleteFile error: ", error);

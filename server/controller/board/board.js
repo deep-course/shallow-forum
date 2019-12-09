@@ -1,11 +1,12 @@
 //论坛相关
 const util = require("../../util");
 const logger = util.getLogger(__filename);
-const boardService = require("../../service/board_service");
-const userService = require("../../service/user_service");
 const _ = require("lodash");
 const moment = require("moment");
-const sharp = require("sharp")
+const sharp = require("sharp");
+const _3rdService=require("../../service/3rd_service");
+const fs = require("fs");
+const path=require("path");
 async function getBoardInfo(ctx, next) {
 
 
@@ -25,6 +26,7 @@ async function getBoardSetting(ctx) {
         laballist
     });
 }
+
 module.exports = {
     getBoardInfo,
     getBoardSetting

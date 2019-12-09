@@ -13,7 +13,7 @@ async function userInfo(ctx, next) {
     if (currentuser) {
         const userindb = await userService.getUserById(currentuser.id);
         if (userindb) {
-            ret.user = _.pick(currentuser, ["id", "username", "lock", "activate"]);
+            ret.user = _.pick(currentuser, ["id", "username", "lock", "activate","avatar"]);
             ret.group = group;
             await userService.updateUserActionTime(currentuser.id, util.getClientIP(ctx.req));
             let token = util.getToken({

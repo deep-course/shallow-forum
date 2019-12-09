@@ -116,7 +116,7 @@ async function showPost(ctx, next) {
         retpost['comment']['edituser'] = edituser["username"];
         retpost['comment']['edittime'] = comment["edittime"];
     }
-    retpost['user'] = _.pick(postuser, ['username', 'lock', 'activate']);
+    retpost['user'] = _.pick(postuser, ['username', 'lock', 'activate', 'avatar']);
     ctx.body = util.retOk(retpost);
 
 
@@ -205,22 +205,27 @@ async function getPostList(ctx, next) {
     }
     page = (!page || page < 1) ? 1 : page;
     const postlist = await boardService.getPostListbyTagId(taginfo[0]["id"], page, sort);
-
+    if (postlist.length == 0) {
+        ctx.body = util.retOk([]);
+        return
+    }
     let ids = [];
     _.forEach(postlist, function (item) {
         ids.push(item["user_id"]);
     });
     ids = _.uniq(ids);
-    const userlist=await userService.getUserInfoByIds(ids);
+
+    const userlist = await userService.getUserInfoByIds(ids);
     let userlistid = {};
     _.forEach(userlist, function (item) {
         userlistid[item["id"]] = item;
     });
-    let retpostlist=[];
-    _.forEach(postlist,function(item){
-        const postuser=userlistid[item["user_id"]]
-        let post=_.pick(item,["slug","title","pubtime","image","label","lastcommenttime"]);
-        post["username"]=postuser ? postuser["username"] : "未知用户",
+    let retpostlist = [];
+    _.forEach(postlist, function (item) {
+        const postuser = userlistid[item["user_id"]]
+        let post = _.pick(item, ["slug", "title", "pubtime", "image", "label", "lastcommenttime"]);
+        post["username"] = postuser ? postuser["username"] : "未知用户";
+        post["useravatar"] = postuser?postuser["avatar"]:"";
         retpostlist.push(post);
     });
     ctx.body = util.retOk(retpostlist);
