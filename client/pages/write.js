@@ -28,7 +28,7 @@ const getBase64 = (file) => {
     });
   }
 
-@inject("user")
+@inject('global', 'write')
 @observer
 class Write extends Component {
   constructor(props) {
@@ -39,10 +39,17 @@ class Write extends Component {
 
       previewVisible: false,
       previewImage: '',
-      fileList: []
+      fileList: [],
       
+      // 发布相关
+      lableid: '',
+      tags: '',
     }
     this.cacheValue()
+  }
+
+  componentDidMount() {
+    this.props.write.getBoardSet()
   }
 
   cacheValue = () => {
@@ -108,8 +115,15 @@ class Write extends Component {
     this.setState({ confirmShow: flag })
   }
 
+  // 选择发布类型
+  chooseType = (key, type) => {
+    this.setState({[type]: key})
+  }
+
+
   render() {
-    const { previewContent, confirmShow, previewVisible, previewImage, fileList } = this.state
+    const { previewContent, confirmShow, previewVisible, previewImage, fileList, lableid, tags } = this.state
+    const { taglist, laballist } = this.props.write
     const uploadButton = (
       <div className="write-upload-cover">
         <span>点击此处添加封面图片</span>
@@ -184,23 +198,17 @@ class Write extends Component {
             <div className="write-type write-block">
               <h5 className="write-drawer-title">分类</h5>
               <ul className="write-type-list">
-                <li className="write-type-list-item">前端</li>
-                <li className="write-type-list-item">后端</li>
-                <li className="write-type-list-item">人工智能</li>
-                <li className="write-type-list-item">开发工具</li>
-                <li className="write-type-list-item">代码人生</li>
-                <li className="write-type-list-item">阅读</li>
+                {Object.keys(taglist).length && Object.keys(taglist).map(key => (
+                  <li className={`write-type-list-item ${tags == key ? 'current' : ''}`} key={key} onClick={() => this.chooseType(key, 'tags')}>{taglist[key]}</li>
+                ))}
               </ul>
             </div>
             <div className="write-label write-block">
               <h5 className="write-drawer-title">标签</h5>
               <ul className="write-type-list">
-                <li className="write-type-list-item">前端</li>
-                <li className="write-type-list-item">后端</li>
-                <li className="write-type-list-item">人工智能</li>
-                <li className="write-type-list-item">开发工具</li>
-                <li className="write-type-list-item">代码人生</li>
-                <li className="write-type-list-item">阅读</li>
+                {Object.keys(laballist).length && Object.keys(laballist).map(key => (
+                  <li className={`write-type-list-item ${lableid == key ? 'current' : ''}`} key={key} onClick={() => this.chooseType(key, 'lableid')}>{laballist[key]}</li>
+                ))}
               </ul>
             </div>
             <div className="write-submit">

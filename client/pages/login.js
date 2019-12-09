@@ -1,7 +1,9 @@
 import React from 'react'
 import { Form, Button, Input, Icon, Modal, message } from 'antd'
+import Router from 'next/router'
+import { observer, inject } from 'mobx-react'
 import PageHead from '../components/PageHead'
-import { login, getCaptcha, register, sendSms } from '../api'
+import { login, getCaptcha, register, sendSms, resetSendSms, resetPassword } from '../api'
 import '../assets/pageStyle/login.less'
 
 const { Search } = Input;
@@ -24,7 +26,7 @@ const modalMap = {
     title: '注册',
     btn: '注册',
     content: [
-      { icon: 'user', placeholder: '请输入用户名', maxLength: 30, bind: 'user', rules: [
+      { icon: 'user', placeholder: '请输入用户名', maxLength: 30, bind: 'username', rules: [
         { required: true, message: '请输入用户名!' },
         { min: 6, max: 30, pattern: /^[a-zA-Z0-9]{6,30}$/, message: '用户名应为6-30位字母或数字!' },
       ]},
@@ -49,7 +51,7 @@ const modalMap = {
         { required: true, message: '请输入手机号!' },
         { pattern: /^1[0-9]{10}$/, message: '请输入正确手机号!' },
       ]},
-      { icon: 'safety-certificate', placeholder: '请输入验证码', maxLength: 4, bind: 'captcha', rules: [
+      { icon: 'safety-certificate', placeholder: '请输入验证码', maxLength: 4, bind: 'token', rules: [
         { required: true, message: '请输入验证码!' }
       ]},
       { icon: 'lock', placeholder: '请输入密码', maxLength: 30, bind: 'password', type: 'password', rules: [
@@ -61,6 +63,9 @@ const modalMap = {
 }
 
 let timer;
+
+@inject('global', 'user')
+@observer
 class Login extends React.Component {
   constructor(props) {
     super(props);
@@ -137,6 +142,7 @@ class Login extends React.Component {
         // 通过校验
         type === 'login' && this.login(values)
         type === 'register' && this.register(values)
+        type === 'forget' && this.reset(values)
       }
     })
   }
@@ -144,9 +150,15 @@ class Login extends React.Component {
   // 登录
   login = (params) => {
     login(params).then(res => {
-      // todo登录后操作
       localStorage.setItem('token', res.token)
-    }).catch(() => {})
+      Router.push('/')
+      this.props.user.setState({ isLogin: true })
+
+      // 获取用户信息
+      this.props.user.getUserInfo()
+    }).catch((err) => {
+      console.log(err)
+    })
   }
 
   // 注册
@@ -155,6 +167,14 @@ class Login extends React.Component {
       message.success('注册成功')
       this.handleChange('登录', 'login')
     }).catch(() => {})
+  }
+
+  // 重置密码
+  reset = (params) => {
+    resetPassword(params).then(res => {
+      message.success('重置密码成功')
+      this.handleChange('登录', 'login')
+    })
   }
 
   // 点击获取验证码
@@ -184,11 +204,21 @@ class Login extends React.Component {
       phone: getFieldValue('phone'),
       captcha
     }
-    sendSms(params).then(() => {
+
+    const { type } = this.state
+    let request = ''
+    if (type === 'register') {
+      request = sendSms
+    } else if (type === 'forget') {
+      request = resetSendSms
+    }
+
+    request(params).then(() => {
       message.success('手机验证码已发送')
       this.setState({ captcha: '', modal: false, startTime: Date.now() })
       setTimeout(() => { this.smsCountDown() })
-    }).catch(() => {
+    }).catch((err) => {
+      console.log(err)
       this.getImgCaptcha()
     })
   }

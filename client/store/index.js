@@ -1,11 +1,15 @@
-import user from './user'
+import global from './global'
 import search from './search'
 import detail from './detail'
+import user from './user'
+import write from './write'
 
 const store = {
-  user,
+  global,
   search,
   detail,
+  user,
+  write
 }
 
 export default store

@@ -4,19 +4,28 @@ import Router from 'next/router'
 import { Menu, Dropdown, Icon } from 'antd'
 import './index.less'
 
-@inject('user')
+@inject('global', 'user')
 @observer
 class User extends Component {
+  constructor(props){
+    super(props);
+  }
+
   // 登出
   logout = () => {
     localStorage.setItem('token', '')
     Router.push('/login')
-    this.props.user.setState({ isLogin: '' })
+    this.props.user.resetUserInfo()
   }
 
   // 进入登录页
   login = () => {
     Router.push('/login')
+  }
+
+  // 进入设置页
+  setting = () => {
+    Router.push('/setting')
   }
 
   initMenu = () => {
@@ -28,8 +37,8 @@ class User extends Component {
             <Icon type="home" />
             <span>我的主页</span>
           </Menu.Item>
-          <Menu.Item>
-            <Icon type="setting" />
+          <Menu.Item onClick={this.setting}>
+            <Icon type="setting"/>
             <span>设置</span>
           </Menu.Item>
           <Menu.Item onClick={this.logout}>
@@ -50,7 +59,7 @@ class User extends Component {
   }
 
   render() {
-    const { isLogin } = this.props.user
+    let { isLogin, avatar } = this.props.user
     return (
       <>
         {!isLogin && (
@@ -60,7 +69,7 @@ class User extends Component {
         )}
         {isLogin && (
           <Dropdown overlay={this.initMenu()} trigger={['click']}>
-            <img src="/static/user-test.png" alt="user-icon" className="login-user"/>
+            <img src={avatar} alt="user-icon" className="login-user"/>
           </Dropdown>
         )}
       </>

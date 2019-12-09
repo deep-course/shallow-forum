@@ -3,16 +3,26 @@ import {observer, inject} from 'mobx-react';
 import PageHead from '../components/PageHead'
 import ListItem from '../components/ListItem'
 import '../assets/pageStyle/index.less'
+import { getHomeList } from '../api'
 
-import test from '../zhujin/test.module.less'
-console.log(test)
-
-@inject('user', 'search')
+@inject('global', 'search')
 @observer
-class Home extends React.Component{
+class Index extends React.Component{
   static async getInitialProps ({ ctx }) {
     return { };
   }
+
+  // 获取首页列表
+  getHomeList = () => {
+    getHomeList().then(res => {
+      console.log(res)
+    })
+  }
+
+  componentDidMount() {
+    this.getHomeList()
+  }
+
   render() {
     const { list, loading } = this.props.search
     return (
@@ -22,11 +32,10 @@ class Home extends React.Component{
           {list.map((data, index) => (
             <ListItem data={data} key={index}></ListItem>
           ))}
-          <div className={test.cssModule}>1111</div>
         </div>
       </div>
     )
   }
 }
 
-export default Home
+export default Index

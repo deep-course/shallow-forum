@@ -5,7 +5,7 @@ import PageHead from '../components/PageHead'
 import CommentItem from '../components/CommentItem'
 import '../assets/pageStyle/detail.less'
 
-@inject('user', 'detail')
+@inject('global', 'detail')
 @observer
 class Home extends React.Component{
   static async getInitialProps ({ ctx }) {

@@ -5,10 +5,8 @@ import { message } from 'antd'
 const instance = axios.create({
   baseURL: 'http://103.61.38.127',
   timeout: 20000,
-  // headers: {
-  //   'token': localStorage['token'] || ''
-  // }
 });
+
 // 请求参数处理
 instance.interceptors.request.use(config=> {
   if (config.method === 'post') {
@@ -34,22 +32,22 @@ instance.interceptors.response.use(res=> {
 
 
 export default {
-  get(url, params) {
+  get(url, params, headers) {
     if (params !== undefined) {
       Object.assign(params, { _t: new Date().getTime() });
     } else {
       // eslint-disable-next-line no-param-reassign
       params = { _t: new Date().getTime() };
     }
-    return instance({ method: 'get', url, params });
+    return instance({ method: 'get', url, params, headers });
   },
 
   // 不常更新的数据用这个
-  getData(url, params) {
-    return instance({ method: 'get', url, params });
+  getData(url, params, headers) {
+    return instance({ method: 'get', url, params, headers });
   },
 
-  post(url, params, config) {
-    return instance.post(url, params, config);
+  post(url, data, headers) {
+    return instance({ method: 'post', url, data, headers});
   },
 };
