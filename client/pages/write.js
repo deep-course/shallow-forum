@@ -1,10 +1,14 @@
 import React, { Component } from 'react'
-import { Button, Icon, Drawer, Upload, Modal } from 'antd'
+import { Button, Icon, Drawer, Upload, Badge, message } from 'antd'
 import marked from 'marked'
 import highlight from 'highlight.js'
+import Router from 'next/router'
 import { observer, inject } from 'mobx-react'
 import PageHead from '../components/PageHead'
 import User from '../components/User'
+import { boardUploadImg, publishNewPost } from '../api'
+import { getToken } from '../utils'
+
 import '../assets/pageStyle/write.less'
 
 highlight.configure({
@@ -12,21 +16,21 @@ highlight.configure({
   classPrefix: 'hljs-',
   languages: ['CSS', 'HTML, XML', 'JavaScript', 'PHP', 'Python', 'Stylus', 'TypeScript', 'Markdown']
 })
+const renderer = new marked.Renderer();
+renderer.heading = (text, level, raw) => {
+  // const id = raw.toLowerCase().replace(/[^a-zA-Z0-9\u4e00-\u9fa5]+/g, '-');
+  return `<h${level}>${text}</h${level}>\n`;
+};
 marked.setOptions({
   highlight (code) {
     return highlight.highlightAuto(code).value
   }
 })
 
-// base64转化
-const getBase64 = (file) => {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.readAsDataURL(file);
-      reader.onload = () => resolve(reader.result);
-      reader.onerror = error => reject(error);
-    });
-  }
+// 获取写入区域
+const getWriteArea = () => {
+  return document.querySelector('.write-wrapper')
+}
 
 @inject('global', 'write')
 @observer
@@ -34,22 +38,25 @@ class Write extends Component {
   constructor(props) {
     super(props)
     this.state = {
-      previewContent: '',
-      confirmShow: false,
-
-      previewVisible: false,
-      previewImage: '',
-      fileList: [],
-      
       // 发布相关
-      lableid: '',
-      tags: '',
+      post: {
+        title: '',
+        lableid: '',
+        tags: '',
+        imagelist: [],
+        mainimage: '',
+        boardid: 0,
+        content: '',      // 转换的dom内容
+      },
+      contentImgShow: false,
+      confirmShow: false,
     }
     this.cacheValue()
   }
 
   componentDidMount() {
-    this.props.write.getBoardSet()
+
+    // getWriteArea().innerText='asdasdasda'
   }
 
   cacheValue = () => {
@@ -71,9 +78,30 @@ class Write extends Component {
     }
   }
 
+  // markdown转换
   onContentChange = (e) => {
     this.setState({
-      previewContent: marked(e.target.innerText, {breaks: true})
+      post: {
+        ...this.state.post,
+        content: marked(e.target.innerText, {
+          breaks: true,
+          renderer
+        })
+      }
+    })
+    !this.hasContentChanged && (this.hasContentChanged = true)
+  }
+
+  // 手动markdown转换
+  onHandleContentChange = () => {
+    this.setState({
+      post: {
+        ...this.state.post,
+        content: marked(e.target.innerText, {
+          breaks: true,
+          renderer
+        })
+      }
     })
     !this.hasContentChanged && (this.hasContentChanged = true)
   }
@@ -91,51 +119,118 @@ class Write extends Component {
     console.log(file)
   }
 
-  // 上传事件
-  imageUpload = () => {
-
+  // 输入标题
+  handleTitle = e => {
+    this.setState({ post: {...this.state.post, title: e.target.value} })
   }
 
-  handleCancel = () => this.setState({ previewVisible: false });
-  handleCancel = () => this.setState({ previewVisible: false });
-  handlePreview = async file => {
-    if (!file.url && !file.preview) {
-      file.preview = await getBase64(file.originFileObj);
-    }
-
-    this.setState({
-      previewImage: file.url || file.preview,
-      previewVisible: true,
-    });
-  };
-  handleChange = ({ fileList }) => this.setState({ fileList });
-
-  // 关闭确认发布框
-  operaConfirm = (flag) => {
-    this.setState({ confirmShow: flag })
-  }
+  // 操作抽屉框
+  operaDrawer = (key, flag) => {
+    this.setState({ [key]: flag })
+  } 
 
   // 选择发布类型
   chooseType = (key, type) => {
-    this.setState({[type]: key})
+    this.setState({
+      post: {
+        ...this.state.post,
+        [type]: key
+      }
+    })
+  }
+
+  // 上传前置校验
+  beforeUpload = (file) => {
+    const isJpgOrPng = file.type === 'image/jpeg' || file.type === 'image/png';
+    if (!isJpgOrPng) {
+      message.error('只能上传 JPG/PNG 文件!');
+    }
+    const isLt5M = file.size / 1024 / 1024 < 5;
+    if (!isLt5M) {
+      message.error('图片大小不能超过 5MB!');
+    }
+    return isJpgOrPng && isLt5M;
+  }
+
+  // 图片上传回调
+  imgChange = (res, type) => {
+    if(res.file.status === 'done') {
+      if (type === 'content') {
+        // 如果是文章内容图片
+        this.setState({
+          post: {
+            ...this.state.post,
+            imagelist: [...this.state.post.imagelist, res.file.response.data.url]
+          }
+        })
+        // 插入图片
+        getWriteArea().innerText += `\n![内容图片](${res.file.response.data.url})`
+        this.onHandleContentChange()
+      } else if (type === 'mainimage') {
+        // 如果是主图
+        this.setState({
+          post: {
+            ...this.state.post,
+            mainimage: res.file.response.data.url
+          }
+        })
+      }
+    }
+  }
+
+  // 删除内容图片
+  deleteContentImg = (url, index) => {
+    let temp = this.state.post.imagelist
+    temp.splice(index, 1)
+    this.setState({ post: {...this.state.post, imagelist: temp} })
+    this.props.write.deleteImg(url)
+  }
+
+  // 删除主图
+  deleteMainimageImg = () => {
+    this.props.write.deleteImg(this.state.post.mainimage)
+    this.setState({ post: {...this.state.post, mainimage: ''} })
+  }
+
+  // 发布帖子
+  publish = () => {
+    const { title, content, tags, lableid } = this.state.post
+    if (!title) {
+      message.error('请输入标题')
+      return ;
+    }
+    if (!content) {
+      message.error('请输入内容')
+      return ;
+    }
+    if (!tags) {
+      message.error('请选择分类')
+      return ;
+    }
+    if (!lableid) {
+      message.error('请选择标签')
+      return ;
+    }
+    publishNewPost(this.state.post).then(res => {
+      message.success('发布成功！')
+      setTimeout(() => {
+        Router.replace('/')
+      }, 1000)
+    })
   }
 
 
   render() {
-    const { previewContent, confirmShow, previewVisible, previewImage, fileList, lableid, tags } = this.state
-    const { taglist, laballist } = this.props.write
-    const uploadButton = (
-      <div className="write-upload-cover">
-        <span>点击此处添加封面图片</span>
-      </div>
-    );
+    const { confirmShow, contentImgShow, } = this.state
+    const { title, lableid, tags, imagelist, mainimage, boardid, content } = this.state.post
+    const { taglist, laballist } = this.props.global
     return (
       <>
         <PageHead title="论坛-发布"></PageHead>
         <div className="write-container">
           <div className="title">
-            <input className="input" type="text" placeholder="请输入标题..."/>
-            <Button type="primary" onClick={() => this.operaConfirm(true)}>发布</Button>
+            <input className="input" value={title} onChange={this.handleTitle}  type="text" placeholder="请输入标题..."/>
+            <Button type="primary" onClick={() => this.operaDrawer('confirmShow', true)}>发布</Button>
             <User></User>
           </div>
           <div className="content">
@@ -148,6 +243,7 @@ class Write extends Component {
               ref={node=>this.editContainer=node}
               className="write">
               <div 
+                value={'asdasdasd'}
                 onInput={this.onContentChange}
                 ref={node=>this.editWrap=node}
                 className="write-wrapper" 
@@ -162,13 +258,42 @@ class Write extends Component {
               <div
                 ref={node=>this.previewWrap=node}
                 className="show-wrapper"
-                dangerouslySetInnerHTML={{__html: previewContent}}>
+                dangerouslySetInnerHTML={{__html: content}}>
               </div>
             </div>
           </div>
           <div className="options">
-            <Icon type="file-image" className="upload-img upload-entry"/>
-            <span className="upload-entry">上传图片</span>
+            <Upload
+              name="file"
+              showUploadList={false}
+              action={boardUploadImg}
+              headers={getToken()}
+              beforeUpload={this.beforeUpload}
+              onChange={res => this.imgChange(res, 'content')}>
+              <Icon type="file-image" className="upload-img upload-entry"/>
+              <span className="upload-entry">上传图片</span>
+            </Upload>
+            {!!imagelist.length && (
+              <Badge count={imagelist.length}>
+                <Button className="write-manage-content-img" type="primary" onClick={() => this.operaDrawer('contentImgShow', true)}>管理上传图片</Button>
+              </Badge>
+            )}
+            <Drawer
+              title="文章内容图片"
+              placement="left"
+              closable={false}
+              onClose={() => this.operaDrawer('contentImgShow', false)}
+              visible={contentImgShow}
+            >
+              <div className="write-content-img-wrapper">
+                {imagelist.map((v, i) => (
+                  <div className="write-content-img-item" key={i}>
+                    <Icon type="delete" className="write-delete-content-img" onClick={() => this.deleteContentImg(v, i)}/>
+                    <img src={v}/>
+                  </div>
+                ))}
+              </div>
+            </Drawer>
           </div>
           <Drawer
             width="400"
@@ -176,24 +301,31 @@ class Write extends Component {
             placement="right"
             className="write-confirm-wrapper"
             closable={false}
-            onClose={() => this.operaConfirm(false)}
+            onClose={() => this.operaDrawer('confirmShow', false)}
             visible={confirmShow}>
             <div className="write-cover write-block">
               <h5 className="write-drawer-title">上传封面图</h5>
               <div className="clearfix">
                 <Upload
-                  action="https://www.mocky.io/v2/5cc8019d300000980a055e76"
-                  listType="picture-card"
-                  fileList={fileList}
-                  onPreview={this.handlePreview}
-                  onChange={this.handleChange}
-                >
-                  {fileList.length ? null : uploadButton}
+                  name="file"
+                  showUploadList={false}
+                  action={boardUploadImg}
+                  headers={getToken()}
+                  beforeUpload={this.beforeUpload}
+                  onChange={res => this.imgChange(res, 'mainimage')}>
+                  {!mainimage && (
+                    <div className="write-upload-cover">
+                      <span>点击此处添加封面图片</span>
+                    </div>
+                  )}
                 </Upload>
-                <Modal visible={previewVisible} footer={null} onCancel={this.handleCancel}>
-                  <img alt="example" style={{ width: '100%' }} src={previewImage} />
-                </Modal>
-            </div>
+                {!!mainimage && (
+                  <div className="write-mainimage-wrapper">
+                    <Icon type="delete" className="write-delete-mainimage-img" onClick={this.deleteMainimageImg}/>
+                    <img src={mainimage} className="write-mainimage"/>
+                  </div>
+                )}
+              </div>
             </div>
             <div className="write-type write-block">
               <h5 className="write-drawer-title">分类</h5>
@@ -212,7 +344,7 @@ class Write extends Component {
               </ul>
             </div>
             <div className="write-submit">
-              <Button type="primary">确认并发布</Button>
+              <Button type="primary" onClick={this.publish}>确认并发布</Button>
             </div>
           </Drawer>
         </div>

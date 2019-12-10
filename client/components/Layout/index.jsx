@@ -16,6 +16,7 @@ class Layout extends Component {
 
   componentDidMount() {
     this.props.user.getUserInfo()
+    this.props.global.getBoardSet()
   }
 
   gotoWrite = () => {

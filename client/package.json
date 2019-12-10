@@ -10,6 +10,7 @@
   "dependencies": {
     "antd": "^3.25.3",
     "axios": "^0.19.0",
+    "dayjs": "^1.8.17",
     "highlight.js": "^9.16.2",
     "lodash": "^4.17.15",
     "marked": "^0.7.0",

@@ -55,6 +55,9 @@
     .upload-entry{
       cursor: pointer;
     }
+    .write-manage-content-img{
+      margin-left: 40px;
+    }
   }
 }
 
@@ -79,14 +82,40 @@
         .userCursor;
         &.current{
           color: #ffffff;
-          background: @listColor;
+          background: @themeColor;
+          border: 1px solid @themeColor;
         }
       }
     }
     .write-upload-cover{
-      width: 200px;
+      width: 240px;
+      height: 100px;
+      border: 1px dotted @listColor;
       color: @listColor;
       font-size: 14px;
+      .flexCenter;
+      .userCursor;
+
+    }
+    .write-mainimage-wrapper{
+      position: relative;
+      width: 240px;
+      font-size: 0;
+      .write-mainimage{
+        width: 100%;
+      }
+      .write-delete-mainimage-img{
+        position: absolute;
+        font-size: 24px;
+        padding: 4px;
+        right: -10px;
+        top: -10px;
+        border-radius: 50%;
+        color: @themeColor;
+        border: 1px solid @themeColor;
+        background: rgba(255,255,255,.7);
+        .userCursor;
+      }
     }
   }
   .write-submit{
@@ -94,6 +123,29 @@
   }
 }
 
+.write-content-img-wrapper{
+  .write-content-img-item{
+    position: relative;
+    width: 200px;
+    margin: 0 auto 20px;
+    font-size: 0;
+    img{
+      width: 100%;
+    }
+    .write-delete-content-img{
+      position: absolute;
+      font-size: 24px;
+      padding: 4px;
+      right: -10px;
+      top: -10px;
+      border-radius: 50%;
+      color: @themeColor;
+      border: 1px solid @themeColor;
+      background: rgba(255,255,255,.7);
+      .userCursor;
+    }
+  }
+}
 
 /*
 Gruvbox style (dark) (c) Pavel Pertsev (original style at https://github.com/morhetz/gruvbox)

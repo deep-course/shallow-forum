@@ -1,3 +1,20 @@
 .index-list{
   .globalBorder;
 }
+.index-filter-tab{
+  margin-bottom: 10px;
+  padding: 8px 20px;
+  overflow: hidden;
+  background: #ffffff;
+  .globalBorder;
+  .index-filter-tab-item{
+    float: left;
+    min-width: 60px;
+    margin-right: 30px;
+    .flexCenter;
+    .userCursor;
+    &.current{
+      color: @themeColor;
+    }
+  }
+}

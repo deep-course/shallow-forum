@@ -5,8 +5,8 @@ import { message } from 'antd'
 const instance = axios.create({
   baseURL: 'http://103.61.38.127',
   timeout: 20000,
+  // withCredentials: true,
 });
-
 // 请求参数处理
 instance.interceptors.request.use(config=> {
   if (config.method === 'post') {

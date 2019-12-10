@@ -1,10 +1,7 @@
 import {action, observable} from 'mobx'
-import { getBoardSet } from '../api'
+import {  boardDeleteImg } from '../api'
 
 class Write {
-  @observable taglist = {}      
-  @observable laballist = {}  
-
   // 修改state
   @action setState = (payload) => {
     Object.keys(payload).forEach(key => {
@@ -12,12 +9,13 @@ class Write {
     })
   }
 
-  // 获取论坛设置
-  @action getBoardSet = () => {
-    getBoardSet().then(res => {
-      this.setState(res)
+  // 删除图片附件
+  @action deleteImg = (fileurl) => {
+    boardDeleteImg({fileurl}).then(res => {
+      console.log(res)
     })
   }
+  
 }
 
 export default new Write()

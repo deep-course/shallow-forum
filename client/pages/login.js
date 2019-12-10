@@ -28,7 +28,7 @@ const modalMap = {
     content: [
       { icon: 'user', placeholder: '请输入用户名', maxLength: 30, bind: 'username', rules: [
         { required: true, message: '请输入用户名!' },
-        { min: 6, max: 30, pattern: /^[a-zA-Z0-9]{6,30}$/, message: '用户名应为6-30位字母或数字!' },
+        { min: 6, max: 30, pattern: /^[a-zA-Z0-9\u4e00-\u9fa5]{6,30}$/, message: '用户名应为6-30位字母或数字或汉字!' },
       ]},
       { icon: 'mobile', placeholder: '请输入手机号', maxLength: 11, bind: 'phone', rules: [
         { required: true, message: '请输入手机号!' },
@@ -80,6 +80,14 @@ class Login extends React.Component {
     }
   }
 
+  componentDidMount() {
+    const { loginType, loginTypeName, setState } = this.props.global
+    if (loginType) {
+      this.handleChange(loginTypeName, loginType)
+      setState({ loginType: '', loginTypeName: '' })
+    }
+  }
+
   // 切换
   handleChange = (title, type) => {
     this.props.form.resetFields()
@@ -88,6 +96,7 @@ class Login extends React.Component {
       title
     })
   }
+
 
   /**
    * 表单Item生成
@@ -302,7 +311,7 @@ class Login extends React.Component {
               </>)
             }
           </div>  
-          <Modal title="图形验证码" visible={state.modal} closable={false} keyboard={false} maskClosable={false} footer={null} width={400} wrapClassName="captcha-modal">
+          <Modal title="图形验证码" visible={state.modal} onCancel={() => {this.setState({modal: false})}} closable={true} keyboard={false} maskClosable={false} footer={null} width={400} wrapClassName="captcha-modal">
             <Input
               value={state.captcha}
               size="large"

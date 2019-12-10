@@ -54,4 +54,18 @@ export const updatePassword = params => http.post('/api/user/updatepassword', pa
 export const getHomeList = () => http.get('/api/home', {}, getToken())
 
 /** board */
+
+// 获取论坛设置
 export const getBoardSet = () => http.get('/api/board/boardsetting')
+
+// 上传图片附件
+export const boardUploadImg = basePreixUrl + '/api/board/uploadattachments'
+
+// 删除图片附件
+export const boardDeleteImg = params => http.post('/api/board/removeattachments', params, getToken())
+
+// 发帖子
+export const publishNewPost = params => http.post('/api/board/newpost', params, getToken())
+
+// 帖子列表
+export const getPostList = params => http.get('/api/board/postlist', params, getToken())
