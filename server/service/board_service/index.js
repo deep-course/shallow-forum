@@ -145,6 +145,12 @@ async function getTagListByName(slugs) {
     const [taglist] = await promiseMysqlPool.query("select * from board_tag where slug in (?)", [slugs]);
     return taglist;
 }
+//获取论坛所有设置的标签列表
+async function getBuildInTagList(){
+    const [taglist] = await promiseMysqlPool.query("select * from board_tag where `type` in ('main','sub')");
+    return taglist;
+
+}
 //添加评论内容
 async function addComment(comment, post) {
     logger.debug("addComment :", comment)
@@ -363,7 +369,7 @@ async function getPostListbyTagId(tagid, page, sort) {
     const sql = `SELECT p.*,a.* FROM board_post AS p 
         LEFT JOIN board_postintag AS t ON p.id = t.post_id 
         LEFT JOIN board_postacticity AS a ON p.id=a.post_id 
-        WHERE t.tag_id=?  and p.deleted=0
+        WHERE t.tag_id=?  and p.deleted=0 and p.\`type\`="post"
         order by ${sort == 1 ? "p.id" : "a.lastcommenttime"} desc
         limit ?,20 
         `;
@@ -379,7 +385,7 @@ async function getPostListByUserId(postid, page) {
     const [result] = await promiseMysqlPool.query(`
         SELECT p.*,a.* FROM board_post AS p
         LEFT JOIN board_postacticity AS a ON p.id=a.post_id
-        WHERE p.user_id=? and p.deleted=0
+        WHERE p.user_id=? and p.deleted=0 and p.\`type\`="post"
         order by p.id desc
         limit ?,20
         `,
@@ -395,7 +401,7 @@ async function getPostListByUserUp(postid, page) {
         SELECT p.*,a.* FROM board_post AS p
         LEFT JOIN board_postacticity AS a ON p.id=a.post_id
         inner JOIN board_useruppost u ON p.id=u.user_id
-        WHERE p.user_id=? and p.deleted=0
+        WHERE p.user_id=? and p.deleted=0 and p.\`type\`="post"
         order by p.id desc
         limit ?,20
         `,
@@ -404,8 +410,24 @@ async function getPostListByUserUp(postid, page) {
         ])
     return result;
 }
-
-
+async function getTagListByPostId(postid){
+    const [result] = await promiseMysqlPool.query("SELECT * FROM board_tag WHERE id IN (SELECT  tag_id FROM board_postintag WHERE post_id=?)",[postid]);
+    return result;
+}
+async function getHomePostList(page,sort){
+    const offset = (page - 1) * 20;
+    const sql = `SELECT p.*,a.* FROM board_post AS p 
+        LEFT JOIN board_postintag AS t ON p.id = t.post_id 
+        LEFT JOIN board_postacticity AS a ON p.id=a.post_id 
+        WHERE p.deleted=0 and p.\`type\`="post"
+        order by ${sort == 1 ? "p.id" : "a.lastcommenttime"} desc
+        limit ?,20 
+        `;
+    const [postlist] = await promiseMysqlPool.query(sql, [
+        offset
+    ]);
+    return postlist;
+}
 module.exports = {
     editPost,
     addPost,
@@ -427,5 +449,8 @@ module.exports = {
     getCommentListByPostId,
     getPostListbyTagId,
     getPostListByUserId,
-    getPostListByUserUp
+    getPostListByUserUp,
+    getBuildInTagList,
+    getTagListByPostId,
+    getHomePostList
 }

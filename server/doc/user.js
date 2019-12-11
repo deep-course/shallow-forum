@@ -95,7 +95,7 @@
  */
 /**
  * 
- * @api {post} /resetpassword 找回密码
+ * @api {post} /resetpassword 找回密码1 发送验证码
  * @apiSampleRequest /api/resetpassword
  * @apiName resetpassword
  * @apiGroup user
@@ -111,7 +111,7 @@
  */
 /**
  * 
- * @api {post} /resetpassword2 找回密码
+ * @api {post} /resetpassword2 找回密码2 设置新密码
  * @apiSampleRequest /api/resetpassword2
  * @apiName resetpassword2
  * @apiGroup user

@@ -62,6 +62,9 @@ async function getPostDetail(ctx, next) {
         return;
     }
     ctx.state.postuser = postuser;
+    //taglist
+    const taglist=await boardService.getTagListByPostId(post["id"]);
+    ctx.state.posttags=taglist;
     //发帖内容
     const comment = await boardService.getCommentById(comment_id);
     if (!comment || _.isEmpty(comment)) {
@@ -175,14 +178,28 @@ async function checkAddPost(ctx, next) {
         return;
     }
     const taglist = tags.split(",");
-    if (taglist.length > 2) {
-        ctx.body = util.retError(-23, "最多只能选择2个标签");
+    if (taglist.length > 3) {
+        ctx.body = util.retError(-23, "最多只能选择3个标签");
         return;
     }
     const tagsindb = await boardService.getTagListByName(taglist);
+    logger.debug(tagsindb)
     if (tagsindb.length != taglist.length) {
         logger.debug(`tag数与数据库不符:${tagsindb.length}-${taglist.length}`);
         ctx.body = util.retError(-24, "tag数量不符");
+        return;
+    }
+    const maintag=_.filter(tagsindb, function(o) { return o["type"]=="main" });
+    if (maintag.length!=1)
+    {
+        ctx.body = util.retError(-25, "主tag数量不符");
+        return;
+    }
+    const subtag=_.filter(tagsindb, function(o) { return o["tagpath"]==maintag[0]["slug"] });
+    //logger.debug(tagsindb.length-subtag.length);
+    if (tagsindb.length-subtag.length!=1)
+    {
+        ctx.body = util.retError(-26, "tag数量不匹配");
         return;
     }
     ctx.state.newpost = {

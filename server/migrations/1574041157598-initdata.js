@@ -18,9 +18,12 @@ module.exports.up = async function (next) {
 	(3, '嘉宾', '');");
   logger.info("insert board_tag");
   await promiseMysqlPool.query("INSERT INTO `board_tag` \
-  (`id`, `name`, `type`, `slug`, `info`, `color`) VALUES \
-	(1, '测试tag', 'main', 'test', '测试的tag', ''), \
-	(2, '子tag', 'sub', 'tag1', '目前没有区分子tag', '');");
+  (`id`, `name`, `type`, `slug`, `info`, `color`,`tagpath`) VALUES \
+	(1, '测试tag', 'main', 'test', '测试的tag', '',''), \
+  (2, '子tag1', 'main', 'tag1', 'test-tag1', '', ''), \
+  (3, '子tag12', 'main', 'tag12', 'test-tag1-tag12', '', ''), \
+  (4, '子tag2', 'main', 'tag2', 'test-tag2', '', ''), \
+  (5, '父tag2', 'main', 'test2', '测试的tag2', '', '');");
   logger.info("insert board_tagactivity");
   await promiseMysqlPool.query("INSERT INTO `board_tagactivity` \
    (`tag_id`, `lastdposttime`, `lastcommenttime`, `lastpost_id`, `lastcommentpost_id`, `postcount`) VALUES \

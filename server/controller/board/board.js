@@ -1,21 +1,21 @@
 //论坛相关
 const util = require("../../util");
 const logger = util.getLogger(__filename);
-const _ = require("lodash");
-const moment = require("moment");
-const sharp = require("sharp");
-const _3rdService=require("../../service/3rd_service");
-const fs = require("fs");
-const path=require("path");
+const _=require('lodash');
+const boardService=require("../../service/board_service");
 async function getBoardInfo(ctx, next) {
 
 
 }
 async function getBoardSetting(ctx) {
-    let taglist = {};
-    taglist["test"]="测试tag";
-    taglist["tag1"]="测试1";
-
+    const taglistindb = await boardService.getBuildInTagList();
+    let taglist=[];
+    taglistindb.forEach(element => {
+        _.unset(element,"id")
+        taglist.push(element);
+        
+    });
+    logger.debug(taglist);
     let laballist={};
     laballist[0]="无";
     laballist[1]="提问";

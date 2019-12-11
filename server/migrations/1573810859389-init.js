@@ -90,8 +90,9 @@ module.exports.up =  async function (next) {
     \`slug\` varchar(50) NOT NULL COMMENT 'slug',
     \`info\` varchar(200) NOT NULL COMMENT '介绍',
     \`color\` char(7) NOT NULL COMMENT '颜色',
+    \`tagpath\` VARCHAR(20) NOT NULL COMMENT 'tag的路径,空为最上级',
     PRIMARY KEY (\`id\`),
-    UNIQUE KEY \`slug\` (\`slug\`)
+    UNIQUE INDEX \`slug_tagpath\` (\`slug\`, \`tagpath\`)
   ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COMMENT='标签';`)
   logger.info("board_tagactivity");
   await promiseMysqlPool.query('DROP TABLE IF EXISTS `board_tagactivity`;');

@@ -99,7 +99,7 @@ async function newLink(ctx, next) {
 async function showPost(ctx, next) {
     logger.debug("showPost:", ctx.state)
     //TODO：增加权限管理和管理员管理
-    const { currentuser, post, postuser, comment, edituser } = ctx.state
+    const { currentuser, post, postuser, comment, edituser,posttags } = ctx.state
     let retpost = _.pick(post, ["slug", "title", "pubtime", "label", "sticky", "lock", "image"]);
     //删帖不显示
     if (post['deleted'] == 1) {
@@ -119,6 +119,11 @@ async function showPost(ctx, next) {
         retpost['comment']['edittime'] = comment["edittime"];
     }
     retpost['user'] = _.pick(postuser, ['username', 'lock', 'activate', 'avatar']);
+    retpost['tags']=[];
+    posttags.forEach(element => {
+        _.unset(element,"id")
+        retpost['tags'].push(element);
+    });
     ctx.body = util.retOk(retpost);
 
 
