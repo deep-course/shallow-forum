@@ -45,7 +45,8 @@ if (env === 'development') {
   app.use(async (ctx, next) => {
     ctx.set('Access-Control-Expose-Headers','token');
     ctx.set('Access-Control-Allow-Headers','Origin, X-Requested-With, Content-Type, Accept, Connection, User-Agent, Cookie, token');
-    ctx.set('Access-Control-Allow-Origin', '*');
+    ctx.set('Access-Control-Allow-Origin', 'http://localhost:3000');
+    ctx.set("Access-Control-Allow-Credentials", true);
     ctx.set('Access-Control-Allow-Methods', 'PUT, POST, GET, DELETE, OPTIONS');
     if (ctx.method == 'OPTIONS') {
       ctx.body = 200; 
