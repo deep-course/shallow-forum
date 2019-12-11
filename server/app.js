@@ -17,6 +17,12 @@ const middleware = require('./middleware')
 const app = new Koa2()
 //计算页面的执行时间
 app.use(middleware.responseTime);
+
+//临时上传目录
+if (!fs.existsSync("./upload"))
+{
+  fs.mkdirSync("./upload");
+}
 //TODO : 异常处理放在最前面
 
 //session设置
