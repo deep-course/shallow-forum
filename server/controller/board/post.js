@@ -21,7 +21,8 @@ async function newPost(ctx, next) {
         sticky: 0,
         board_id: newpost.boardid,
         image: newpost.mainimage,
-        deleted: 0
+        deleted: 0,
+        type:"post"
 
     };
     const content = {
@@ -72,7 +73,8 @@ async function newLink(ctx, next) {
         sticky: 0,
         board_id: newpost.boardid,
         image: "",
-        deleted: 0
+        deleted: 0,
+        type:"link"
 
     };
     const content = {

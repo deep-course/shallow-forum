@@ -11,7 +11,7 @@ module.exports.up =  async function (next) {
     \`user_id\` int(10) unsigned NOT NULL COMMENT '用户id',
     \`addtime\` datetime NOT NULL COMMENT '添加时间',
     \`type\` varchar(20) NOT NULL COMMENT '类型 comment action',
-    \`content\` text NOT NULL COMMENT '内容',
+    \`content\` MEDIUMTEXT NOT NULL COMMENT '内容',
     \`edittime\` datetime NOT NULL COMMENT '编辑时间',
     \`edituser_id\` int(10) unsigned NOT NULL COMMENT '编辑用户',
     \`ip\` varchar(20) NOT NULL COMMENT 'ip地址',
@@ -36,6 +36,7 @@ module.exports.up =  async function (next) {
     \`board_id\` int(10) unsigned NOT NULL COMMENT '板块id，暂时没用',
     \`image\` VARCHAR(100) NOT NULL COMMENT '主图的hash',
     \`deleted\` tinyint(4) unsigned NOT NULL COMMENT '逻辑删除标识',
+    \`type\` VARCHAR(20) NOT NULL COMMENT '帖子类型post，url',
     PRIMARY KEY (\`id\`),
     UNIQUE KEY \`slug\` (\`slug\`)
   ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='帖子';
