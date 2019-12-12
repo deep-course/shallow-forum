@@ -205,9 +205,15 @@ async function upPost(ctx, next) {
 async function getPostList(ctx, next) {
     logger.debug("getPostList:", ctx.request.query);
     let { tag, page, sort } = ctx.request.query
-    const taginfo = await boardService.getTagListByName([tag]);
-    if (taginfo.length != 1) {
+    const tags=_.split(tag,",");
+    if (tags.length>2)
+    {
         ctx.body = util.retError(1000, "tag错误");
+        return;
+    }
+    const taginfo = await boardService.getTagListByName(tags);
+    if (taginfo.length != 1) {
+        ctx.body = util.retError(2000, "tag未找到");
         return;
     }
     page = (!page || page < 1) ? 1 : page;

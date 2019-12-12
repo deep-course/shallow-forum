@@ -141,8 +141,13 @@ async function addPost(post, content, tags, imagelist) {
 
 }
 //根据slug获取tag列表
-async function getTagListByName(slugs) {
-    const [taglist] = await promiseMysqlPool.query("select * from board_tag where slug in (?)", [slugs]);
+async function getTagListByName(tags) {
+    if (tags.length==1)
+    {
+        tags[1]=tags[0];
+        tags[0]="";
+    }
+    const [taglist] = await promiseMysqlPool.query("select * from board_tag where tagpath=? and slug=?", tags);
     return taglist;
 }
 //获取论坛所有设置的标签列表
