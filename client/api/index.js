@@ -1,5 +1,5 @@
 import http from '../utils/http'
-const basePreixUrl = 'http://103.61.38.127'
+const basePreixUrl = ''
 
 function getToken () {
   try {
