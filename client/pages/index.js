@@ -3,7 +3,7 @@ import {observer, inject} from 'mobx-react';
 import PageHead from '../components/PageHead'
 import ListItem from '../components/ListItem'
 import '../assets/pageStyle/index.less'
-import { getPostList } from '../api'
+import { getHomeList } from '../api'
 
 @inject('global')
 @observer
@@ -47,7 +47,7 @@ class Index extends React.Component{
   // 获取帖子列表
   getPostList = () => {
     this.setState({loading: true, finish: false})
-    getPostList(this.state.filter).then(res => {
+    getHomeList(this.state.filter).then(res => {
       console.log(res)
       if (res.length) {
         // 有返回结果
@@ -75,11 +75,17 @@ class Index extends React.Component{
       <div>
         <PageHead title="论坛-首页"></PageHead>
         <ul className="index-filter-tab">
-          {Object.keys(taglist).length && (
+        {/* {Object.keys(taglist).length && (
             Object.keys(taglist).map((k, i) => (
               <li className={`index-filter-tab-item ${filter.tag == k ? 'current' : ''}`} key={i} onClick={() => this.chooseFilter('tag', k)}>{taglist[k]}</li>
             ))
-          )}
+          )} */}
+          {taglist.map((data, index) => (
+            <li 
+              className={`index-filter-tab-item ${filter.tag == data.slug ? 'current' : ''}`} 
+              key={index} 
+              onClick={() => this.chooseFilter('tag', data.slug)}>{data.name}</li>
+          ))}
         </ul>
         <div className="index-filter-tab">
           {Object.keys(sort).length && (

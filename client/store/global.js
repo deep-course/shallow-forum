@@ -5,7 +5,7 @@ class Global {
   @observable tempLink = ''         // 登录后应该跳转页面
   @observable loginType = ''
   @observable loginTypeName = ''
-  @observable taglist = {}      
+  @observable taglist = []      
   @observable laballist = {}  
   @observable sort = {
     1: '最新发布',

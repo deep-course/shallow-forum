@@ -330,8 +330,14 @@ class Write extends Component {
             <div className="write-type write-block">
               <h5 className="write-drawer-title">分类</h5>
               <ul className="write-type-list">
-                {Object.keys(taglist).length && Object.keys(taglist).map(key => (
+                {/* {Object.keys(taglist).length && Object.keys(taglist).map(key => (
                   <li className={`write-type-list-item ${tags == key ? 'current' : ''}`} key={key} onClick={() => this.chooseType(key, 'tags')}>{taglist[key]}</li>
+                ))} */}
+                {taglist.map((data, index) => (
+                  <li 
+                    className={`write-type-list-item ${tags == data.slug ? 'current' : ''}`} 
+                    key={index} 
+                    onClick={() => this.chooseType(data.slug, "tags")}>{data.name}</li>
                 ))}
               </ul>
             </div>
