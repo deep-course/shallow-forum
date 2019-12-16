@@ -197,7 +197,7 @@ module.exports.up =  async function (next) {
     \`id\` INT(11) NOT NULL AUTO_INCREMENT,
     \`user_id\` INT(11) NOT NULL,
     \`board_id\` INT(11) NOT NULL,
-    \`addtime\` INT(11) NOT NULL,
+    \`addtime\` DATETIME NOT NULL,
     PRIMARY KEY (\`id\`),
     UNIQUE INDEX \`user_id_board_id\` (\`user_id\`, \`board_id\`)
   ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='用户和板块的绑定';`);

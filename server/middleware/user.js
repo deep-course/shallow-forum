@@ -15,7 +15,7 @@ async function getUser(ctx, next) {
     if (currentUser && !_.isEmpty(currentUser)) {
       const hash = util.md5(`${currentUser.id}|${currentUser.password}`);
       //判断hash是否一致
-      logger.warn(hash,data);
+      logger.warn(hash, data);
       if (hash == data.hash && data.iat) {
         logger.debug("middleware-user:hash验证通过");
         //判断是否过期
@@ -27,28 +27,29 @@ async function getUser(ctx, next) {
           ctx.state.currentuser = currentUser;
           //用户分组,取最小的组，id小权限大，但是0 为普通用户
           const userInGroup = await userService.getUserGroup(data.id);
-          let group={
-            id:0,
-            name:"普通用户",
-            color:""
+          let group = {
+            id: 0,
+            name: "普通用户",
+            color: ""
           };
 
           if (userInGroup && !_.isEmpty(userInGroup)) {
-           const userGroup =_.sortBy(userInGroup,(item)=>{
+            const userGroup = _.sortBy(userInGroup, (item) => {
               return item.id;
             });
-            group=userGroup[0];       
+            group = userGroup[0];
           }
           ctx.state.group = group;
           //获取用户board
           const userInBoard = await userService.getUserBoard(data.id);
-          let boards=[];
+          let boards = [];
           userInBoard.forEach(element => {
-            boards.push(element["id"]);
+            boards.push(element);
           });
-          if (boards.length==0){
-            boards.push(0);
-          }
+          boards.push({
+            id: 0,
+            name: "开放板块"
+          });
           ctx.state.board = boards;
 
         }
@@ -60,16 +61,16 @@ async function getUser(ctx, next) {
 
 }
 async function checkUser(ctx, next) {
-    const { currentuser } = ctx.state;
-    if (!currentuser || _.isEmpty(currentuser)) {
-        ctx.body = util.retError(-11, "请先登录")
-        return;
-    }
-    if (currentuser['lock'] == 1) {
-        ctx.body = util.retError(-12, "用户已被锁定")
-        return;
-    }
-    await next();
+  const { currentuser } = ctx.state;
+  if (!currentuser || _.isEmpty(currentuser)) {
+    ctx.body = util.retError(-11, "请先登录")
+    return;
+  }
+  if (currentuser['lock'] == 1) {
+    ctx.body = util.retError(-12, "用户已被锁定")
+    return;
+  }
+  await next();
 }
 module.exports = {
   //从header中获取相应的token并且判断
