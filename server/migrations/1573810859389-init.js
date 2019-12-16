@@ -140,7 +140,7 @@ module.exports.up =  async function (next) {
   logger.info("user_group");
   await promiseMysqlPool.query('DROP TABLE IF EXISTS `user_group`;');
   await promiseMysqlPool.query(`CREATE TABLE IF NOT EXISTS \`user_group\` (
-    \`id\` int(11) unsigned NOT NULL AUTO_INCREMENT,
+    \`id\` int(11) unsigned NOT NULL,
     \`name\` varchar(50) NOT NULL COMMENT '组名',
     \`color\` char(7) NOT NULL COMMENT '显示颜色',
     PRIMARY KEY (\`id\`)
@@ -192,6 +192,24 @@ module.exports.up =  async function (next) {
     PRIMARY KEY (\`id\`),
     UNIQUE KEY \`user_id_group_id\` (\`user_id\`,\`group_id\`)
   ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='用户分组对应';`)
+  await promiseMysqlPool.query('DROP TABLE IF EXISTS `user_userinboard`;');
+  await promiseMysqlPool.query(`CREATE TABLE \`user_userinboard\` (
+    \`id\` INT(11) NOT NULL AUTO_INCREMENT,
+    \`user_id\` INT(11) NOT NULL,
+    \`board_id\` INT(11) NOT NULL,
+    \`addtime\` INT(11) NOT NULL,
+    PRIMARY KEY (\`id\`),
+    UNIQUE INDEX \`user_id_board_id\` (\`user_id\`, \`board_id\`)
+  ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='用户和板块的绑定';`);
+
+  
+  await promiseMysqlPool.query('DROP TABLE IF EXISTS `board_board`;')
+  await promiseMysqlPool.query(`CREATE TABLE \`board_board\` (
+    \`id\` INT(11) NOT NULL,
+    \`name\` VARCHAR(50) NOT NULL,
+    \`addtime\` DATETIME NOT NULL,
+    PRIMARY KEY (\`id\`)
+  ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='板块';`)
   logger.info("init done");
 
 

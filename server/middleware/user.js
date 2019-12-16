@@ -25,11 +25,32 @@ async function getUser(ctx, next) {
           //token未过期
           //设置用户头像
           ctx.state.currentuser = currentUser;
-          //用户分组
+          //用户分组,取最小的组，id小权限大，但是0 为普通用户
           const userInGroup = await userService.getUserGroup(data.id);
+          let group={
+            id:0,
+            name:"普通用户",
+            color:""
+          };
+
           if (userInGroup && !_.isEmpty(userInGroup)) {
-            ctx.state.group = userInGroup;
+           const userGroup =_.sortBy(userInGroup,(item)=>{
+              return item.id;
+            });
+            group=userGroup[0];       
           }
+          ctx.state.group = group;
+          //获取用户board
+          const userInBoard = await userService.getUserBoard(data.id);
+          let boards=[];
+          userInBoard.forEach(element => {
+            boards.push(element["id"]);
+          });
+          if (boards.length==0){
+            boards.push(0);
+          }
+          ctx.state.board = boards;
+
         }
 
       }

@@ -9,12 +9,13 @@ async function userInfo(ctx, next) {
     logger.debug("state:", ctx.state);
     let ret = {
     }
-    const { currentuser, group } = ctx.state;
+    const { currentuser, group, board } = ctx.state;
     if (currentuser) {
         const userindb = await userService.getUserById(currentuser.id);
         if (userindb) {
-            ret.user = _.pick(currentuser, ["id", "username", "lock", "activate","avatar"]);
+            ret.user = _.pick(currentuser, ["id", "username", "lock", "activate", "avatar"]);
             ret.group = group;
+            ret.board = board
             await userService.updateUserActionTime(currentuser.id, util.getClientIP(ctx.req));
             let token = util.getToken({
                 id: currentuser.id,
@@ -35,23 +36,23 @@ async function changePassword(ctx) {
         return;
 
     }
-    await userService.changePassword(currentuser["id"],util.sha256(newpass));
-    ctx.body=util.retOk();
+    await userService.changePassword(currentuser["id"], util.sha256(newpass));
+    ctx.body = util.retOk();
 }
-async function getUserDetail(ctx){
+async function getUserDetail(ctx) {
     const { currentuser } = ctx.state;
-    const bio=currentuser["bio"];
+    const bio = currentuser["bio"];
     //const result= await userService.getUserInfoById(currentuser["id"]);
-    const userinfo={
+    const userinfo = {
         bio
     };
-    ctx.body=util.retOk(userinfo);
+    ctx.body = util.retOk(userinfo);
 }
-async function updateUserDetail(ctx){
+async function updateUserDetail(ctx) {
     const { currentuser } = ctx.state;
-    const {bio}= ctx.request.body
-    await userService.updateUserBio(currentuser["id"],bio);
-    ctx.body=util.retOk();
+    const { bio } = ctx.request.body
+    await userService.updateUserBio(currentuser["id"], bio);
+    ctx.body = util.retOk();
 }
 module.exports = {
     userInfo,
