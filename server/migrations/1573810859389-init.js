@@ -188,6 +188,7 @@ module.exports.up =  async function (next) {
     \`id\` int(10) unsigned NOT NULL AUTO_INCREMENT,
     \`user_id\` int(10) unsigned NOT NULL,
     \`group_id\` int(10) unsigned NOT NULL,
+    \`setting\` VARCHAR(100) NOT NULL COMMENT '一些设置值',
     \`addtime\` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (\`id\`),
     UNIQUE KEY \`user_id_group_id\` (\`user_id\`,\`group_id\`)

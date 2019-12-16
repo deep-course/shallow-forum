@@ -19,7 +19,7 @@ module.exports.up = async function (next) {
   (11, 'VIP', ''), \
   (100, '小助手', '');");
   logger.info("insert user_useringroup");
-  await promiseMysqlPool.query("INSERT INTO `user_useringroup` (`user_id`, `group_id`, `addtime`) VALUES ('1', '1', '2019-12-16 16:17:59');");
+  await promiseMysqlPool.query("INSERT INTO `user_useringroup` (`user_id`, `group_id`, `setting`,`addtime`) VALUES ('1', '1', '','2019-12-16 16:17:59');");
   logger.info("insert board_tag");
   await promiseMysqlPool.query("INSERT INTO `board_tag` \
   (`id`, `name`, `type`, `slug`, `info`, `color`,`tagpath`) VALUES \
