@@ -33,7 +33,11 @@ async function getUserInfoById(id) {
     return rows;
 }
 async function getUserGroup(id) {
-    const [rows, fields] = await promiseMysqlPool.query("select * from user_useringroup where  user_id=?", [id]);
+    const [rows, fields] = await promiseMysqlPool.query("SELECT * FROM user_group WHERE id in(select group_id from user_useringroup where  user_id=?)", [id]);
+    return rows;
+}
+async function getUserBoard(id) {
+    const [rows, fields] = await promiseMysqlPool.query("SELECT * FROM board_board WHERE id in(select board_id from user_userinboard where  user_id=?)", [id]);
     return rows;
 }
 async function updateUserLoginTime(id, ip) {
@@ -165,5 +169,6 @@ module.exports = {
     getUserInfoByIds,
     changePassword,
     updateUserBio,
-    updateAvatar
+    updateAvatar,
+    getUserBoard
 }

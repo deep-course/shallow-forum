@@ -6,9 +6,13 @@ const userService = require("../service/user_service");
 const boardService = require('../service/board_service');
 async function home(ctx) {
     logger.debug("home:", ctx.request.query);
-    let { page, sort } = ctx.request.query
+    let { page, sort,board } = ctx.request.query
+    if (!board)
+    {
+        board=0;
+    }
     page = (!page || page < 1) ? 1 : page;
-    const postlist = await boardService.getHomePostList(page, sort);
+    const postlist = await boardService.getHomePostList(page, sort,board);
     if (postlist.length == 0) {
         ctx.body = util.retOk([]);
         return
