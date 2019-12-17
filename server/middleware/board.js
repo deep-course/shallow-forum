@@ -177,13 +177,20 @@ async function checkAddPost(ctx, next) {
         ctx.body = util.retError(-22, "请选择至少1个标签");
         return;
     }
-    const taglist = tags.split(",");
+    const {currentuser,board:userInBoard}=ctx.state;
+    //board的权限判断
+    if (!await boardService.checkBoardPermission(boardid,userInBoard))
+    {
+        ctx.body=util.retError(-220,"板块错误");
+        return;
+    }
+    const taglist = _.split(tags,',');
+    logger.debug(taglist);
     if (taglist.length > 3) {
         ctx.body = util.retError(-23, "最多只能选择3个标签");
         return;
     }
-    const tagsindb = await boardService.getTagListByName(taglist);
-    logger.debug(tagsindb)
+    const tagsindb = await boardService.getTagListByName(_.clone(taglist));
     if (tagsindb.length != taglist.length) {
         logger.debug(`tag数与数据库不符:${tagsindb.length}-${taglist.length}`);
         ctx.body = util.retError(-24, "tag数量不符");
@@ -315,6 +322,26 @@ async function checkEditComment(ctx, next) {
     };
     await next();
 }
+async function checkBoardPermission(ctx,next){
+    logger.debug("checkBoardPermission");
+    const{board,post}= ctx.state;
+    if (_.isNil(post))
+    {
+        //附件提交有可能是空，所以加了这个判断
+        await next();
+    }
+    logger.debug(board,post);
+    if (await boardService.checkBoardPermission(post["board_id"],board))
+    {
+        await next();
+    }
+    else
+    {
+        ctx.body=util.retError(-22,"板块获取错误");
+    }
+    
+    
+}
 module.exports = {
     //从请求中获取post信息存入到state中
     getPost,
@@ -350,4 +377,6 @@ module.exports = {
     //1、解析请求信息，验证
     //2、根据当前post，当前的comment和user做权限的判断
     checkEditComment,
+    //在getuser和getpost后面，获取用户的board和当前post的board，进行权限的判断
+    checkBoardPermission
 }

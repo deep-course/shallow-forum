@@ -367,7 +367,7 @@ async function getCommentListByPostId(postid, page) {
         ])
     return result;
 }
-async function getPostListbyTagId(tagid, page, sort,board) {
+async function getPostListbyTagId(tagid, page, sort, board) {
     logger.debug("getPostListbyTags:", tagid, page, sort);
     const offset = (page - 1) * 20;
     const sql = `SELECT p.*,a.* FROM board_post AS p 
@@ -446,6 +446,8 @@ async function checkBoardPermission(board_id, boardlist) {
         else {
             return true;
         }
+    } else if (board_id == 0) {
+        return true;
     } else {
         return false;
     }

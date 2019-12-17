@@ -16,6 +16,7 @@ router.post('/newlink',
 router.post('/newcomment',
     middleware.getUser,
     middleware.getPost,
+    middleware.checkBoardPermission,
     middleware.checkUser,
     middleware.checkAddComment,
     boardController.newComment);
@@ -23,18 +24,21 @@ router.post('/newcomment',
 router.post('/uploadattachments',
     middleware.getUser,
     middleware.getPost,
+    middleware.checkBoardPermission,
     middleware.checkUser,
     boardController.uploadAttachment);
 
 router.get('/showattachments',
     middleware.getUser,
     middleware.getPost,
+    middleware.checkBoardPermission,
     middleware.checkUser,
     boardController.showAttachment);
 
 router.post('/removeattachments',
     middleware.getUser,
     middleware.getPost,
+    middleware.checkBoardPermission,
     middleware.checkUser,
     boardController.removeAttachment);
 
@@ -42,12 +46,14 @@ router.post('/removeattachments',
 router.get('/getpost',
     middleware.getUser,
     middleware.getPost,
+    middleware.checkBoardPermission,
     middleware.getPostDetail,
     boardController.showPost);
 
 router.post('/editpost',
     middleware.getUser,
     middleware.getPost,
+    middleware.checkBoardPermission,
     middleware.getPostDetail,
     middleware.checkUser,
     middleware.checkEditPost,
@@ -73,6 +79,7 @@ router.post('/deletepost',
     middleware.getUser,
     middleware.checkUser,
     middleware.getPost,
+    middleware.checkBoardPermission,
     boardController.deletePost
 
 );
@@ -82,6 +89,7 @@ router.post('/uppost',
     middleware.getUser,
     middleware.checkUser,
     middleware.getPost,
+    middleware.checkBoardPermission,
     boardController.upPost
 );
 
@@ -94,6 +102,7 @@ router.get('/postlist',
 router.get('/commentlist',
     middleware.getUser,
     middleware.getPost,
+    middleware.checkBoardPermission,
     boardController.getCommentList
 );
 router.get('/boardsetting',

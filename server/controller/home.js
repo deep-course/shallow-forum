@@ -7,6 +7,7 @@ const boardService = require('../service/board_service');
 async function home(ctx) {
     logger.debug("home:", ctx.request.query);
     let { page, sort, board: board_id } = ctx.request.query
+    const{board:userInBoard}=ctx.state;
     //权限判断
     if (_.isNil(board_id)) {
         board_id = 0;
@@ -23,7 +24,7 @@ async function home(ctx) {
         board_id = 0;
     }
     page = (!page || page < 1) ? 1 : page;
-    const postlist = await boardService.getHomePostList(page, sort, board);
+    const postlist = await boardService.getHomePostList(page, sort, board_id);
     if (postlist.length == 0) {
         ctx.body = util.retOk([]);
         return
