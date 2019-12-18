@@ -4,8 +4,8 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "rm -rf .next && next build",
-    "start": "next start"
+    "build": "next build",
+    "start": "node server.js"
   },
   "dependencies": {
     "antd": "^3.25.3",
