@@ -67,6 +67,7 @@ app.prepare()
 
         //其他
         router.get('*', async (ctx, next) => {
+            //这里设置判断开发模式不走handle
             if (dev && ctx.url.startsWith('/api')) {
                 await next()
             }

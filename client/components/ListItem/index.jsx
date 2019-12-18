@@ -34,11 +34,11 @@ class PageHead extends Component {
           <div className="slug-list-item-action">
             <span className="slug-list-item-action-item">
               <Icon type="like" />
-              <span>7</span>
+              <span>{data.upcount}</span>
             </span>
             <span className="slug-list-item-action-item">
               <Icon type="message" />
-              <span>7</span>
+              <span>{data.commentcount}</span>
             </span>
           </div>
         </div>
