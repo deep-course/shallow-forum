@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import { observer, inject } from 'mobx-react'
 import Router from 'next/router';
-import { Icon } from 'antd'
+import { Icon, List } from 'antd'
 import moment from 'dayjs'
 import './index.less'
 
@@ -13,13 +13,16 @@ class PageHead extends Component {
   }
 
   usernameClick = () => {
+    Router.push('/user')
+  }
+
+  detailClick = () => {
     Router.push('/detail')
   }
 
   render() {
-    const { taglist, sort } = this.props.global
-    const data = this.props.data
-    console.log(data)
+    const { laballist } = this.props.global
+    const { data, index } = this.props
     return (
       <div className="slug-list-item">
         <div className="slug-list-item-left">
@@ -30,7 +33,7 @@ class PageHead extends Component {
             <span className="slug-list-item-time">{moment(new Date(data.pubtime)).format('YYYY/MM/DD HH:mm:ss')}</span>
             {/* <span className="slug-list-item-label">前端</span> */}
           </div>
-          <div className="slug-list-item-title">【{data.slug}】{data.title}</div>
+          <div className="slug-list-item-title" onClick={this.detailClick}>【{laballist[data.label]}】{data.title} </div>
           <div className="slug-list-item-action">
             <span className="slug-list-item-action-item">
               <Icon type="like" />

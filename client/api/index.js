@@ -1,5 +1,5 @@
 import http from '../utils/http'
-const basePreixUrl = ''
+const basePreixUrl = 'http://103.61.38.127'
 
 function getToken () {
   try {
@@ -51,7 +51,7 @@ export const updatePassword = params => http.post('/api/user/updatepassword', pa
 /** home */
 
 // 首页列表
-export const getHomeList = () => http.get('/api/home', {}, getToken())
+export const getHomeList = (filter) => http.get('/api/home', filter, getToken())
 
 /** board */
 
