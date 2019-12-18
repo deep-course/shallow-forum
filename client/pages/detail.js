@@ -8,8 +8,9 @@ import '../assets/pageStyle/detail.less'
 @inject('global', 'detail')
 @observer
 class Home extends React.Component{
-  static async getInitialProps ({ ctx }) {
-    return { };
+  static async getInitialProps ({ctx:{query}}) {
+    console.log(query);
+    return {slug:query};
   }
 
   constructor() {
