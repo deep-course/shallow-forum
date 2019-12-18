@@ -72,6 +72,9 @@ async function getPostDetail(ctx, next) {
         return;
     }
     ctx.state.comment = comment;
+    //帖子活跃度
+    const postactivity= await boardService.getActivityByPostId(post["id"]);
+    ctx.state.activity=postactivity;
     //编辑用户
     if (comment['edituser_id'] > 0) {
         const edituser = await userService.getUserById(comment['edituser_id']);
@@ -81,6 +84,7 @@ async function getPostDetail(ctx, next) {
         }
         ctx.state.edituser = edituser;
     }
+    
     await next();
 
 }

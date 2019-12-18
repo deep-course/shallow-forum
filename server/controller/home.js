@@ -43,7 +43,7 @@ async function home(ctx) {
     let retpostlist = [];
     _.forEach(postlist, function (item) {
         const postuser = userlistid[item["user_id"]]
-        let post = _.pick(item, ["slug", "title", "pubtime", "image", "label", "lastcommenttime"]);
+        let post = _.pick(item, ["slug", "title", "pubtime", "image", "label", "upcount","commentcount","lastcommenttime"]);
         post["username"] = postuser ? postuser["username"] : "未知用户";
         post["useravatar"] = postuser ? postuser["avatar"] : "";
         retpostlist.push(post);

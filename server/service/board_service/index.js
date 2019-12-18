@@ -452,6 +452,10 @@ async function checkBoardPermission(board_id, boardlist) {
         return false;
     }
 }
+async function getActivityByPostId(postid){
+    const [result] = await promiseMysqlPool.query("SELECT * FROM board_postacticity WHERE post_id=?", [postid]);
+    return result[0];
+}
 module.exports = {
     editPost,
     addPost,
@@ -477,5 +481,6 @@ module.exports = {
     getBuildInTagList,
     getTagListByPostId,
     getHomePostList,
-    checkBoardPermission
+    checkBoardPermission,
+    getActivityByPostId,
 }

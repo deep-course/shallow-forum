@@ -99,8 +99,10 @@ async function newLink(ctx, next) {
 async function showPost(ctx, next) {
     logger.debug("showPost:", ctx.state)
     //TODO：增加权限管理和管理员管理
-    const { currentuser, post, postuser, comment, edituser, posttags } = ctx.state
-    let retpost = _.pick(post, ["slug", "title", "pubtime", "label", "sticky", "lock", "image"]);
+    const { currentuser, post, postuser, comment, edituser, posttags,activity } = ctx.state
+    let repost=_.assign(post,activity);
+    retpost = _.pick(repost, 
+        ["slug", "title", "pubtime", "label", "sticky", "lock", "image","upcount","lastuptime","commentcount","lastcommenttime"]);
     //删帖不显示
     if (post['deleted'] == 1) {
         ctx.body = util.retError(10, '无法找到内容');
@@ -233,7 +235,7 @@ async function getPostList(ctx, next) {
         return;
     }
     page = (!page || page < 1) ? 1 : page;
-    const postlist = await boardService.getPostListbyTagId(taginfo[0]["id"], page, sort);
+    const postlist = await boardService.getPostListbyTagId(taginfo[0]["id"], page, sort,board_id);
     if (postlist.length == 0) {
         ctx.body = util.retOk([]);
         return
@@ -252,7 +254,7 @@ async function getPostList(ctx, next) {
     let retpostlist = [];
     _.forEach(postlist, function (item) {
         const postuser = userlistid[item["user_id"]]
-        let post = _.pick(item, ["slug", "title", "pubtime", "image", "label", "lastcommenttime"]);
+        let post = _.pick(item, ["slug", "title", "pubtime", "image", "label",  "upcount","commentcount","lastcommenttime"]);
         post["username"] = postuser ? postuser["username"] : "未知用户";
         post["useravatar"] = postuser ? postuser["avatar"] : "";
         retpostlist.push(post);
