@@ -57,7 +57,10 @@ class Home extends React.Component{
       commentContent, 
       title,
       user,
-      image
+      image,
+      comment,
+      commentcount,
+      upcount
     } = this.state
     const { commentList, commentTotal, commentLoading } = this.props.detail
     return (
@@ -67,12 +70,12 @@ class Home extends React.Component{
             <Affix offsetTop={100}>
               <div className="detail-action">
                 <div className="detail-action-like">
-                  <Badge count={86} overflowCount={99} style={{ backgroundColor: '#52c41a' }}>
+                  <Badge count={upcount} overflowCount={99} style={{ backgroundColor: '#52c41a' }}>
                     <Icon type="like" />
                   </Badge>
                 </div>
                 <div className="detail-action-comment" onClick={this.goCommnet}>
-                  <Badge count={53} overflowCount={99} style={{ backgroundColor: '#52c41a' }}>
+                  <Badge count={commentcount} overflowCount={99} style={{ backgroundColor: '#52c41a' }}>
                     <Icon type="message" />
                   </Badge>
                 </div>
@@ -94,15 +97,7 @@ class Home extends React.Component{
             </div>
             <h4 className="detail-title">{title}</h4>
           </div>
-          <div className="detail-content">
-            <p>1111</p>
-            <p>2222</p>
-            <p>2222</p>
-            <p>2222</p>
-            <p>2222</p>
-            <p>2222</p>
-            <p>2222</p>
-            <p>2222</p>
+          <div className="detail-content" dangerouslySetInnerHTML={{ __html: comment ? comment.content : ""}}>
           </div>
           <div className="detail-comment">
             <h6 className="detail-comment-title" id="detail-comment">评论</h6>
