@@ -3,7 +3,7 @@ import qs from 'qs'
 import { message } from 'antd'
 
 const instance = axios.create({
-  baseURL: 'http://103.61.38.127',
+  baseURL: '',
   timeout: 20000,
   // withCredentials: true,
 });

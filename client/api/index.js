@@ -1,5 +1,5 @@
 import http from '../utils/http'
-const basePreixUrl = 'http://103.61.38.127'
+const basePreixUrl = ''
 
 function getToken () {
   try {
@@ -66,6 +66,9 @@ export const boardDeleteImg = params => http.post('/api/board/removeattachments'
 
 // 发帖子
 export const publishNewPost = params => http.post('/api/board/newpost', params, getToken())
+
+// 帖子详情
+export const getBoardDetail = params => http.get('/api/board/getpost', params, getToken())
 
 // 帖子列表
 export const getPostList = params => http.get('/api/board/postlist', params, getToken())

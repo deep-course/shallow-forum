@@ -3,13 +3,13 @@ import {observer, inject} from 'mobx-react';
 import { Button, Input, Affix, Badge, Icon } from 'antd'
 import PageHead from '../components/PageHead'
 import CommentItem from '../components/CommentItem'
+import { getBoardDetail } from '../api'
 import '../assets/pageStyle/detail.less'
 
 @inject('global', 'detail')
 @observer
 class Home extends React.Component{
   static async getInitialProps ({ctx:{query}}) {
-    console.log(query);
     return {slug:query};
   }
 
@@ -19,6 +19,10 @@ class Home extends React.Component{
       commentBtn: false,
       commentContent: ''
     }
+  }
+
+  componentDidMount() {
+    this.getBoardDetail();
   }
 
   commentBtnShow = (flag) => {
@@ -36,8 +40,25 @@ class Home extends React.Component{
     window.scrollTo(0, document.getElementById('detail-comment').offsetTop)
   }
 
+  //获取帖子详情
+  getBoardDetail = () => {
+    const { slug } = this.props;
+    getBoardDetail({ postslug: slug }).then(res => {
+      this.setState({
+        ...this.state,
+        ...res
+      })
+    })
+
+  }
   render() {
-    const { commentBtn, commentContent } = this.state
+    const { 
+      commentBtn, 
+      commentContent, 
+      title,
+      user,
+      image
+    } = this.state
     const { commentList, commentTotal, commentLoading } = this.props.detail
     return (
       <>
@@ -59,19 +80,19 @@ class Home extends React.Component{
             </Affix>
           <div className="detail-info">
             <div className="detail-user">
-              <img src="/static/user-test.png" alt="作者头像" className="detail-user-img"/>
+              <img src={user && user.avatar} alt="作者头像" className="detail-user-img"/>
               <div className="detail-user-info">
-                <p className="detail-user-name">澹台</p>
+                <p className="detail-user-name">{user && user.username}</p>
                 <p className="detail-user-date">
                   <span>2019年11月26日</span>
-                  <span className="detail-user-read">阅读量 17502</span>
+                <span className="detail-user-read">阅读量 {user && user.activate}</span>
                 </p>
               </div>
             </div>
             <div className="detail-cover">
-              <img src="/static/logo.png" alt="文章封面图"/>
+              <img src={image ? image : '/static/logo.png'} alt="文章封面图"/>
             </div>
-            <h4 className="detail-title">《吐血整理》-顶级程序员工具集</h4>
+            <h4 className="detail-title">{title}</h4>
           </div>
           <div className="detail-content">
             <p>1111</p>
