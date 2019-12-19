@@ -27,13 +27,13 @@ class PageHead extends Component {
       <div className="slug-list-item">
         <div className="slug-list-item-left">
           <div className="slug-list-item-info">
-            {/* <span className="slug-list-item-type">{data.label}</span> */}
+            {data.label>0 && (<span className="slug-list-item-type">{laballist[data.label]}</span>) }
             <span className="slug-list-item-name" onClick={this.usernameClick}>{data.username}</span>
             <span>·</span>
             <span className="slug-list-item-time">{moment(new Date(data.pubtime)).format('YYYY/MM/DD HH:mm:ss')}</span>
             {/* <span className="slug-list-item-label">前端</span> */}
           </div>
-          <div className="slug-list-item-title" onClick={this.detailClick}>【{laballist[data.label]}】{data.title} </div>
+          <div className="slug-list-item-title" onClick={this.detailClick}>{data.title} </div>
           <div className="slug-list-item-action">
             <span className="slug-list-item-action-item">
               <Icon type="like" />
