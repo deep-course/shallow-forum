@@ -48,7 +48,7 @@ async function deleteComment(ctx, next) {
 }
 async function getCommentList(ctx, next) {
     logger.debug("getCommentList", ctx.state);
-    let { page } = ctx.request.body;
+    let { page } = ctx.request.query;
     page = (!page || page < 1) ? 1 : page;
     const { post } = ctx.state;
     if (!post || _.isEmpty(post) || post["deleted"] == 1) {
