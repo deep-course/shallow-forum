@@ -1,9 +1,10 @@
 import React from 'react'
 import {observer, inject} from 'mobx-react';
-import { Button, Input, Affix, Badge, Icon } from 'antd'
+import { Button, Input, Affix, Badge, Icon, Divider } from 'antd'
 import PageHead from '../components/PageHead'
 import CommentItem from '../components/CommentItem'
-import { getBoardDetail } from '../api'
+import { getBoardDetail, getCommentlist, addNewComment } from '../api'
+import moment from 'dayjs'
 import '../assets/pageStyle/detail.less'
 
 @inject('global', 'detail')
@@ -17,12 +18,16 @@ class Home extends React.Component{
     super()
     this.state = {
       commentBtn: false,
-      commentContent: ''
+      commentContent: '',
+      commentList: [],
+      commentListPage: 1,
+      commentBtnMore: true,
     }
   }
 
   componentDidMount() {
     this.getBoardDetail();
+    this.getCommentlist();
   }
 
   commentBtnShow = (flag) => {
@@ -34,7 +39,27 @@ class Home extends React.Component{
       commentContent: e.target.value
     })
   }
-  
+
+  //新建回复
+  addNewComment = () => {
+    const { commentContent } = this.state;
+    const { slug } = this.props;
+    let params = {
+      postslug: slug,
+      content: commentContent,
+      commentContent: ''
+    }
+    addNewComment(params).then(data => {
+      this.setState({ 
+        commentListPage: 1,
+        commentList: []
+      })
+      setTimeout(() => {
+        this.getCommentlist()
+      })
+    })
+  }
+
   // 滚动到评论位置
   goCommnet = () => {
     window.scrollTo(0, document.getElementById('detail-comment').offsetTop)
@@ -49,8 +74,34 @@ class Home extends React.Component{
         ...res
       })
     })
-
   }
+
+  //获取回复列表
+  getCommentlist = () => {
+    const { commentListPage } = this.state;
+    const { slug } = this.props;
+    getCommentlist({ postslug: slug, page: commentListPage }).then(data => {
+      if(data && data.length > 0){
+        let commentList = this.state.commentList.concat(data);
+        this.setState({ commentList })
+      }else{
+        if(commentListPage != 1){
+          this.setState({ commentBtnMore: false })
+        }
+      }
+    })
+  }
+
+  //回复列表加载更多
+  getMoreCommentlist = () => {
+    let { commentListPage } = this.state;
+    commentListPage = commentListPage + 1;
+    this.setState({ commentListPage })
+    setTimeout(() => {
+      this.getCommentlist()
+    })
+  }
+
   render() {
     const { 
       commentBtn, 
@@ -60,9 +111,11 @@ class Home extends React.Component{
       image,
       comment,
       commentcount,
-      upcount
+      upcount,
+      pubtime,
+      commentList,
+      commentBtnMore
     } = this.state
-    const { commentList, commentTotal, commentLoading } = this.props.detail
     return (
       <>
         <PageHead title="论坛-文章详情"></PageHead>
@@ -87,13 +140,13 @@ class Home extends React.Component{
               <div className="detail-user-info">
                 <p className="detail-user-name">{user && user.username}</p>
                 <p className="detail-user-date">
-                  <span>2019年11月26日</span>
-                <span className="detail-user-read">阅读量 {user && user.activate}</span>
+                  <span>{moment(new Date(pubtime)).format('YYYY年MM月DD日')}</span>
+                {/* <span className="detail-user-read">阅读量 {user && user.activate}</span> */}
                 </p>
               </div>
             </div>
             <div className="detail-cover">
-              <img src={image ? image : '/static/logo.png'} alt="文章封面图"/>
+              <img src={image} alt="文章封面图"/>
             </div>
             <h4 className="detail-title">{title}</h4>
           </div>
@@ -117,7 +170,7 @@ class Home extends React.Component{
               </div>
               {(commentBtn || commentContent) && (
                 <div className="detail-comment-self-submit">
-                  <Button type="primary">评论</Button>
+                  <Button type="primary" onClick={this.addNewComment}>评论</Button>
                 </div>
               )}
             </div>
@@ -129,7 +182,11 @@ class Home extends React.Component{
               )}
             </div>
             <div className="detail-comment-loadmore">
-              <Button>加载更多</Button>
+              {commentBtnMore ?
+                  <Button onClick={this.getMoreCommentlist}>加载更多</Button>
+                :
+                  <Divider>到底了</Divider>
+                }
             </div>
           </div>
         </div>

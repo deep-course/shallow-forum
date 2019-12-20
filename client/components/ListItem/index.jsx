@@ -16,8 +16,9 @@ class PageHead extends Component {
     Router.push('/user')
   }
 
-  detailClick = () => {
-    Router.push('/detail')
+  detailClick = (slug) => {
+    const { data } = this.props
+    Router.push(`/p/${data.slug}`)
   }
 
   render() {

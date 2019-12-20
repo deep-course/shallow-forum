@@ -72,3 +72,9 @@ export const getBoardDetail = params => http.get('/api/board/getpost', params, g
 
 // 帖子列表
 export const getPostList = params => http.get('/api/board/postlist', params, getToken())
+
+//回复列表
+export const getCommentlist = params => http.get('/api/board/commentlist', params, getToken())
+
+//新建回复
+export const addNewComment = params => http.post('/api/board/newcomment', params, getToken())

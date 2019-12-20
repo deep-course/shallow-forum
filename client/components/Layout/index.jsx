@@ -29,6 +29,10 @@ class Layout extends Component {
     Router.push('/login')
   }
 
+  goHome = () => {
+    Router.push('/')
+  }
+
   render() {
     const routeName = this.props.router.route
     const noNeedLayout = this.noNeedLayoutRouterMap.includes(routeName)
@@ -44,7 +48,10 @@ class Layout extends Component {
                     <img src="/static/logo.png" alt="logo"/>
                   </div>
                   <ul className="layout-header-type">
-                    <li className="layout-header-type-item">首页</li>
+                    <li className="layout-header-type-item" 
+                      onClick={ this.goHome }>
+                        首页
+                    </li>
                     <li className="layout-header-type-item">题库</li>
                   </ul>
                   {/* <div className="layout-header-search">
