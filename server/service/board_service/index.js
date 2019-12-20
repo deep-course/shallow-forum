@@ -142,16 +142,15 @@ async function addPost(post, content, tags, imagelist) {
 }
 //根据slug获取tag列表
 async function getTagListByName(tags) {
-    if (tags.length==1)
-    {
-        tags[1]=tags[0];
-        tags[0]="";
+    if (tags.length == 1) {
+        tags[1] = tags[0];
+        tags[0] = "";
     }
     const [taglist] = await promiseMysqlPool.query("select * from board_tag where tagpath=? and slug=?", tags);
     return taglist;
 }
 //获取论坛所有设置的标签列表
-async function getBuildInTagList(){
+async function getBuildInTagList() {
     const [taglist] = await promiseMysqlPool.query("select * from board_tag where `type` in ('main','sub')");
     return taglist;
 
@@ -243,7 +242,7 @@ async function getBoardBySlug(slug) {
 }
 //保存上传的文件
 async function saveFile(filepath, format, userid, postid) {
-    const filename = "upload/"+util.getUuid() + "." + format;
+    const filename = "upload/" + util.getUuid() + "." + format;
     const hash = util.getFileMd5(filepath);
     //保存文件
     saveresult = await _3rd_service.saveFile(filepath, filename);
@@ -368,18 +367,20 @@ async function getCommentListByPostId(postid, page) {
         ])
     return result;
 }
-async function getPostListbyTagId(tagid, page, sort) {
+async function getPostListbyTagId(tagid, page, sort, board) {
     logger.debug("getPostListbyTags:", tagid, page, sort);
     const offset = (page - 1) * 20;
     const sql = `SELECT p.*,a.* FROM board_post AS p 
         LEFT JOIN board_postintag AS t ON p.id = t.post_id 
         LEFT JOIN board_postacticity AS a ON p.id=a.post_id 
         WHERE t.tag_id=?  and p.deleted=0 and p.\`type\`="post"
+        and p.board_id=?
         order by ${sort == 1 ? "p.id" : "a.lastcommenttime"} desc
         limit ?,20 
         `;
     const [postlist] = await promiseMysqlPool.query(sql, [
         tagid,
+        board,
         offset
     ]);
     return postlist;
@@ -415,23 +416,45 @@ async function getPostListByUserUp(postid, page) {
         ])
     return result;
 }
-async function getTagListByPostId(postid){
-    const [result] = await promiseMysqlPool.query("SELECT * FROM board_tag WHERE id IN (SELECT  tag_id FROM board_postintag WHERE post_id=?)",[postid]);
+async function getTagListByPostId(postid) {
+    const [result] = await promiseMysqlPool.query("SELECT * FROM board_tag WHERE id IN (SELECT  tag_id FROM board_postintag WHERE post_id=?)", [postid]);
     return result;
 }
-async function getHomePostList(page,sort){
+async function getHomePostList(page, sort, board) {
     const offset = (page - 1) * 20;
     const sql = `SELECT p.*,a.* FROM board_post AS p 
         LEFT JOIN board_postintag AS t ON p.id = t.post_id 
         LEFT JOIN board_postacticity AS a ON p.id=a.post_id 
-        WHERE p.deleted=0 and p.\`type\`="post"
+        WHERE p.deleted=0 and p.\`type\`="post" and p.board_id=?
         order by ${sort == 1 ? "p.id" : "a.lastcommenttime"} desc
         limit ?,20 
         `;
     const [postlist] = await promiseMysqlPool.query(sql, [
+        board,
         offset
     ]);
     return postlist;
+}
+//判断用户group和board进行比对，返回是否与权限
+async function checkBoardPermission(board_id, boardlist) {
+    logger.debug(board_id, boardlist);
+    if (boardlist) {
+        const board = _.filter(boardlist, function (o) { return o["id"] == board_id; });
+        if (board.length == 0) {
+            return false;
+        }
+        else {
+            return true;
+        }
+    } else if (board_id == 0) {
+        return true;
+    } else {
+        return false;
+    }
+}
+async function getActivityByPostId(postid){
+    const [result] = await promiseMysqlPool.query("SELECT * FROM board_postacticity WHERE post_id=?", [postid]);
+    return result[0];
 }
 module.exports = {
     editPost,
@@ -457,5 +480,7 @@ module.exports = {
     getPostListByUserUp,
     getBuildInTagList,
     getTagListByPostId,
-    getHomePostList
+    getHomePostList,
+    checkBoardPermission,
+    getActivityByPostId,
 }

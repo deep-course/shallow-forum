@@ -4,6 +4,8 @@ import PageHead from '../components/PageHead'
 import ListItem from '../components/ListItem'
 import '../assets/pageStyle/index.less'
 import { getHomeList } from '../api'
+import InfiniteScroll from 'react-infinite-scroller'
+import { List, Spin, Divider } from 'antd'
 
 @inject('global')
 @observer
@@ -21,7 +23,7 @@ class Index extends React.Component{
       },
       list: [],
       loading: false,
-      finish: false,
+      hasMore: true,
     }
   }
 
@@ -46,34 +48,41 @@ class Index extends React.Component{
 
   // 获取帖子列表
   getPostList = () => {
-    this.setState({loading: true, finish: false})
+    this.setState({loading: true})
     getHomeList(this.state.filter).then(res => {
-      console.log(res)
       if (res.length) {
-        // 有返回结果
-        if (this.state.filter.page == 1) {
-          // 首次加载
-          this.setState({list: res})
-        } else {
-          // 翻页
-          this.setState({list: [...this.state.list, ...res]})
-        }
+        this.setState({list: [...this.state.list, ...res]})
       } else {
         // 无结果 已加载全部
-        this.setState({finish: true})
+        this.setState({hasMore: false})
       }
       this.setState({loading: false})
     }, () => {
       this.setState({loading: false})
     })
   }
+  //无限滚动加载
+  handleInfiniteOnLoad = (page) => {
+    if(page>10){
+      this.setState({hasMore: false})
+    }
+    this.setState({ 
+      filter: { 
+        ...this.state.filter, 
+        page,
+      } 
+    })
+    setTimeout(() => {
+      this.getPostList()
+    })
+  };
 
   render() {
     const { taglist, sort } = this.props.global
-    const { filter, list, loading } = this.state
+    const { filter, list, loading, hasMore } = this.state
     return (
       <div>
-        <PageHead title="论坛-首页"></PageHead>
+        <PageHead title="论坛-首页"></PageHead>        
         <ul className="index-filter-tab">
         {/* {Object.keys(taglist).length && (
             Object.keys(taglist).map((k, i) => (
@@ -95,9 +104,33 @@ class Index extends React.Component{
           )}
         </div>
         <div className="index-list">
-          {list.map((data, index) => (
-            <ListItem data={data} key={index}></ListItem>
-          ))}
+          <InfiniteScroll
+            initialLoad={false}
+            pageStart={0}
+            loadMore={this.handleInfiniteOnLoad}
+            hasMore={!loading && hasMore}
+          >
+            <List
+              dataSource={list}
+              renderItem={(item,index) => {
+                if(item){
+                  return <ListItem data={item} index={index}></ListItem>
+                }else{
+                  return <div></div>
+                }
+              }                
+              }
+            >
+              {loading && hasMore && (
+                <div className="demo-loading-container">
+                  <Spin />
+                </div>
+              )}
+              {!hasMore && (
+                <Divider>到底了</Divider>
+              )}
+            </List>
+          </InfiniteScroll>
         </div>
       </div>
     )

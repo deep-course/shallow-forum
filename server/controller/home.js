@@ -6,9 +6,25 @@ const userService = require("../service/user_service");
 const boardService = require('../service/board_service');
 async function home(ctx) {
     logger.debug("home:", ctx.request.query);
-    let { page, sort } = ctx.request.query
+    let { page, sort, board: board_id } = ctx.request.query
+    const{board:userInBoard}=ctx.state;
+    //权限判断
+    if (_.isNil(board_id)) {
+        board_id = 0;
+
+    }
+    else if (board_id > 0) {
+        if (!await boardService.checkBoardPermission(board_id, userInBoard)) {
+            ctx.body = util.retError(-1, "你访问的板块有误");
+            return;
+
+        }
+    }
+    else {
+        board_id = 0;
+    }
     page = (!page || page < 1) ? 1 : page;
-    const postlist = await boardService.getHomePostList(page, sort);
+    const postlist = await boardService.getHomePostList(page, sort, board_id);
     if (postlist.length == 0) {
         ctx.body = util.retOk([]);
         return
@@ -27,7 +43,7 @@ async function home(ctx) {
     let retpostlist = [];
     _.forEach(postlist, function (item) {
         const postuser = userlistid[item["user_id"]]
-        let post = _.pick(item, ["slug", "title", "pubtime", "image", "label", "lastcommenttime"]);
+        let post = _.pick(item, ["slug", "title", "pubtime", "image", "label", "upcount","commentcount","lastcommenttime"]);
         post["username"] = postuser ? postuser["username"] : "未知用户";
         post["useravatar"] = postuser ? postuser["avatar"] : "";
         retpostlist.push(post);

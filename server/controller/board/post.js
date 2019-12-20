@@ -22,7 +22,7 @@ async function newPost(ctx, next) {
         board_id: newpost.boardid,
         image: newpost.mainimage,
         deleted: 0,
-        type:"post"
+        type: "post"
 
     };
     const content = {
@@ -74,7 +74,7 @@ async function newLink(ctx, next) {
         board_id: newpost.boardid,
         image: "",
         deleted: 0,
-        type:"link"
+        type: "link"
 
     };
     const content = {
@@ -99,8 +99,10 @@ async function newLink(ctx, next) {
 async function showPost(ctx, next) {
     logger.debug("showPost:", ctx.state)
     //TODO：增加权限管理和管理员管理
-    const { currentuser, post, postuser, comment, edituser,posttags } = ctx.state
-    let retpost = _.pick(post, ["slug", "title", "pubtime", "label", "sticky", "lock", "image"]);
+    const { currentuser, post, postuser, comment, edituser, posttags,activity } = ctx.state
+    let repost=_.assign(post,activity);
+    retpost = _.pick(repost, 
+        ["slug", "title", "pubtime", "label", "sticky", "lock", "image","upcount","lastuptime","commentcount","lastcommenttime"]);
     //删帖不显示
     if (post['deleted'] == 1) {
         ctx.body = util.retError(10, '无法找到内容');
@@ -119,9 +121,9 @@ async function showPost(ctx, next) {
         retpost['comment']['edittime'] = comment["edittime"];
     }
     retpost['user'] = _.pick(postuser, ['username', 'lock', 'activate', 'avatar']);
-    retpost['tags']=[];
+    retpost['tags'] = [];
     posttags.forEach(element => {
-        _.unset(element,"id")
+        _.unset(element, "id")
         retpost['tags'].push(element);
     });
     ctx.body = util.retOk(retpost);
@@ -204,10 +206,26 @@ async function upPost(ctx, next) {
 }
 async function getPostList(ctx, next) {
     logger.debug("getPostList:", ctx.request.query);
-    let { tag, page, sort } = ctx.request.query
-    const tags=_.split(tag,",");
-    if (tags.length>2)
-    {
+    let { tag, page, sort, board: board_id } = ctx.request.query;
+    const { board: userInBoard } = ctx.state;
+
+    //权限判断
+    if (_.isNil(board_id)) {
+        board_id = 0;
+
+    }
+    else if (board_id > 0) {
+        if (!await boardService.checkBoardPermission(board_id, userInBoard)) {
+            ctx.body = util.retError(-1, "你访问的板块有误");
+            return;
+
+        }
+    }
+    else {
+        board_id = 0;
+    }
+    const tags = _.split(tag, ",");
+    if (tags.length > 2) {
         ctx.body = util.retError(1000, "tag错误");
         return;
     }
@@ -217,7 +235,7 @@ async function getPostList(ctx, next) {
         return;
     }
     page = (!page || page < 1) ? 1 : page;
-    const postlist = await boardService.getPostListbyTagId(taginfo[0]["id"], page, sort);
+    const postlist = await boardService.getPostListbyTagId(taginfo[0]["id"], page, sort,board_id);
     if (postlist.length == 0) {
         ctx.body = util.retOk([]);
         return
@@ -236,9 +254,9 @@ async function getPostList(ctx, next) {
     let retpostlist = [];
     _.forEach(postlist, function (item) {
         const postuser = userlistid[item["user_id"]]
-        let post = _.pick(item, ["slug", "title", "pubtime", "image", "label", "lastcommenttime"]);
+        let post = _.pick(item, ["slug", "title", "pubtime", "image", "label",  "upcount","commentcount","lastcommenttime"]);
         post["username"] = postuser ? postuser["username"] : "未知用户";
-        post["useravatar"] = postuser?postuser["avatar"]:"";
+        post["useravatar"] = postuser ? postuser["avatar"] : "";
         retpostlist.push(post);
     });
     ctx.body = util.retOk(retpostlist);
