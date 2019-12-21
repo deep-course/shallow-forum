@@ -21,6 +21,7 @@ class Index extends React.Component{
         tag: '',
         sort: 1,
         page: 1,
+        subTag: ''
       },
       list: [],
       loading: false,
@@ -52,7 +53,15 @@ class Index extends React.Component{
     this.setState({loading: true})
     getHomeList(this.state.filter).then(res => {
       if (res.length) {
-        this.setState({list: [...this.state.list, ...res]})
+        if(this.state.filter.page == 1){
+          this.setState({
+            list: res
+          })
+        }else{
+          this.setState({
+            list: [...this.state.list, ...res]
+          })
+        }
       } else {
         // 无结果 已加载全部
         this.setState({hasMore: false})
@@ -107,10 +116,9 @@ class Index extends React.Component{
 
   render() {
     const { taglist, sort } = this.props.global
+    const { filter, list, loading, hasMore } = this.state
     const { taglistMap, mainTagList } = this.getNewTagList(taglist);
-    console.log(taglistMap, mainTagList)
-    const { filter, list, loading, hasMore, tag } = this.state
-    let subTagList = taglistMap.get(tag);
+    let subTagList = filter.tag ? taglistMap.get(filter.tag) : [];
     return (
       <div>
         <PageHead title="论坛-首页"></PageHead> 
@@ -120,17 +128,17 @@ class Index extends React.Component{
             <li 
               className={`index-filter-tab-item ${filter.tag == data.slug ? 'current' : ''}`} 
               key={index} 
-              onClick={() => this.mainTagClick(data.slug)}>{data.name}</li>
+              onClick={() => this.chooseFilter('tag', data.slug)}>{data.name}</li>
           ))}
         </ul>
 
-        {tag && subTagList.length > 0 &&
+        {filter.tag && subTagList.length > 0 &&
           <div className="index-filter-tab">
             {subTagList.map(tag => (
               <CheckableTag
                 key={tag.slug}
-                // checked={selectedTags.indexOf(tag) > -1}
-                // onChange={checked => this.handleChange(tag, checked)}
+                checked={filter.subTag == tag.slug}
+                onChange={checked => this.chooseFilter('subTag', tag.slug)}
               >
                 {tag.name}
               </CheckableTag>
