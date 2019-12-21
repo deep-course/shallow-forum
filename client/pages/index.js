@@ -5,7 +5,8 @@ import ListItem from '../components/ListItem'
 import '../assets/pageStyle/index.less'
 import { getHomeList } from '../api'
 import InfiniteScroll from 'react-infinite-scroller'
-import { List, Spin, Divider } from 'antd'
+import { List, Spin, Divider, Tag } from 'antd'
+const { CheckableTag } = Tag;
 
 @inject('global')
 @observer
@@ -17,7 +18,7 @@ class Index extends React.Component{
     super()
     this.state = {
       filter: {
-        tag: 'tag1',
+        tag: '',
         sort: 1,
         page: 1,
       },
@@ -61,6 +62,7 @@ class Index extends React.Component{
       this.setState({loading: false})
     })
   }
+
   //无限滚动加载
   handleInfiniteOnLoad = (page) => {
     if(page>10){
@@ -76,26 +78,66 @@ class Index extends React.Component{
       this.getPostList()
     })
   };
+  
+  mainTagClick = (slug) => {
+    this.setState({tag: slug})
+  }
+
+  //获取筛选器
+  getNewTagList = (taglist) => {
+    let taglistMap = new Map();
+    let mainTagList = [];
+    taglist.forEach(item => {
+      if(item.type == 'main'){
+        taglistMap.set(item.slug, [])
+        mainTagList.push(item);
+      }
+    });
+    taglist.forEach(item => {
+      if(item.type == 'sub'){
+        let subList = taglistMap.get(item.tagpath) || [];
+        subList.push(item)
+      }
+    })
+    return {
+      taglistMap,
+      mainTagList
+    }
+  }
 
   render() {
     const { taglist, sort } = this.props.global
-    const { filter, list, loading, hasMore } = this.state
+    const { taglistMap, mainTagList } = this.getNewTagList(taglist);
+    console.log(taglistMap, mainTagList)
+    const { filter, list, loading, hasMore, tag } = this.state
+    let subTagList = taglistMap.get(tag);
     return (
       <div>
-        <PageHead title="论坛-首页"></PageHead>        
+        <PageHead title="论坛-首页"></PageHead> 
+
         <ul className="index-filter-tab">
-        {/* {Object.keys(taglist).length && (
-            Object.keys(taglist).map((k, i) => (
-              <li className={`index-filter-tab-item ${filter.tag == k ? 'current' : ''}`} key={i} onClick={() => this.chooseFilter('tag', k)}>{taglist[k]}</li>
-            ))
-          )} */}
-          {taglist.map((data, index) => (
+          {mainTagList.map((data, index) => (
             <li 
               className={`index-filter-tab-item ${filter.tag == data.slug ? 'current' : ''}`} 
               key={index} 
-              onClick={() => this.chooseFilter('tag', data.slug)}>{data.name}</li>
+              onClick={() => this.mainTagClick(data.slug)}>{data.name}</li>
           ))}
         </ul>
+
+        {tag && subTagList.length > 0 &&
+          <div className="index-filter-tab">
+            {subTagList.map(tag => (
+              <CheckableTag
+                key={tag.slug}
+                // checked={selectedTags.indexOf(tag) > -1}
+                // onChange={checked => this.handleChange(tag, checked)}
+              >
+                {tag.name}
+              </CheckableTag>
+            ))}
+          </div>
+        }
+
         <div className="index-filter-tab">
           {Object.keys(sort).length && (
             Object.keys(sort).map((k, i) => (
