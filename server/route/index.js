@@ -14,7 +14,7 @@ files
     .forEach(file => {
         const file_name = file.substr(0, file.length - 3);
         const router_entity = require(path.join(__dirname, file));
-        if (file_name.toLocaleLowerCase() !== 'index') {
+        if (file_name.toLocaleLowerCase() !== 'index' && file_name.toLocaleLowerCase() !== 'admin') {
             rootRoute.use(router_entity.routes(), router_entity.allowedMethods())
             logger.info(`router loaded :`,file)
             router_entity.stack.forEach(element => {

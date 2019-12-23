@@ -1,6 +1,5 @@
 const Koa2 = require('koa')
 const KoaBody = require('koa-body')
-const jwt = require('koa-jwt')
 const static = require('koa-static');
 const fs = require('fs')
 const path = require('path')
@@ -8,16 +7,22 @@ const db = require('./db')
 const util = require('./util')
 const logger = util.getLogger(__filename);
 const session = require('koa-session');
+const views = require('koa-views');
 //配置文件
 const { setting, env } = require('./config')
 //路由
 const router = require('./route')
+const adminRouter=require('./route/admin')
 //中间件
 const middleware = require('./middleware')
 const app = new Koa2()
 //计算页面的执行时间
 app.use(middleware.responseTime);
 
+// 加载模板引擎
+app.use(views(path.join(__dirname, './adminview'), {
+  extension: 'ejs'
+}))
 //临时上传目录
 if (!fs.existsSync("./upload"))
 {
@@ -47,19 +52,6 @@ if (env === 'development') {
       logger.warn(`${ctx.method} ${ctx.url} ${ctx.status}  -  end ${ms}ms`)
     })
   })
-  //开发模式可以跨域
-  app.use(async (ctx, next) => {
-    ctx.set('Access-Control-Expose-Headers','token');
-    ctx.set('Access-Control-Allow-Headers','Origin, X-Requested-With, Content-Type, Accept, Connection, User-Agent, Cookie, token');
-    ctx.set('Access-Control-Allow-Origin', 'http://localhost:3000');
-    ctx.set("Access-Control-Allow-Credentials", true);
-    ctx.set('Access-Control-Allow-Methods', 'PUT, POST, GET, DELETE, OPTIONS');
-    if (ctx.method == 'OPTIONS') {
-      ctx.body = 200; 
-    } else {
-      await next();
-    }
-  });
 }
 //静态文件
 app.use(static(
@@ -76,6 +68,9 @@ app.use(KoaBody({
 
 //路由
 app.use(router.routes(), router.allowedMethods())
+//admin路由
+app.use(adminRouter.routes(), adminRouter.allowedMethods())
+
 
 //错误处理
 app.on("error", (err, ctx) => {//捕获异常记录错误日志
