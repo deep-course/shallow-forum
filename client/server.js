@@ -7,6 +7,8 @@ const app = next({ dev })
 const handle = app.getRequestHandler()
 const server = new Koa()
 const router = new Router({ strict: true })
+const axios = require('axios')
+
 //测试反向代理
 if (dev) {
     const proxy = require('koa2-proxy-middleware');
@@ -57,14 +59,12 @@ router.get('/u/:slug', async ctx => {
 router.get('/t/:main', async ctx => {
     const {main}=ctx.params
     ctx.status = 200
-    ctx.respond = false
-    await app.render(ctx.req, ctx.res, '/index', main)
+    await app.render(ctx.req, ctx.res, '/index', { main })
 })
 router.get('/t/:main/:sub', async ctx => {
     const {main,sub}=ctx.params
     ctx.status = 200
-    ctx.respond = false
-    await app.render(ctx.req, ctx.res, '/index', `${main},${sub}`)
+    await app.render(ctx.req, ctx.res, '/index', { main , sub })
 })
 
 //帖子详情 /p/123456
