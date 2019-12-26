@@ -3,6 +3,7 @@ import { Form, Button, Input, Icon, Modal, message } from 'antd'
 import Router from 'next/router'
 import { observer, inject } from 'mobx-react'
 import PageHead from '../components/PageHead'
+import { setToken } from '@utils/cookie'
 import { login, getCaptcha, register, sendSms, resetSendSms, resetPassword } from '../api'
 import '../assets/pageStyle/login.less'
 
@@ -159,7 +160,7 @@ class Login extends React.Component {
   // 登录
   login = (params) => {
     login(params).then(res => {
-      localStorage.setItem('token', res.token)
+      setToken(res.token)
       Router.push('/')
       this.props.user.setState({ isLogin: true })
 

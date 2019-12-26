@@ -128,6 +128,11 @@ module.exports = {
       });
     }
       
+    config.resolve.alias = {
+      ...config.resolve.alias,
+      '@utils': path.join(__dirname, "./utils")
+    }
+
     return config
   }
 

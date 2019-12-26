@@ -2,6 +2,7 @@ import React, { Component } from 'react'
 import { inject, observer } from 'mobx-react'
 import Router from 'next/router'
 import { Menu, Dropdown, Icon } from 'antd'
+import { setToken } from '@utils/cookie';
 import './index.less'
 
 @inject('global', 'user')
@@ -13,7 +14,7 @@ class User extends Component {
 
   // 登出
   logout = () => {
-    localStorage.setItem('token', '')
+    setToken('');
     Router.push('/login')
     this.props.user.resetUserInfo()
   }

@@ -2,19 +2,8 @@ import React, { Component } from 'react'
 import { Icon, Button, Upload, message } from 'antd'
 import {observer, inject} from 'mobx-react';
 import { uploadAvatar } from '../../api'
+import { getToken } from '@utils/cookie';
 import './index.less'
-
-function getToken () {
-  try {
-    return {
-      token: localStorage['token'] || '' 
-    }
-  } catch (e) {
-    return {
-      token: ''
-    }
-  }
-}
 
 @inject('user')
 @observer
