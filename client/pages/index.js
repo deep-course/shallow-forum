@@ -12,14 +12,14 @@ const { CheckableTag } = Tag;
 @inject('global')
 @observer
 class Index extends React.Component{
-  static async getInitialProps ({ ctx: { query } }) {
-    let mainTag = '';
-    let subTag = '';
-    if( query ){
-      mainTag = query.main ? query.main : '';
-      subTag = query.sub ? query.sub : '';
-    }
-    return { mainTag, subTag };
+  static async getInitialProps ({ ctx }) {
+    const { query } = ctx;
+    const {
+      main = '',
+      sub = '',
+      list = []
+    } = query;
+    return { mainTag: main, subTag: sub, list };
   }
   constructor() {
     super()
@@ -28,7 +28,7 @@ class Index extends React.Component{
         mainTag: '',
         subTag: '',
         sort: 1,
-        page: 1,
+        page: 2,
       },
       list: [],
       loading: false,
@@ -39,12 +39,22 @@ class Index extends React.Component{
   componentDidMount() {
     const {
       mainTag,
-      subTag
+      subTag,
+      list
     } = this.props;
-    this.chooseFilter({
-      mainTag,
-      subTag
+    this.setState({ 
+      list,
+      filter: { 
+        ...this.state.filter, 
+        mainTag,
+        subTag
+      }
     });
+    if(list.length == 0){
+      this.setState({
+        hasMore: false
+      })
+    }
   }
 
   // 搜索
@@ -67,15 +77,9 @@ class Index extends React.Component{
     this.setState({loading: true})
     getHomeList(this.state.filter).then(res => {
       if (res.length) {
-        if(this.state.filter.page == 1){
-          this.setState({
-            list: res
-          })
-        }else{
-          this.setState({
-            list: [...this.state.list, ...res]
-          })
-        }
+        this.setState({
+          list: [...this.state.list, ...res]
+        })
       } else {
         // 无结果 已加载全部
         this.setState({hasMore: false})
