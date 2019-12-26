@@ -11,12 +11,22 @@ import '../assets/pageStyle/detail.less'
 @observer
 class Home extends React.Component{
   static async getInitialProps ({ctx:{query}}) {
-    return {slug:query};
+    const {
+      slug = '',
+      detail = {},
+    } = query;
+    return { slug, detail };
   }
 
-  constructor() {
-    super()
+  constructor(props) {
+    super(props)
+    const {
+      slug,
+      detail
+    } = props;
     this.state = {
+      ...detail,
+      slug,
       commentBtn: false,
       commentContent: '',
       commentList: [],
@@ -26,8 +36,8 @@ class Home extends React.Component{
   }
 
   componentDidMount() {
-    this.getBoardDetail();
-    this.getCommentlist();
+    // this.getBoardDetail();
+    this.getCommentlist()
   }
 
   commentBtnShow = (flag) => {

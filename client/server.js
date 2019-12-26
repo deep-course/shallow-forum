@@ -90,9 +90,16 @@ router.get('/t/:main/:sub', async ctx => {
 
 //帖子详情 /p/123456
 router.get('/p/:slug', async ctx => {
+    const { slug }=ctx.params
+    let config = {
+        params: { postslug: slug },
+        headers: {
+            token: ctx.cookies.get("token")
+        },
+    };
+    let { data } = await axios.get('http://103.61.38.127/api/board/getpost', config);
     ctx.status = 200
-    ctx.respond = false
-    await app.render(ctx.req, ctx.res, '/detail', ctx.params.slug)
+    await app.render(ctx.req, ctx.res, '/detail',  { detail: data.data, slug })
 })
 //其他
 router.get('*', async (ctx, next) => {

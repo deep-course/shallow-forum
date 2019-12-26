@@ -21,40 +21,36 @@ class Index extends React.Component{
     } = query;
     return { mainTag: main, subTag: sub, list };
   }
-  constructor() {
-    super()
-    this.state = {
-      filter: {
-        mainTag: '',
-        subTag: '',
-        sort: 1,
-        page: 2,
-      },
-      list: [],
-      loading: false,
-      hasMore: true,
-    }
-  }
+  constructor(props) {
+    super(props)
 
-  componentDidMount() {
     const {
       mainTag,
       subTag,
       list
-    } = this.props;
-    this.setState({ 
-      list,
-      filter: { 
-        ...this.state.filter, 
-        mainTag,
-        subTag
-      }
-    });
+    } = props;
+    let hasMore = true;
     if(list.length == 0){
       this.setState({
         hasMore: false
       })
     }
+
+    this.state = {
+      filter: {
+        mainTag,
+        subTag,
+        sort: 1,
+        page: 2,
+      },
+      list,
+      loading: false,
+      hasMore,
+    }
+  }
+
+  componentDidMount() {
+ 
   }
 
   // 搜索
