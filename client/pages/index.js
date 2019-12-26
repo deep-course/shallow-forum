@@ -4,6 +4,7 @@ import PageHead from '../components/PageHead'
 import ListItem from '../components/ListItem'
 import '../assets/pageStyle/index.less'
 import { getHomeList } from '../api'
+import Router from 'next/router';
 import InfiniteScroll from 'react-infinite-scroller'
 import { List, Spin, Divider, Tag } from 'antd'
 const { CheckableTag } = Tag;
@@ -11,17 +12,23 @@ const { CheckableTag } = Tag;
 @inject('global')
 @observer
 class Index extends React.Component{
-  static async getInitialProps ({ ctx }) {
-    return { };
+  static async getInitialProps ({ ctx: { query } }) {
+    let mainTag = '';
+    let subTag = '';
+    if( query ){
+      mainTag = query.main ? query.main : '';
+      subTag = query.sub ? query.sub : '';
+    }
+    return { mainTag, subTag };
   }
   constructor() {
     super()
     this.state = {
       filter: {
-        tag: '',
+        mainTag: '',
+        subTag: '',
         sort: 1,
         page: 1,
-        subTag: ''
       },
       list: [],
       loading: false,
@@ -30,17 +37,24 @@ class Index extends React.Component{
   }
 
   componentDidMount() {
-    this.getPostList()
+    const {
+      mainTag,
+      subTag
+    } = this.props;
+    this.chooseFilter({
+      mainTag,
+      subTag
+    });
   }
 
   // 搜索
-  chooseFilter = (type, key) => {
+  chooseFilter = (obj) => {
     // 重置第一页
     this.setState({ 
       filter: { 
         ...this.state.filter, 
         page: 1,  
-        [type]: key
+        ...obj
       } 
     })
     setTimeout(() => {
@@ -88,8 +102,15 @@ class Index extends React.Component{
     })
   };
   
-  mainTagClick = (slug) => {
-    this.setState({tag: slug})
+  //主标签点击
+  mainTagClick = (mainTag) => {
+    Router.push(`/t/${mainTag}`);
+  }
+
+  //子标签点击
+  subTagClick = (subTag) => {
+    const { mainTag } = this.state.filter;
+    Router.push(`/t/${mainTag}/${subTag}`);
   }
 
   //获取筛选器
@@ -118,7 +139,11 @@ class Index extends React.Component{
     const { taglist, sort } = this.props.global
     const { filter, list, loading, hasMore } = this.state
     const { taglistMap, mainTagList } = this.getNewTagList(taglist);
-    let subTagList = filter.tag ? taglistMap.get(filter.tag) : [];
+    const { mainTag, subTag } = filter;
+    let subTagList = [];
+    if(mainTag && taglistMap.get(mainTag)){
+      subTagList = taglistMap.get(mainTag);
+    }
     return (
       <div>
         <PageHead title="论坛-首页"></PageHead> 
@@ -126,19 +151,19 @@ class Index extends React.Component{
         <ul className="index-filter-tab">
           {mainTagList.map((data, index) => (
             <li 
-              className={`index-filter-tab-item ${filter.tag == data.slug ? 'current' : ''}`} 
+              className={`index-filter-tab-item ${mainTag == data.slug ? 'current' : ''}`} 
               key={index} 
-              onClick={() => this.chooseFilter('tag', data.slug)}>{data.name}</li>
+              onClick={() => this.mainTagClick(data.slug)}>{data.name}</li>
           ))}
         </ul>
 
-        {filter.tag && subTagList.length > 0 &&
+        {mainTag && subTagList.length > 0 &&
           <div className="index-filter-tab">
             {subTagList.map(tag => (
               <CheckableTag
                 key={tag.slug}
-                checked={filter.subTag == tag.slug}
-                onChange={checked => this.chooseFilter('subTag', tag.slug)}
+                checked={subTag == tag.slug}
+                onChange={checked => this.subTagClick(tag.slug)}
               >
                 {tag.name}
               </CheckableTag>
@@ -149,7 +174,10 @@ class Index extends React.Component{
         <div className="index-filter-tab">
           {Object.keys(sort).length && (
             Object.keys(sort).map((k, i) => (
-              <li className={`index-filter-tab-item ${filter.sort == k ? 'current' : ''}`} key={i} onClick={() => this.chooseFilter('sort', k)}>{sort[k]}</li>
+              <li 
+                className={`index-filter-tab-item ${filter.sort == k ? 'current' : ''}`} 
+                key={i} 
+                onClick={() => this.chooseFilter({sort: k})}>{sort[k]}</li>
             ))
           )}
         </div>

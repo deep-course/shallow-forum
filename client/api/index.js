@@ -1,17 +1,6 @@
 import http from '../utils/http'
+import { getToken } from '@utils/cookie';
 const basePreixUrl = ''
-
-function getToken () {
-  try {
-    return {
-      token: localStorage['token'] || '' 
-    }
-  } catch (e) {
-    return {
-      token: ''
-    }
-  }
-}
 
 /** user */
 
@@ -52,8 +41,12 @@ export const updatePassword = params => http.post('/api/user/updatepassword', pa
 
 // 首页列表
 export const getHomeList = (filter) => {
-  console.log(filter);
-  if(filter.tag){
+  const {
+    mainTag,
+    subTag
+  } = filter;
+  if(mainTag){
+    filter.tag = subTag ? `${mainTag},${subTag}` : mainTag;
     return http.get('/api/board/postlist', filter, getToken())
   }else{
     return http.get('/api/home', filter, getToken())
