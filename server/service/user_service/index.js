@@ -66,7 +66,7 @@ async function insertUser(phone, username, password, ip) {
             bio: '',
             lock: 0,
             ip: ip,
-            avatar:"/avatar.png",
+            avatar:"/static/default-avatar.png",
         });
         insertuserid = insertresult[0].insertId;
         if (insertuserid == 0) {

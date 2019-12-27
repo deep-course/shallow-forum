@@ -6,7 +6,7 @@ module.exports.up = async function (next) {
   logger.info("insert user_user");
   await promiseMysqlPool.query("INSERT INTO `user_user` \
  (`id`, `slug`,`username`, `email`, `phone`, `activate`, `password`, `jointime`, `bio`, `lock`, `ip`,`avatar`) VALUES \
-(1, 'tant','tant', 'dc@deep-course.com', '13800138000', 1, '8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92', '2019-05-01 10:00:00', '', 0, '','default.png');")
+(1, 'tant','tant', 'dc@deep-course.com', '13800138000', 1, '8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92', '2019-05-01 10:00:00', '', 0, '','/static/default-avatar.png');")
   logger.info("insert user_activity");
   await promiseMysqlPool.query("INSERT INTO `user_activity` \
 (`user_id`, `lastactiontime`, `lastlogintime`, `logincount`, `postcount`, `commentcount`, `lastvisitip`) VALUES \
