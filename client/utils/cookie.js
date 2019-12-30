@@ -1,16 +1,30 @@
-import cookie from 'cookie';
+//import cookie from 'cookie';
+import { parseCookies, setCookie, destroyCookie } from 'nookies'
+function getToken(cookies) {
+  let cookie = {};
+  if (cookies && Object.keys(cookies).length == 0) {
+    //客户端获取cookies
+    cookie = parseCookies({})
+  } else {
+    cookie = cookies;
+  }
 
-function getToken(){
-  let cookies = cookie.parse(document.cookie);
-  let token = cookies['token'] || '';
-  return { token };
+  if (cookie && cookie["token"]) {
+    return { token: cookie["token"] };
+  } else {
+    return {};
+  }
+
+
+
+
 }
 
-function setToken(token){
-  let cookies = cookie.serialize('token', String(token), {
-    maxAge: 86400 
-  });
-  document.cookie = cookies;
+function setToken(token) {
+  //let cookies = cookie.serialize('token', String(token), {
+  //  maxAge: 86400
+  //});
+  //document.cookie = cookies;
 }
 
 module.exports = {

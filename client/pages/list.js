@@ -7,46 +7,50 @@ import { getHomeList } from '../api'
 import Router from 'next/router';
 import InfiniteScroll from 'react-infinite-scroller'
 import { List, Spin, Divider, Tag } from 'antd'
-
 const { CheckableTag } = Tag;
-
-import nookies from 'nookies'
 
 @inject('global')
 @observer
 class Index extends React.Component{
   static async getInitialProps ({ ctx }) {
-    //这里写服务端的初始化代码，就是ssr第一次首屏现实的东西
-    //nookies获取cookies信息
-    const cookies=nookies.get(ctx);
-    console.log(cookies);
-    const list=await getHomeList({
-      sort: 1,
-      page: 1,
-    },cookies);
-    return {  list };
+    const { query } = ctx;
+    const {
+      main = '',
+      sub = '',
+      list = []
+    } = query;
+    return { mainTag: main, subTag: sub, list };
   }
- 
   constructor(props) {
-    //console.log(props);
     super(props)
+
+    const {
+      mainTag,
+      subTag,
+      list
+    } = props;
+    let hasMore = true;
+    if(list.length == 0){
+      this.setState({
+        hasMore: false
+      })
+    }
 
     this.state = {
       filter: {
+        mainTag,
+        subTag,
         sort: 1,
-        page: 1,
+        page: 2,
       },
-      list: props.list,
+      list,
       loading: false,
-      finish: false,
+      hasMore,
     }
-
   }
 
   componentDidMount() {
-    //这里写客户端的初始化代码
-    this.getPostList()
-
+ 
   }
 
   // 搜索
@@ -100,13 +104,13 @@ class Index extends React.Component{
   
   //主标签点击
   mainTagClick = (mainTag) => {
-    //Router.push(`/t/${mainTag}`);
+    Router.push(`/t/${mainTag}`);
   }
 
   //子标签点击
   subTagClick = (subTag) => {
-    //const { mainTag } = this.state.filter;
-    //Router.push(`/t/${mainTag}/${subTag}`);
+    const { mainTag } = this.state.filter;
+    Router.push(`/t/${mainTag}/${subTag}`);
   }
 
   //获取筛选器

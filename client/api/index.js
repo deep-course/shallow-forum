@@ -1,6 +1,6 @@
 import http from '../utils/http'
 import { getToken } from '@utils/cookie';
-const basePreixUrl = ''
+const basePreixUrl = 'http://localhost:3000'
 
 /** user */
 
@@ -8,7 +8,7 @@ const basePreixUrl = ''
 export const login = params => http.post('/api/login', params, getToken())
 
 // 获取验证码
-export const getCaptcha = basePreixUrl + '/api/captcha'
+export const getCaptcha =  '/api/captcha'
 
 // 注册
 export const register = params => http.post('/api/register', params)
@@ -40,17 +40,11 @@ export const updatePassword = params => http.post('/api/user/updatepassword', pa
 /** home */
 
 // 首页列表
-export const getHomeList = (filter) => {
-  const {
-    mainTag,
-    subTag
-  } = filter;
-  if(mainTag){
-    filter.tag = subTag ? `${mainTag},${subTag}` : mainTag;
-    return http.get('/api/board/postlist', filter, getToken())
-  }else{
-    return http.get('/api/home', filter, getToken())
-  }
+//添加一个token参数
+export const getHomeList = (filter,cookies) => {
+    //console.log(cookies);
+    return http.get(basePreixUrl+'/api/home', filter, getToken(cookies))
+  
 }
 
 /** board */
