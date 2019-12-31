@@ -424,7 +424,6 @@ async function getTagListByPostId(postid) {
 async function getHomePostList(page, sort, board) {
     const offset = (page - 1) * 20;
     const sql = `SELECT p.*,a.* FROM board_post AS p 
-        LEFT JOIN board_postintag AS t ON p.id = t.post_id 
         LEFT JOIN board_postacticity AS a ON p.id=a.post_id 
         WHERE p.deleted=0 and p.\`type\`="post" and p.board_id=?
         order by ${sort == 1 ? "p.id" : "a.lastcommenttime"} desc
@@ -463,6 +462,7 @@ async function getTagListBySlugs(slugs)
     logger.info(slugs);
     const [result] = await promiseMysqlPool.query("SELECT * FROM board_tag WHERE slug IN (?)", [slugs]);
     return result;
+    
 }
 module.exports = {
     editPost,
