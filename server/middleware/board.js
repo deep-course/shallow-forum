@@ -194,7 +194,15 @@ async function checkAddPost(ctx, next) {
         ctx.body = util.retError(-23, "最多只能选择3个标签");
         return;
     }
-    const tagsindb = await boardService.getTagListBySlugs(taglist);
+    let tagsindb = await boardService.getTagListBySlugs(taglist);
+    //保留都在一个maintag里的tag
+
+    if (taglist.length>1){
+        tagsindb=_.filter(tagsindb,function(item) { 
+            return item["tagpath"]=="" || item["tagpath"]== taglist[0];
+         });
+    }
+
     if (tagsindb.length != taglist.length) {
         logger.debug(`tag数与数据库不符:${tagsindb.length}-${taglist.length}`);
         ctx.body = util.retError(-24, "tag数量不符");
