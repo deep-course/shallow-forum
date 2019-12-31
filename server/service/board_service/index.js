@@ -140,8 +140,9 @@ async function addPost(post, content, tags, imagelist) {
     };
 
 }
-//根据slug获取tag列表
-async function getTagListByName(tags) {
+
+//根据slug获取单个tag
+async function getTagBySlug(tags) {
     if (tags.length == 1) {
         tags[1] = tags[0];
         tags[0] = "";
@@ -456,10 +457,18 @@ async function getActivityByPostId(postid){
     const [result] = await promiseMysqlPool.query("SELECT * FROM board_postacticity WHERE post_id=?", [postid]);
     return result[0];
 }
+//根据slug列表获取相应的tag列表
+async function getTagListBySlugs(slugs)
+{
+    logger.info(slugs);
+    const [result] = await promiseMysqlPool.query("SELECT * FROM board_tag WHERE slug IN (?)", [slugs]);
+    return result;
+}
 module.exports = {
     editPost,
     addPost,
-    getTagListByName,
+    getTagBySlug,
+    getTagListBySlugs,
     addComment,
     updateComment,
     getPostBySlug,

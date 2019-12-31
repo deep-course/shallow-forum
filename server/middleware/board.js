@@ -194,7 +194,7 @@ async function checkAddPost(ctx, next) {
         ctx.body = util.retError(-23, "最多只能选择3个标签");
         return;
     }
-    const tagsindb = await boardService.getTagListByName(_.clone(taglist));
+    const tagsindb = await boardService.getTagListBySlugs(taglist);
     if (tagsindb.length != taglist.length) {
         logger.debug(`tag数与数据库不符:${tagsindb.length}-${taglist.length}`);
         ctx.body = util.retError(-24, "tag数量不符");

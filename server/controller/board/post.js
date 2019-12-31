@@ -229,7 +229,7 @@ async function getPostList(ctx, next) {
         ctx.body = util.retError(1000, "tag错误");
         return;
     }
-    const taginfo = await boardService.getTagListByName(tags);
+    const taginfo = await boardService.getTagBySlug(_.clone(tags));
     if (taginfo.length != 1) {
         ctx.body = util.retError(2000, "tag未找到");
         return;
