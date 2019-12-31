@@ -16,11 +16,6 @@ class PageHead extends Component {
     Router.push('/user')
   }
 
-  detailClick = (slug) => {
-    const { data } = this.props
-    Router.push(`/p/${data.slug}`)
-  }
-
   render() {
     const { laballist } = this.props.global
     const { data, index } = this.props
@@ -34,7 +29,10 @@ class PageHead extends Component {
             <span className="slug-list-item-time">{moment(new Date(data.pubtime)).format('YYYY/MM/DD HH:mm:ss')}</span>
             {/* <span className="slug-list-item-label">前端</span> */}
           </div>
-          <div className="slug-list-item-title" onClick={this.detailClick}>{data.title} </div>
+          <div className="slug-list-item-title">
+            <a href={`/p/${data.slug}`}>{data.title}</a>
+             
+            </div>
           <div className="slug-list-item-action">
             <span className="slug-list-item-action-item">
               <Icon type="like" />

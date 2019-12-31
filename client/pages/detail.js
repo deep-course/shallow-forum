@@ -3,18 +3,19 @@ import {observer, inject} from 'mobx-react';
 import { Button, Input, Affix, Badge, Icon, Divider } from 'antd'
 import PageHead from '../components/PageHead'
 import CommentItem from '../components/CommentItem'
-import { getBoardDetail, getCommentlist, addNewComment } from '../api'
+import { getPostDetail, getCommentlist, addNewComment } from '../api'
 import moment from 'dayjs'
 import '../assets/pageStyle/detail.less'
-
+import nookies from 'nookies'
 @inject('global', 'detail')
 @observer
-class Home extends React.Component{
-  static async getInitialProps ({ctx:{query}}) {
+class PostDetail extends React.Component{
+  static async getInitialProps ({ctx}) {
+    const cookies=nookies.get(ctx)
     const {
-      slug = '',
-      detail = {},
-    } = query;
+      slug = ''
+    } = ctx.query;
+    const detail= await getPostDetail({postslug:slug},cookies)
     return { slug, detail };
   }
 
@@ -155,9 +156,9 @@ class Home extends React.Component{
                 </p>
               </div>
             </div>
-            <div className="detail-cover">
+            {/*<div className="detail-cover">
               <img src={image} alt="文章封面图"/>
-            </div>
+    </div> */}
             <h4 className="detail-title">{title}</h4>
           </div>
           <div className="detail-content" dangerouslySetInnerHTML={{ __html: comment ? comment.content : ""}}>
@@ -205,4 +206,4 @@ class Home extends React.Component{
   }
 }
 
-export default Home
+export default PostDetail

@@ -2,13 +2,11 @@ import React from 'react'
 import {observer, inject} from 'mobx-react';
 import PageHead from '../components/PageHead'
 import ListItem from '../components/ListItem'
+import TagList from '../components/TagList'
 import '../assets/pageStyle/index.less'
 import { getHomeList } from '../api'
-import Router from 'next/router';
 import InfiniteScroll from 'react-infinite-scroller'
 import { List, Spin, Divider, Tag } from 'antd'
-
-const { CheckableTag } = Tag;
 
 import nookies from 'nookies'
 
@@ -19,24 +17,22 @@ class Index extends React.Component{
     //这里写服务端的初始化代码，就是ssr第一次首屏现实的东西
     //nookies获取cookies信息
     const cookies=nookies.get(ctx);
-    console.log(cookies);
-    const list=await getHomeList({
+    //console.log(ctx);
+    const postlist=await getHomeList({
       sort: 1,
       page: 1,
     },cookies);
-    return {  list };
+    return {  postlist };
   }
  
   constructor(props) {
-    //console.log(props);
     super(props)
-
     this.state = {
       filter: {
         sort: 1,
         page: 1,
       },
-      list: props.list,
+      list: props.postlist,
       loading: false,
       finish: false,
     }
@@ -45,7 +41,9 @@ class Index extends React.Component{
 
   componentDidMount() {
     //这里写客户端的初始化代码
-    this.getPostList()
+
+    //console.log(this.state);
+    this.chooseFilter({sort: 1})
 
   }
 
@@ -60,18 +58,27 @@ class Index extends React.Component{
       } 
     })
     setTimeout(() => {
-      this.getPostList()
+      this.getPostList(true)
     })
   }
 
   // 获取帖子列表
-  getPostList = () => {
+  getPostList = (clear=false) => {
     this.setState({loading: true})
     getHomeList(this.state.filter).then(res => {
       if (res.length) {
-        this.setState({
-          list: [...this.state.list, ...res]
-        })
+        if(clear){
+          this.setState({
+            list: [...res]
+          })
+        }
+        else
+        {
+          this.setState({
+            list: [...this.state.list, ...res]
+          })
+        }
+
       } else {
         // 无结果 已加载全部
         this.setState({hasMore: false})
@@ -96,76 +103,18 @@ class Index extends React.Component{
     setTimeout(() => {
       this.getPostList()
     })
-  };
-  
-  //主标签点击
-  mainTagClick = (mainTag) => {
-    //Router.push(`/t/${mainTag}`);
   }
-
-  //子标签点击
-  subTagClick = (subTag) => {
-    //const { mainTag } = this.state.filter;
-    //Router.push(`/t/${mainTag}/${subTag}`);
-  }
-
-  //获取筛选器
-  getNewTagList = (taglist) => {
-    let taglistMap = new Map();
-    let mainTagList = [];
-    taglist.forEach(item => {
-      if(item.type == 'main'){
-        taglistMap.set(item.slug, [])
-        mainTagList.push(item);
-      }
-    });
-    taglist.forEach(item => {
-      if(item.type == 'sub'){
-        let subList = taglistMap.get(item.tagpath) || [];
-        subList.push(item)
-      }
-    })
-    return {
-      taglistMap,
-      mainTagList
-    }
-  }
+    
 
   render() {
-    const { taglist, sort } = this.props.global
+    const {  sort } = this.props.global
+    const {taglist}=this.props
     const { filter, list, loading, hasMore } = this.state
-    const { taglistMap, mainTagList } = this.getNewTagList(taglist);
-    const { mainTag, subTag } = filter;
-    let subTagList = [];
-    if(mainTag && taglistMap.get(mainTag)){
-      subTagList = taglistMap.get(mainTag);
-    }
     return (
       <div>
         <PageHead title="论坛-首页"></PageHead> 
 
-        <ul className="index-filter-tab">
-          {mainTagList.map((data, index) => (
-            <li 
-              className={`index-filter-tab-item ${mainTag == data.slug ? 'current' : ''}`} 
-              key={index} 
-              onClick={() => this.mainTagClick(data.slug)}>{data.name}</li>
-          ))}
-        </ul>
-
-        {mainTag && subTagList.length > 0 &&
-          <div className="index-filter-tab">
-            {subTagList.map(tag => (
-              <CheckableTag
-                key={tag.slug}
-                checked={subTag == tag.slug}
-                onChange={checked => this.subTagClick(tag.slug)}
-              >
-                {tag.name}
-              </CheckableTag>
-            ))}
-          </div>
-        }
+      <TagList taglist={taglist}></TagList>
 
         <div className="index-filter-tab">
           {Object.keys(sort).length && (

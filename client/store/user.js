@@ -2,7 +2,7 @@ import {action, observable} from 'mobx'
 import { trim } from 'lodash' 
 import { message } from 'antd'
 import Router from 'next/router'
-import { setToken } from '@utils/cookie';
+import { clearToken } from '@utils/cookie';
 import { getUserInfo, getUserInfoDetail, updateUserInfoDetail, updatePassword } from '../api'
 
 class User {
@@ -69,7 +69,7 @@ class User {
       newpass: this.newPassword
     }).then(() => {
       message.success('密码修改成功')
-      setToken('')
+      clearToken()
       this.setState({
         oldPassword: '',
         newPassword: '',

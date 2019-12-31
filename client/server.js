@@ -25,7 +25,6 @@ if (dev) {
 //首页
 router.get('/', async ctx => {
     ctx.status = 200
-    //let { data } = await axios.get('http://103.61.38.127/api/home', config);
     await app.render(ctx.req, ctx.res, '/index')
     ctx.respond = false
 })
@@ -58,42 +57,21 @@ router.get('/u/:slug', async ctx => {
 
 //帖子列表 有两种可能  /t/主tag 和 /t/主tag/附tag
 router.get('/t/:main', async ctx => {
-    const { main } = ctx.params
-    let config = {
-        params: { page: 1, page: 1, tag: main },
-        headers: {
-            token: ctx.cookies.get("token")
-        },
-    };
-    let { data } = await axios.get('http://103.61.38.127/api/home', config);
     ctx.status = 200
-    await app.render(ctx.req, ctx.res, '/list', { main, list: data.data })
+
+    await app.render(ctx.req, ctx.res, '/list',ctx.params)
+    ctx.respond = false
 })
 router.get('/t/:main/:sub', async ctx => {
-    const { main, sub } = ctx.params
-    let config = {
-        params: { page: 1, page: 1, tag: `${main},${sub}` },
-        headers: {
-            token: ctx.cookies.get("token")
-        },
-    };
-    let { data } = await axios.get('http://103.61.38.127/api/home', config);
     ctx.status = 200
-    await app.render(ctx.req, ctx.res, '/list', { main, sub, list: data.data })
+    await app.render(ctx.req, ctx.res, '/list',ctx.params)
+    ctx.respond = false
 })
 
 //帖子详情 /p/123456
 router.get('/p/:slug', async ctx => {
-    const { slug } = ctx.params
-    let config = {
-        params: { postslug: slug },
-        headers: {
-            token: ctx.cookies.get("token")
-        },
-    };
-    let { data } = await axios.get('http://103.61.38.127/api/board/getpost', config);
     ctx.status = 200
-    await app.render(ctx.req, ctx.res, '/detail', { detail: data.data, slug })
+    await app.render(ctx.req, ctx.res, '/detail', ctx.params)
 })
 //其他
 router.get('*', async (ctx, next) => {
