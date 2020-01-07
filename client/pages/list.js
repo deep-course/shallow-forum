@@ -22,12 +22,12 @@ class PostList extends React.Component{
     {
       tag=main+","+sub
     }
-    const postlist=await getPostList({
+    const {list:postlist,total}=await getPostList({
       sort: 1,
       page: 1,
       tag,
     },cookies);
-    return {  postlist ,tag,main,sub};
+    return {  postlist ,tag,main,sub,total};
   }
  
   constructor(props) {
@@ -40,6 +40,7 @@ class PostList extends React.Component{
         tag:props.tag
       },
       list: props.postlist,
+      total:props.total,
       loading: false,
     }
 
@@ -58,7 +59,7 @@ class PostList extends React.Component{
       } 
     })
     setTimeout(() => {
-      this.onChange()
+      this.onChange(1)
     })
   }
   onChange= (page)=> {
@@ -74,7 +75,8 @@ class PostList extends React.Component{
         this.setState({
           ...this.state,
           loading:false,
-          list:res
+          list:res.list,
+          total:res.total
         })
 
       })
@@ -84,7 +86,7 @@ class PostList extends React.Component{
   render() {
     const {  sort } = this.props.global
     const {taglist}=this.props
-    const { filter, list, loading } = this.state
+    const { filter, list, loading ,total} = this.state
     console.log(this.state)
     return (
       <div>
@@ -124,7 +126,7 @@ class PostList extends React.Component{
            
 
         </div>
-        <Pagination onChange={this.onChange} total={1000} pageSize={20} current={filter.page}  />
+        <Pagination hideOnSinglePage={true} onChange={this.onChange} total={total} pageSize={20} current={filter.page}  />
       </div>
     )
   }

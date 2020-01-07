@@ -18,11 +18,12 @@ class Index extends React.Component{
     //nookies获取cookies信息
     const cookies=nookies.get(ctx);
     //console.log(ctx);
-    const postlist=await getHomeList({
+    const {list:postlist,total}=await getHomeList({
       sort: 1,
       page: 1,
     },cookies);
-    return {  postlist };
+  
+    return {  postlist ,total};
   }
  
   constructor(props) {
@@ -51,7 +52,6 @@ class Index extends React.Component{
   // 搜索
   chooseFilter = (obj) => {
     // 重置第一页
-    console.log(this.state)
     this.setState({ 
       filter: { 
         ...this.state.filter, 
@@ -68,16 +68,17 @@ class Index extends React.Component{
   getPostList = (clear=false) => {
     this.setState({loading: true})
     getHomeList(this.state.filter).then(res => {
-      if (res.length) {
+      if (res.list.length>0) {
         if(clear){
           this.setState({
-            list: [...res]
+            list: [...res.list],
           })
         }
         else
         {
           this.setState({
-            list: [...this.state.list, ...res]
+            ...this.state,
+            list: [...this.state.list, ...res.list],
           })
         }
 
@@ -113,7 +114,7 @@ class Index extends React.Component{
   render() {
     const {  sort } = this.props.global
     const {taglist}=this.props
-    const { filter, list, loading, hasMore } = this.state
+    const { filter, list, loading, hasMore,total } = this.state
     const loader=<div key="loading" className="demo-loading-container" key="none"><Spin /></div>;
     return (
       <div>
