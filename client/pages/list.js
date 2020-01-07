@@ -6,7 +6,7 @@ import TagList from '../components/TagList'
 import '../assets/pageStyle/index.less'
 import { getPostList } from '../api'
 import { List, Spin, Divider, Tag } from 'antd'
-
+import {Pagination} from 'antd'
 import nookies from 'nookies'
 
 @inject('global')
@@ -31,12 +31,13 @@ class PostList extends React.Component{
   }
  
   constructor(props) {
+    console.log("cons")
     super(props)
     this.state = {
       filter: {
         sort: 1,
         page: 1,
-        tag:this.props.tag
+        tag:props.tag
       },
       list: props.postlist,
       loading: false,
@@ -48,11 +49,43 @@ class PostList extends React.Component{
     //这里写客户端的初始化代码
 
   }
+  chooseFilter = (obj) => {
+    this.setState({ 
+      filter: { 
+        ...this.state.filter, 
+        page: 1,  
+        ...obj
+      } 
+    })
+    setTimeout(() => {
+      this.onChange()
+    })
+  }
+  onChange= (page)=> {
 
+    this.setState({
+      filter: {
+        ...this.state.filter,
+        page: page
+      },
+      loading:true,
+    },()=>{
+      getPostList(this.state.filter).then(res=>{
+        this.setState({
+          ...this.state,
+          loading:false,
+          list:res
+        })
+
+      })
+
+    })
+  }
   render() {
     const {  sort } = this.props.global
     const {taglist}=this.props
-    const { filter, list, loading, hasMore } = this.state
+    const { filter, list, loading } = this.state
+    console.log(this.state)
     return (
       <div>
         <PageHead title="论坛-列表页"></PageHead> 
@@ -77,7 +110,7 @@ class PostList extends React.Component{
                 if(item){
                   return <ListItem data={item} index={index}></ListItem>
                 }else{
-                  return <div></div>
+                  return <li>未找到数据</li>
                 }
               }                
               }
@@ -88,8 +121,10 @@ class PostList extends React.Component{
                 </div>
               )}
             </List>
+           
 
         </div>
+        <Pagination onChange={this.onChange} total={1000} pageSize={20} current={filter.page}  />
       </div>
     )
   }
