@@ -34,7 +34,8 @@ class Index extends React.Component{
       },
       list: props.postlist,
       loading: false,
-      finish: false,
+      finish: true,
+      hasMore:true,
     }
 
   }
@@ -43,13 +44,14 @@ class Index extends React.Component{
     //这里写客户端的初始化代码
 
     //console.log(this.state);
-    this.chooseFilter({sort: 1})
+    //this.chooseFilter({sort: 1})
 
   }
 
   // 搜索
   chooseFilter = (obj) => {
     // 重置第一页
+    console.log(this.state)
     this.setState({ 
       filter: { 
         ...this.state.filter, 
@@ -91,6 +93,7 @@ class Index extends React.Component{
 
   //无限滚动加载
   handleInfiniteOnLoad = (page) => {
+    this.setState({loading: true})
     if(page>10){
       this.setState({hasMore: false})
     }
@@ -98,6 +101,7 @@ class Index extends React.Component{
       filter: { 
         ...this.state.filter, 
         page,
+        loading:false,
       } 
     })
     setTimeout(() => {
@@ -110,6 +114,7 @@ class Index extends React.Component{
     const {  sort } = this.props.global
     const {taglist}=this.props
     const { filter, list, loading, hasMore } = this.state
+    const loader=<div key="loading" className="demo-loading-container" key="none"><Spin /></div>;
     return (
       <div>
         <PageHead title="论坛-首页"></PageHead> 
@@ -129,7 +134,8 @@ class Index extends React.Component{
         <div className="index-list">
           <InfiniteScroll
             initialLoad={false}
-            pageStart={0}
+            pageStart={1}
+            loader={loader}
             loadMore={this.handleInfiniteOnLoad}
             hasMore={!loading && hasMore}
           >
@@ -137,20 +143,18 @@ class Index extends React.Component{
               dataSource={list}
               renderItem={(item,index) => {
                 if(item){
-                  return <ListItem data={item} index={index}></ListItem>
+                  return <ListItem data={item} index={index} key={index}></ListItem>
                 }else{
-                  return <div></div>
+                  return <li>未找到</li>
                 }
               }                
               }
             >
               {loading && hasMore && (
-                <div className="demo-loading-container">
-                  <Spin />
-                </div>
+                loader
               )}
               {!hasMore && (
-                <Divider>到底了</Divider>
+                <Divider key="none">到底了</Divider>
               )}
             </List>
           </InfiniteScroll>

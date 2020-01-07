@@ -7,7 +7,7 @@ import './index.less'
 
 @inject('global')
 @observer
-class PageHead extends Component {
+class ListItem extends Component {
   constructor(props) {
     super(props)
   }
@@ -18,9 +18,9 @@ class PageHead extends Component {
 
   render() {
     const { laballist } = this.props.global
-    const { data, index } = this.props
+    const { data, index,key } = this.props
     return (
-      <div className="slug-list-item">
+      <li className="slug-list-item">
         <div className="slug-list-item-left">
           <div className="slug-list-item-info">
             {data.label>0 && (<span className="slug-list-item-type">{laballist[data.label]}</span>) }
@@ -49,9 +49,9 @@ class PageHead extends Component {
             <img src={data.image} alt="标题图" className="slug-list-item-img"/>
           </div>
         )}
-      </div>
+      </li>
     )
   } 
 }
 
-export default PageHead
+export default ListItem
