@@ -371,51 +371,54 @@ async function getCommentListByPostId(postid, page) {
 async function getPostListbyTagId(tagid, page, sort, board) {
     logger.debug("getPostListbyTags:", tagid, page, sort);
     const offset = (page - 1) * 20;
-    const sql = `SELECT p.*,a.* FROM board_post AS p 
+    const sql = `SELECT SQL_CALC_FOUND_ROWS p.*,a.* FROM board_post AS p 
         LEFT JOIN board_postintag AS t ON p.id = t.post_id 
         LEFT JOIN board_postacticity AS a ON p.id=a.post_id 
         WHERE t.tag_id=?  and p.deleted=0 and p.\`type\`="post"
         and p.board_id=?
         order by ${sort == 1 ? "p.id" : "a.lastcommenttime"} desc
-        limit ?,20 
+        limit ?,20 ;
+        SELECT FOUND_ROWS() as total;
         `;
     const [postlist] = await promiseMysqlPool.query(sql, [
         tagid,
         board,
         offset
     ]);
-    return postlist;
+    return [postlist[0],postlist[1][0]["total"]];
 
 }
 async function getPostListByUserId(postid, page) {
     const offset = (page - 1) * 20;
     const [result] = await promiseMysqlPool.query(`
-        SELECT p.*,a.* FROM board_post AS p
+        SELECT SQL_CALC_FOUND_ROWS p.*,a.* FROM board_post AS p
         LEFT JOIN board_postacticity AS a ON p.id=a.post_id
         WHERE p.user_id=? and p.deleted=0 and p.\`type\`="post"
         order by p.id desc
-        limit ?,20
+        limit ?,20;
+        SELECT FOUND_ROWS() as total;
         `,
         [
             postid, offset
         ])
-    return result;
+        return [result[0],result[1][0]["total"]];
 
 }
 async function getPostListByUserUp(postid, page) {
     const offset = (page - 1) * 20;
     const [result] = await promiseMysqlPool.query(`
-        SELECT p.*,a.* FROM board_post AS p
+        SELECT SQL_CALC_FOUND_ROWS p.*,a.* FROM board_post AS p
         LEFT JOIN board_postacticity AS a ON p.id=a.post_id
         inner JOIN board_useruppost u ON p.id=u.user_id
         WHERE p.user_id=? and p.deleted=0 and p.\`type\`="post"
         order by p.id desc
-        limit ?,20
+        limit ?,20;
+        SELECT FOUND_ROWS() as total;
         `,
         [
             postid, offset
         ])
-    return result;
+        return [result[0],result[1][0]["total"]];
 }
 async function getTagListByPostId(postid) {
     const [result] = await promiseMysqlPool.query("SELECT * FROM board_tag WHERE id IN (SELECT  tag_id FROM board_postintag WHERE post_id=?)", [postid]);
@@ -423,17 +426,17 @@ async function getTagListByPostId(postid) {
 }
 async function getHomePostList(page, sort, board) {
     const offset = (page - 1) * 20;
-    const sql = `SELECT p.*,a.* FROM board_post AS p 
+    const sql = `SELECT  SQL_CALC_FOUND_ROWS p.*,a.* FROM board_post AS p 
         LEFT JOIN board_postacticity AS a ON p.id=a.post_id 
         WHERE p.deleted=0 and p.\`type\`="post" and p.board_id=?
         order by ${sort == 1 ? "p.id" : "a.lastcommenttime"} desc
-        limit ?,20 
-        `;
+        limit ?,20;
+        SELECT FOUND_ROWS() as total;`;
     const [postlist] = await promiseMysqlPool.query(sql, [
         board,
         offset
     ]);
-    return postlist;
+    return [postlist[0],postlist[1][0]["total"]];
 }
 //判断用户group和board进行比对，返回是否与权限
 async function checkBoardPermission(board_id, boardlist) {

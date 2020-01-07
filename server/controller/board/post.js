@@ -235,9 +235,9 @@ async function getPostList(ctx, next) {
         return;
     }
     page = (!page || page < 1) ? 1 : page;
-    const postlist = await boardService.getPostListbyTagId(taginfo[0]["id"], page, sort,board_id);
+    const [postlist,total] = await boardService.getPostListbyTagId(taginfo[0]["id"], page, sort,board_id);
     if (postlist.length == 0) {
-        ctx.body = util.retOk([]);
+        ctx.body = util.retOk({total:0,list:[]});
         return
     }
     let ids = [];
@@ -259,7 +259,7 @@ async function getPostList(ctx, next) {
         post["useravatar"] = postuser ? postuser["avatar"] : "";
         retpostlist.push(post);
     });
-    ctx.body = util.retOk(retpostlist);
+    ctx.body = util.retOk({total,list:retpostlist});
 
 
 }

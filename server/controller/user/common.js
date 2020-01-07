@@ -246,16 +246,17 @@ async function getHomeList(ctx) {
     const user = await userService.getUserBySlug(userslug);
     logger.debug(user);
     let postlist = [];
+    let total=0;
     if (!user || _.isEmpty(user)) {
         ctx.body = util.retError(1000, "未找到用户")
         return;
     }
     if (type == "post") {
-        postlist = await boardService.getPostListByUserId(user["id"],page);
+        [postlist,total] = await boardService.getPostListByUserId(user["id"],page);
 
     }
     else if (type == "up") {
-        postlist = await boardService.getPostListByUserUp(user["id"],page);
+        [postlist,total] = await boardService.getPostListByUserUp(user["id"],page);
 
 
     }
@@ -264,7 +265,7 @@ async function getHomeList(ctx) {
     }
     if (postlist.length==0)
     {
-        ctx.body=util.retOk([]);
+        ctx.body=util.retOk({total:0,list:[]});
         return;
     }
     let ids = [];
@@ -285,7 +286,7 @@ async function getHomeList(ctx) {
         post["useravatar"]=postuser ?  postuser["avatar"] : "",
         retpostlist.push(post);
     });
-    ctx.body = util.retOk(retpostlist);
+    ctx.body = util.retOk({total,list:retpostlist});
 }
 async function uploadAvatar(ctx){
     logger.debug('uploadAvatar')
