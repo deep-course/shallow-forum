@@ -15,7 +15,7 @@ async function getBoardSetting(ctx) {
         taglist.push(element);
         
     });
-    logger.debug(taglist);
+    //logger.debug(taglist);
     let laballist={};
     laballist[0]="无";
     laballist[1]="提问";

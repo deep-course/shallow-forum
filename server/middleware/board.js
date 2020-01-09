@@ -54,6 +54,10 @@ async function getBoard(ctx, next) {
 }
 async function getPostDetail(ctx, next) {
     const { post } = ctx.state;
+    if (_.isNil(post)){
+        ctx.body = util.retError(-11, "获取帖子信息错误");
+        return;
+    }
     const { user_id, comment_id } = post;
     let postuser = await userService.getUserById(user_id);
     //发帖用户
@@ -341,11 +345,13 @@ async function checkBoardPermission(ctx,next){
     {
         //附件提交有可能是空，所以加了这个判断
         await next();
+        return;
     }
     logger.debug(board,post);
     if (await boardService.checkBoardPermission(post["board_id"],board))
     {
         await next();
+
     }
     else
     {
