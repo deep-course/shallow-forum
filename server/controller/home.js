@@ -45,6 +45,7 @@ async function home(ctx) {
         const postuser = userlistid[item["user_id"]]
         let post = _.pick(item, ["slug", "title", "pubtime", "image", "label", "upcount","commentcount","lastcommenttime"]);
         post["username"] = postuser ? postuser["username"] : "未知用户";
+        post["userslug"] = postuser ? postuser["slug"] : "";
         post["useravatar"] = postuser ? postuser["avatar"] : "";
         retpostlist.push(post);
     });

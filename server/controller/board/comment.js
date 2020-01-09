@@ -79,6 +79,7 @@ async function getCommentList(ctx, next) {
             id:item["id"],
             content: item["content"],
             username: commentuser ? commentuser["username"] : "未知用户",
+            userslug: commentuser ? commentuser["slug"] : "",
             addtime:item["addtime"],
             useravatar:commentuser ? commentuser["avatar"] : "",
         };
