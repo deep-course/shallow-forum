@@ -7,7 +7,7 @@ import { getPostDetail, getCommentlist, addNewComment } from '../api'
 import moment from 'dayjs'
 import '../assets/pageStyle/detail.less'
 import nookies from 'nookies'
-@inject('global', 'detail')
+@inject('global')
 @observer
 class PostDetail extends React.Component{
   static async getInitialProps ({ctx}) {
@@ -16,6 +16,7 @@ class PostDetail extends React.Component{
       slug = ''
     } = ctx.query;
     const detail= await getPostDetail({postslug:slug},cookies)
+    console.log("detail:",detail);
     return { slug, detail };
   }
 
@@ -129,7 +130,7 @@ class PostDetail extends React.Component{
     } = this.state
     return (
       <>
-        <PageHead title="论坛-文章详情"></PageHead>
+        <PageHead title={title}></PageHead>
         <div className="detail-wrapper">
             <Affix offsetTop={100}>
               <div className="detail-action">
@@ -186,7 +187,7 @@ class PostDetail extends React.Component{
               )}
             </div>
             <div className="detail-comment-list">
-              {commentList.length && (
+              {commentList.length>0 && (
                 commentList.map((data, index) => (
                   <CommentItem data={data} key={index}></CommentItem>
                 ))

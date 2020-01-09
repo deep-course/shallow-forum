@@ -10,6 +10,7 @@ import './index.less'
 class User extends Component {
   constructor(props){
     super(props);
+    //console.log(props);
   }
 
   // 登出

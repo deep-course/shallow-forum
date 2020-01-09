@@ -75,7 +75,10 @@ export const getPostList = (params,cookies={}) =>
 }
 
 //回复列表
-export const getCommentlist = params => http.get(basePreixUrl+'/api/board/commentlist', params, getToken())
+export const getCommentlist = (params,cookies={}) => http.get(basePreixUrl+'/api/board/commentlist', params, getToken(cookies))
 
 //新建回复
 export const addNewComment = params => http.post(basePreixUrl+'/api/board/newcomment', params, getToken())
+
+export const userHomeList= params => http.get(basePreixUrl+'/api/user/home',params)
+export const userHomeInfo= parms => http.get(basePreixUrl+'/api/user/homeinfo',parms)

@@ -24,7 +24,7 @@ class ListItem extends Component {
         <div className="slug-list-item-left">
           <div className="slug-list-item-info">
             {data.label>0 && (<span className="slug-list-item-type">{laballist[data.label]}</span>) }
-            <span className="slug-list-item-name" onClick={this.usernameClick}>{data.username}</span>
+            <a className="slug-list-item-name" href={`/u/${data.userslug}`}>{data.username}</a>
             <span>·</span>
             <span className="slug-list-item-time">{moment(new Date(data.pubtime)).format('YYYY/MM/DD HH:mm:ss')}</span>
             {/* <span className="slug-list-item-label">前端</span> */}
