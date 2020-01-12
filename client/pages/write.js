@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { Button, Icon, Drawer, Upload, Badge, message } from 'antd'
+import { Button, Icon, Drawer, Upload, Badge, message, Tag } from 'antd'
 import marked from 'marked'
 import highlight from 'highlight.js'
 import Router from 'next/router'
@@ -7,9 +7,11 @@ import { observer, inject } from 'mobx-react'
 import PageHead from '../components/PageHead'
 import User from '../components/User'
 import { boardUploadImg, publishNewPost } from '../api'
-import { getToken } from '../utils'
+import { getToken } from '@utils/cookie';
 
 import '../assets/pageStyle/write.less'
+
+const { CheckableTag } = Tag;
 
 highlight.configure({
   tabReplace: '  ',
@@ -47,6 +49,7 @@ class Write extends Component {
         mainimage: '',
         boardid: 0,
         content: '',      // 转换的dom内容
+        selectedTags: []
       },
       contentImgShow: false,
       confirmShow: false,
@@ -131,10 +134,16 @@ class Write extends Component {
 
   // 选择发布类型
   chooseType = (key, type) => {
+    const { tags } = this.state.post;
     this.setState({
       post: {
         ...this.state.post,
         [type]: key
+      }
+    })
+    setTimeout(() => {
+      if(type == "tags" && key != tags){
+        this.chooseType([], "selectedTags");
       }
     })
   }
@@ -194,7 +203,7 @@ class Write extends Component {
 
   // 发布帖子
   publish = () => {
-    const { title, content, tags, lableid } = this.state.post
+    const { title, content, tags, lableid, selectedTags } = this.state.post
     if (!title) {
       message.error('请输入标题')
       return ;
@@ -211,6 +220,9 @@ class Write extends Component {
       message.error('请选择标签')
       return ;
     }
+    let newTags = [tags, ...selectedTags];
+    newTags = newTags.join();
+    this.state.post.tags = newTags;
     publishNewPost(this.state.post).then(res => {
       message.success('发布成功！')
       setTimeout(() => {
@@ -219,11 +231,47 @@ class Write extends Component {
     })
   }
 
+  //获取筛选器
+  getNewTagList = () => {
+    let taglistMap = new Map();
+    let mainTagList = [];
+    this.props.taglist.forEach(item => {
+      if (item.type == 'main') {
+        taglistMap.set(item.slug, [])
+        mainTagList.push(item);
+      }
+    });
+    this.props.taglist.forEach(item => {
+      if (item.type == 'sub') {
+        let subList = taglistMap.get(item.tagpath) || [];
+        subList.push(item)
+      }
+    })
+    return {
+      taglistMap,
+      mainTagList
+    }
+  }
+
+  handleChangeSelectedTags = (tag, checked) => {
+    const { selectedTags } = this.state.post;
+    const nextSelectedTags = checked ? [...selectedTags, tag] : selectedTags.filter(t => t !== tag);
+    if(nextSelectedTags.length > 2){
+      message.error('子标签不能超过2个');
+      return;
+    }
+    this.chooseType(nextSelectedTags, "selectedTags")
+  }
 
   render() {
     const { confirmShow, contentImgShow, } = this.state
-    const { title, lableid, tags, imagelist, mainimage, boardid, content } = this.state.post
+    const { title, lableid, tags, imagelist, mainimage, boardid, content, selectedTags } = this.state.post
     const { taglist, laballist } = this.props.global
+    const { taglistMap, mainTagList } = this.getNewTagList();
+    let subTagList = [];
+    if (tags && taglistMap.get(tags)) {
+      subTagList = taglistMap.get(tags);
+    }
     return (
       <>
         <PageHead title="论坛-发布"></PageHead>
@@ -330,14 +378,22 @@ class Write extends Component {
             <div className="write-type write-block">
               <h5 className="write-drawer-title">分类</h5>
               <ul className="write-type-list">
-                {/* {Object.keys(taglist).length && Object.keys(taglist).map(key => (
-                  <li className={`write-type-list-item ${tags == key ? 'current' : ''}`} key={key} onClick={() => this.chooseType(key, 'tags')}>{taglist[key]}</li>
-                ))} */}
-                {taglist.map((data, index) => (
+                {mainTagList.map((data, index) => (
                   <li 
                     className={`write-type-list-item ${tags == data.slug ? 'current' : ''}`} 
                     key={index} 
                     onClick={() => this.chooseType(data.slug, "tags")}>{data.name}</li>
+                ))}
+              </ul>
+              <ul className="write-type-list">
+                {subTagList.map(tag => (
+                  <CheckableTag
+                    key={tag.slug}
+                    checked={selectedTags.indexOf(tag.slug) > -1}
+                    onChange={checked => this.handleChangeSelectedTags(tag.slug, checked)}
+                  >
+                    {tag.name}
+                  </CheckableTag>
                 ))}
               </ul>
             </div>
