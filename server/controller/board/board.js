@@ -16,14 +16,14 @@ async function getBoardSetting(ctx) {
         
     });
     //logger.debug(taglist);
-    let laballist={};
-    laballist[0]="无";
-    laballist[1]="提问";
-    laballist[2]="已解决";
+    let labellist={};
+    labellist[0]="无";
+    labellist[1]="提问";
+    labellist[2]="已解决";
 
     ctx.body = util.retOk({
         taglist,
-        laballist
+        labellist
     });
 }
 
