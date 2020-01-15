@@ -7,7 +7,7 @@ import { getPostDetail, getCommentlist, addNewComment } from '../api'
 import moment from 'dayjs'
 import '../assets/pageStyle/detail.less'
 import nookies from 'nookies'
-@inject('global')
+//@inject('global')
 @observer
 class PostDetail extends React.Component{
   static async getInitialProps ({ctx}) {

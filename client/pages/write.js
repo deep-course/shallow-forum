@@ -34,7 +34,7 @@ const getWriteArea = () => {
   return document.querySelector('.write-wrapper')
 }
 
-@inject('global', 'write')
+//@inject('global', 'write')
 @observer
 class Write extends Component {
   constructor(props) {

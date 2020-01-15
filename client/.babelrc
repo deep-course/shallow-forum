@@ -1,9 +1,13 @@
 {
-  "presets": ["next/babel"],
+  "presets": [["next/babel", {
+    "transform-runtime": {
+      "corejs": 2,
+      "helpers": false
+    },
+    "class-properties": { "loose": true }
+  }]],
   "plugins": [
-    // ["module-alias", { "src": "./src", "expose": "@", "pagestyle": "./assets/pageStyle" }],
     ["@babel/plugin-proposal-decorators", { "legacy": true }],
-    ["@babel/plugin-proposal-class-properties", { "loose": true }],
     [
       "import",
       {

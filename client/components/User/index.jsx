@@ -5,7 +5,7 @@ import { Menu, Dropdown, Icon } from 'antd'
 import { clearToken } from '@utils/cookie';
 import './index.less'
 
-@inject('global', 'user')
+@inject( 'currentUser')
 @observer
 class User extends Component {
   constructor(props){
@@ -16,29 +16,29 @@ class User extends Component {
   // 登出
   logout = () => {
     clearToken();
-    this.props.user.resetUserInfo()
-    Router.push('/')
+    window.location.href="/"
     
   }
 
   // 进入登录页
   login = () => {
-    Router.push('/login')
+    window.location.href="/login";
   }
 
   // 进入设置页
   setting = () => {
-    Router.push('/setting')
+    window.location.href="/user/setting";
   }
 
   initMenu = () => {
-    const { isLogin } = this.props.user
+    const  isLogin = this.props.currentUser.checkLogin()
+    const  {user} = this.props.currentUser
     if (isLogin) {
       return (
         <Menu>
           <Menu.Item>
             <Icon type="home" />
-            <span>我的主页</span>
+            <span>欢迎：{user.username}</span>
           </Menu.Item>
           <Menu.Item onClick={this.setting}>
             <Icon type="setting"/>
@@ -62,7 +62,8 @@ class User extends Component {
   }
 
   render() {
-    let { isLogin, avatar } = this.props.user
+    const isLogin=this.props.currentUser.checkLogin()
+    const{user}=this.props.currentUser
     return (
       <>
         {!isLogin && (
@@ -72,7 +73,7 @@ class User extends Component {
         )}
         {isLogin && (
           <Dropdown overlay={this.initMenu()} trigger={['click']}>
-            <img src={avatar} alt="user-icon" className="login-user"/>
+            <img src={user.avatar} alt="user-icon" className="login-user"/>
           </Dropdown>
         )}
       </>

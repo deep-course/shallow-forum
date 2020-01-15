@@ -161,11 +161,8 @@ class Login extends React.Component {
   login = (params) => {
     login(params).then(res => {
       setToken(res.token)
-      Router.push('/')
-      this.props.user.setState({ isLogin: true })
+      window.location.href="/"
 
-      // 获取用户信息
-      this.props.user.getUserInfo()
     }).catch((err) => {
       console.log(err)
     })

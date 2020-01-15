@@ -9,27 +9,13 @@ import './index.less'
 
 const { Search } = Input
 
-@inject('global', 'user')
+@inject('currentUser')
 @observer
 class Layout extends Component {
   noNeedLayoutRouterMap = ['/login', '/write']
   componentDidMount() {
-    this.props.user.getUserInfo()
-    this.props.global.getBoardSet()
-  }
-
-  gotoWrite = () => {
-    const { isLogin } = this.props.user
-    if (isLogin) {
-      Router.push('/write')
-      return
-    }
-    this.props.user.setState({ tempLink: '/write' })
-    Router.push('/login')
-  }
-
-  goHome = () => {
-    Router.push('/')
+    //this.props.user.getUserInfo()
+    //this.props.global.getBoardSet()
   }
 
   render() {
@@ -47,22 +33,26 @@ class Layout extends Component {
                     <img src="http://images.deephub.ai/logo.png" alt="logo"/>
                   </div>
                   <ul className="layout-header-type">
-                    <li className="layout-header-type-item" 
-                      onClick={ this.goHome }>
-                        首页
+                    <li className="layout-header-type-item">
+                        <a href="/">首页</a>
                     </li>
-                    <li className="layout-header-type-item">题库</li>
+                    {/* <li className="layout-header-type-item">题库</li> */}
                   </ul>
                   {/* <div className="layout-header-search">
                     <Search placeholder="搜索" onSearch={value => console.log(value)} enterButton />
                   </div> */}
-                  <div className="layout-header-write">
-                    <Button type="primary">
-                      <Link href="/write">
-                        <a>写文章</a>
-                      </Link>
-                    </Button>
-                  </div>
+
+
+                      {
+                        this.props.currentUser.checkLogin() &&  <div className="layout-header-write">
+                          <Button type="primary">
+                            <a href="/write">写文章</a>
+                          </Button>
+                        </div>
+                      }
+
+
+
                   <div className="layout-header-user">
                     <User></User>
                   </div>

@@ -2,18 +2,18 @@ const Koa = require('koa')
 const next = require('next')
 const Router = require('koa-router')
 const port = parseInt(process.env.PORT, 10) || 3000
-const dev = process.env.NODE_ENV !== 'production'
-const app = next({ dev })
+const dev =process.env.NODE_ENV !== 'production'
+const app = next({dev})
 const handle = app.getRequestHandler()
 const server = new Koa()
-const router = new Router({ strict: true })
-const fs= require('fs');
+const router = new Router({strict: true})
+const fs = require('fs');
 
 
 let pagelist = fs.readdirSync("pages");
-pagelist=pagelist.filter(file => ~file.search(/^[^\.].*\.js$/))
-.filter(file=>file.substr(0,1)!="_")
-.map(item=>item.substr(0,item.length-3));
+pagelist = pagelist.filter(file => ~file.search(/^[^\.].*\.js$/))
+    .filter(file => file.substr(0, 1) != "_")
+    .map(item => item.substr(0, item.length - 3));
 
 //测试反向代理
 if (dev) {
@@ -36,7 +36,7 @@ server.use(async (ctx, next) => {
 
     await next()
 
-  })
+})
 //首页
 router.get('/', async ctx => {
     await app.render(ctx.req, ctx.res, '/index')
@@ -67,11 +67,11 @@ router.get('/u/:slug', async ctx => {
 
 //帖子列表 有两种可能  /t/主tag 和 /t/主tag/附tag
 router.get('/t/:main', async ctx => {
-    await app.render(ctx.req, ctx.res, '/list',ctx.params)
+    await app.render(ctx.req, ctx.res, '/list', ctx.params)
     ctx.respond = false
 })
 router.get('/t/:main/:sub', async ctx => {
-    await app.render(ctx.req, ctx.res, '/list',ctx.params)
+    await app.render(ctx.req, ctx.res, '/list', ctx.params)
     ctx.respond = false
 })
 
@@ -86,22 +86,18 @@ router.get('*', async (ctx, next) => {
     if (dev && ctx.url.startsWith('/api')) {
         console.log(ctx.url)
         await next()
-    }
-    else {
-        const urlpath=ctx.url.substr(1);
-        if (pagelist.indexOf(urlpath)>=0)
-        {
-            ctx.statusCode=404;
+    } else {
+        const urlpath = ctx.url.substr(1);
+        if (pagelist.indexOf(urlpath) >= 0) {
+            ctx.statusCode = 404;
             app.render(ctx.req, ctx.res, '_error');
             ctx.respond = false
-        }
-        else
-        {
-        await handle(ctx.req, ctx.res)
-        ctx.respond = false
+        } else {
+            await handle(ctx.req, ctx.res)
+            ctx.respond = false
         }
     }
-    
+
 
 })
 app.prepare()

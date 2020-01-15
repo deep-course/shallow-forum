@@ -9,7 +9,7 @@ import { List, Spin, Divider, Tag } from 'antd'
 import {Pagination} from 'antd'
 import nookies from 'nookies'
 
-@inject('global')
+//@inject('global')
 @observer
 class PostList extends React.Component{
   static async getInitialProps ({ ctx}) {

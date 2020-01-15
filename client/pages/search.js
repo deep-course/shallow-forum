@@ -4,7 +4,7 @@ import PageHead from '../components/PageHead'
 import ListItem from '../components/ListItem'
 import '../assets/pageStyle/search.less'
 
-@inject('global', 'search')
+//@inject('global', 'search')
 @observer
 class Home extends React.Component{
   static async getInitialProps ({ ctx }) {

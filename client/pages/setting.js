@@ -9,7 +9,7 @@ import '../assets/pageStyle/setting.less'
 
 const { TabPane } = Tabs;
 
-@inject('global', 'user')
+//@inject('global', 'user')
 @observer
 class Setting extends React.Component{
   static async getInitialProps ({ ctx }) {

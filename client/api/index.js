@@ -1,11 +1,14 @@
 import http from '../utils/http'
 import { getToken } from '@utils/cookie';
-const basePreixUrl = 'http://localhost:3000'
-
+import getConfig from 'next/config'
+//获取配置
+const isServer=typeof window === "undefined"
+const config=isServer?getConfig().serverRuntimeConfig:getConfig().publicRuntimeConfig
+const {basePreixUrl}=config
 /** user */
 
 // 登录
-export const login = params => http.post(basePreixUrl+'/api/login', params, getToken())
+export const login = params => http.post(basePreixUrl+'/api/login', params)
 
 // 获取验证码
 export const getCaptcha =  basePreixUrl+'/api/captcha'
@@ -23,19 +26,19 @@ export const resetSendSms = params => http.post(basePreixUrl+'/api/resetpassword
 export const resetPassword = params => http.post(basePreixUrl+'/api/resetpassword2', params)
 
 // 获取用户信息
-export const getUserInfo = () => http.get(basePreixUrl+'/api/user/info', {}, getToken())
+export const getUserInfo = (cookies={}) => http.get(basePreixUrl+'/api/user/info', {}, getToken(cookies))
 
 // 获取用户详细信息
-export const getUserInfoDetail = () => http.get(basePreixUrl+'/api/user/detail', {}, getToken())
+export const getUserInfoDetail = (cookies={}) => http.get(basePreixUrl+'/api/user/detail', {}, getToken(cookies))
 
 // 更新用户信息
-export const updateUserInfoDetail = params => http.post(basePreixUrl+'/api/user/updatedetail', params, getToken())
+export const updateUserInfoDetail = (params,cookies={}) => http.post(basePreixUrl+'/api/user/updatedetail', params, getToken(cookies))
 
 // 上传用户头像
 export const uploadAvatar = basePreixUrl+'/api/user/uploadavatar'
 
 // 更新密码
-export const updatePassword = params => http.post(basePreixUrl+'/api/user/updatepassword', params, getToken())
+export const updatePassword = (params,cookies={}) => http.post(basePreixUrl+'/api/user/updatepassword', params, getToken(cookies))
 
 /** home */
 
@@ -50,16 +53,16 @@ export const getHomeList = (filter,cookies={}) => {
 /** board */
 
 // 获取论坛设置
-export const getBoardSet = () => http.get(basePreixUrl+'/api/board/boardsetting')
+export const getBoardSet = (cookies={}) => http.get(basePreixUrl+'/api/board/boardsetting',{},getToken(cookies))
 
 // 上传图片附件
 export const boardUploadImg =  basePreixUrl+'/api/board/uploadattachments'
 
 // 删除图片附件
-export const boardDeleteImg = params => http.post(basePreixUrl+'/api/board/removeattachments', params, getToken())
+export const boardDeleteImg = (params,cookies={}) => http.post(basePreixUrl+'/api/board/removeattachments', params, getToken(cookies))
 
 // 发帖子
-export const publishNewPost = params => http.post(basePreixUrl+'/api/board/newpost', params, getToken())
+export const publishNewPost = (params,cookies={}) => http.post(basePreixUrl+'/api/board/newpost', params, getToken(cookies))
 
 // 帖子详情
 export const getPostDetail = (params,cookies={}) => 
@@ -78,7 +81,7 @@ export const getPostList = (params,cookies={}) =>
 export const getCommentlist = (params,cookies={}) => http.get(basePreixUrl+'/api/board/commentlist', params, getToken(cookies))
 
 //新建回复
-export const addNewComment = params => http.post(basePreixUrl+'/api/board/newcomment', params, getToken())
+export const addNewComment = (params,cookies={}) => http.post(basePreixUrl+'/api/board/newcomment', params, getToken(cookies))
 
-export const userHomeList= params => http.get(basePreixUrl+'/api/user/home',params)
-export const userHomeInfo= parms => http.get(basePreixUrl+'/api/user/homeinfo',parms)
+export const userHomeList= (params,cookies={}) => http.get(basePreixUrl+'/api/user/home',params, getToken(cookies))
+export const userHomeInfo= (params,cookies={}) => http.get(basePreixUrl+'/api/user/homeinfo',params, getToken(cookies))
