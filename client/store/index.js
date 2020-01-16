@@ -17,6 +17,7 @@ export default function initializeStore(initData={}) {
       boardSetting: new BoardSetting(initData.boardSetting),
       global,
       user,
+      write,
       currentUser:new CurrentUser(initData.currentUser),
     };
   }
@@ -25,6 +26,7 @@ export default function initializeStore(initData={}) {
       boardSetting: new BoardSetting(initData.boardSetting),
       global,
       user,
+      write,
       currentUser:new CurrentUser(initData.currentUser),
     };
   }

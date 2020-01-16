@@ -49,7 +49,7 @@ class Index extends React.Component {
         //this.props.boardSetting.initialData()
 
 
-        console.log(this.props)
+        //console.log(this.props)
     }
 
     // 搜索
@@ -114,11 +114,7 @@ class Index extends React.Component {
 
     render() {
 
-        const u = this.props.currentUser.checkLogin()
-        console.log(u)
         const {sort, taglist} = this.props.boardSetting
-
-
         const {filter, list, loading, hasMore, total} = this.state
         const loader = <div key="loading" className="demo-loading-container" key="none"><Spin/></div>;
         return (

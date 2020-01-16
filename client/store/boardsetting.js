@@ -22,7 +22,7 @@ class BoardSetting {
         {
             //console.log("SSR BoardSetting")
             this.taglist=initialData.taglist
-            this.labellist=initialData.laballist
+            this.labellist=initialData.labellist
 
         }
     }

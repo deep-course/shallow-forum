@@ -20,10 +20,12 @@ Router.events.on('routeChangeComplete', () => {
 
 class MyApp extends App {
     static async getInitialProps({Component, ctx}) {
+
         const cookies = nookies.get(ctx)
         let pageProps = {isServer};
         //初始化mobx状态
         const  boardSetting=await getBoardSet(cookies);
+
         const  currentUser=await getUserInfo(cookies);
         const mobxStore = initializeStore({boardSetting,currentUser});
         pageProps = Object.assign(pageProps, isServer);
@@ -51,6 +53,7 @@ class MyApp extends App {
         return (
             <Provider {...this.mobxStore}>
                 <Layout>
+
                     <Component {...pageProps} />
                 </Layout>
             </Provider>
