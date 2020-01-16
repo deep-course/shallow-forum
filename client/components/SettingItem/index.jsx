@@ -5,7 +5,7 @@ import { uploadAvatar } from '../../api'
 import { getToken } from '@utils/cookie';
 import './index.less'
 
-@inject('user')
+@inject('currentUser','userSetting')
 @observer
 class SettingItem extends Component {
   state = {
@@ -14,11 +14,12 @@ class SettingItem extends Component {
   }
 
   componentDidMount() {
+    this.props.userSetting.setUserAvatar(this.props.currentUser.user.avatar)
     // saveInput 模式
     if (this.props.type === 'saveInput') {
-      this.props.user.getUserInfoDetail().then(() => {
+      this.props.userSetting.getUserInfoDetail().then(() => {
         this.setState({
-          tempCon: this.props.user[this.props.sign]
+          tempCon: this.props.userSetting[this.props.sign]
         })
       })
     }
@@ -39,8 +40,8 @@ class SettingItem extends Component {
   // 更改状态
   changeState = status => {
     const { tempCon } = this.state
-    const { sign, user } = this.props
-    if (!status && tempCon !== user[sign]) {
+    const { sign, userSetting } = this.props
+    if (!status && tempCon !== userSetting[sign]) {
       return ;
     }
     this.setState({ inputStatus: status })
@@ -48,9 +49,9 @@ class SettingItem extends Component {
 
   // 取消
   cancel = () => {
-    const { sign, user } = this.props
+    const { sign, userSetting } = this.props
     this.setState({
-      tempCon: user[sign],
+      tempCon: userSetting[sign],
       inputStatus: false
     })
     this.refs.input.blur()
@@ -58,7 +59,7 @@ class SettingItem extends Component {
 
   // 保存
   save = () => {
-    this.props.user.updateUserInfoDetail({bio: this.state.tempCon}).then(res => {
+    this.props.userSetting.updateUserInfoDetail({bio: this.state.tempCon}).then(res => {
       this.changeState(false)
     })
   }
@@ -83,7 +84,7 @@ class SettingItem extends Component {
 
   imgChange = (res) => {
     if(res.file.status === 'done') {
-      this.props.user.setState({
+      this.props.userSetting.setState({
         avatar: res.file.response.url
       })
     }
@@ -96,14 +97,14 @@ class SettingItem extends Component {
       placeholder,
       label,
       sign,
-      user
+      userSetting
     } = this.props
     return (
       <div className={`${type === 'upload' ? 'setting-upload-item' : ''} setting-item`}>
         <span className="setting-item-label">{label}</span>
         {type === 'upload' && (
           <>
-            <img src={user[sign]} className="setting-upload-show"/>
+            <img src={userSetting[sign]} className="setting-upload-show"/>
             <Upload
               name="file"
               className="setting-upload"
@@ -125,7 +126,7 @@ class SettingItem extends Component {
               type='password'
               className="setting-item-input" 
               placeholder={placeholder}
-              value={user[sign]}
+              value={userSetting[sign]}
               onChange={this.handleInput}
             />
             {children}

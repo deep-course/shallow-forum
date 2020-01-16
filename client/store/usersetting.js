@@ -3,15 +3,10 @@ import { trim } from 'lodash'
 import { message } from 'antd'
 import Router from 'next/router'
 import { clearToken } from '@utils/cookie';
-import { getUserInfo, getUserInfoDetail, updateUserInfoDetail, updatePassword } from '../api'
+import { getUserInfoDetail, updateUserInfoDetail, updatePassword } from '../api'
 
-class User {
-  @observable isLogin = false       // 是否登录
-  @observable id = ''
-  @observable lock = ''
-  @observable activate = ''
-  @observable username = ''
-  @observable avatar = ''
+class UserSetting {
+  @observable avatar= ''
   @observable bio = ''
   @observable oldPassword = ''
   @observable newPassword = ''
@@ -24,22 +19,14 @@ class User {
     })
   }
 
-  // 获取用户信息
-  @action getUserInfo = () => {
-    getUserInfo().then(res => {
-      if (Object.keys(res).length) {
-        this.isLogin = true
-        this.setState(res.user)
-        this.getUserInfoDetail()
-      }
-    })
-  }
-
   // 获取用户详细信息
   @action getUserInfoDetail = () => {
     return getUserInfoDetail().then(res => {
       this.setState(res)
     })
+  }
+  @action setUserAvatar=(url)=>{
+    this.avatar=url;
   }
 
   // 更新用户信息
@@ -82,15 +69,9 @@ class User {
 
   // 登出重置
   @action resetUserInfo = () => {
-    this.isLogin = false       // 是否登录
-    this.id = ''
-    this.lock = ''
-    this.activate = ''
-    this.username = ''
     this.avatar = ''
-    this.userdesc = ''
     this.bio = ''
   }
 }
 
-export default new User()
+export default new UserSetting()

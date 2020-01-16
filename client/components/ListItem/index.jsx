@@ -5,25 +5,20 @@ import { Icon, List } from 'antd'
 import moment from 'dayjs'
 import './index.less'
 
-@inject('global')
+@inject('boardSetting')
 @observer
 class ListItem extends Component {
   constructor(props) {
     super(props)
   }
-
-  usernameClick = () => {
-    Router.push('/user')
-  }
-
   render() {
-    const { laballist } = this.props.global
+    const { labellist } = this.props.boardSetting
     const { data, index,key } = this.props
     return (
       <li className="slug-list-item">
         <div className="slug-list-item-left">
           <div className="slug-list-item-info">
-            {data.label>0 && (<span className="slug-list-item-type">{laballist[data.label]}</span>) }
+            {data.label>0 && (<span className="slug-list-item-type">{labellist[data.label]}</span>) }
             <a className="slug-list-item-name" href={`/u/${data.userslug}`}>{data.username}</a>
             <span>·</span>
             <span className="slug-list-item-time">{moment(new Date(data.pubtime)).format('YYYY/MM/DD HH:mm:ss')}</span>

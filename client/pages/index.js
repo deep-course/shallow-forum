@@ -10,7 +10,7 @@ import {Divider, List, Spin} from 'antd'
 
 import nookies from 'nookies'
 
-@inject('boardSetting', "user", "currentUser")
+@inject('boardSetting',  "currentUser")
 @observer
 class Index extends React.Component {
     static async getInitialProps({ctx}) {

@@ -21,13 +21,13 @@ class User extends React.Component{
  
   constructor(props) {
     super(props)
-    console.log(props)
+
   }
 
   render() {
     const {list1,list2,userinfo} = this.props;
-    //console.log(userinfo)
-console.log(typeof list)
+
+
     return (
       <>
         <PageHead title="论坛-用户主页"></PageHead>

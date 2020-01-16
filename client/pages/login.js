@@ -65,7 +65,7 @@ const modalMap = {
 
 let timer;
 
-@inject('global', 'user')
+
 @observer
 class Login extends React.Component {
   constructor(props) {
@@ -82,10 +82,11 @@ class Login extends React.Component {
   }
 
   componentDidMount() {
-    const { loginType, loginTypeName, setState } = this.props.global
+    //const { loginType, loginTypeName, setState } = this.props.global
+    const loginType="", loginTypeName=""
     if (loginType) {
       this.handleChange(loginTypeName, loginType)
-      setState({ loginType: '', loginTypeName: '' })
+      //setState({ loginType: '', loginTypeName: '' })
     }
   }
 
@@ -161,6 +162,7 @@ class Login extends React.Component {
   login = (params) => {
     login(params).then(res => {
       setToken(res.token)
+      message.success("登录成功，正在跳转")
       window.location.href="/"
 
     }).catch((err) => {

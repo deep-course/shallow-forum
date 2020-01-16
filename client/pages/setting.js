@@ -1,7 +1,6 @@
 import React from 'react'
 import {observer, inject} from 'mobx-react';
 import { Tabs, Button } from 'antd';
-import Router from 'next/router';
 import PageHead from '../components/PageHead'
 import SettingItem from '../components/SettingItem'
 import '../assets/pageStyle/setting.less'
@@ -9,13 +8,16 @@ import '../assets/pageStyle/setting.less'
 
 const { TabPane } = Tabs;
 
-//@inject('global', 'user')
+@inject('currentUser', 'userSetting')
 @observer
 class Setting extends React.Component{
   static async getInitialProps ({ ctx }) {
     return { };
   }
+  constructor(props) {
+    super(props);
 
+  }
   changeTab = (key) => {
   }
 
@@ -29,8 +31,7 @@ class Setting extends React.Component{
   // 忘记密码
   forgetPassword = () => {
     // 跳回登录页 并标记
-    Router.push('/login')
-    this.props.global.setState({ loginType: 'forget', loginTypeName: '忘记密码' })
+    window.location.href="/login"
   }
 
   handleInput = (e, key) => {
@@ -40,7 +41,7 @@ class Setting extends React.Component{
   render() {
     return (
       <>
-        <PageHead title="论坛-个人设置"></PageHead>
+        <PageHead title="个人设置"></PageHead>
         <div className="setting">
           <Tabs defaultActiveKey="1" onChange={this.changeTab}>
             <TabPane tab="个人资料" key="1">
@@ -55,7 +56,7 @@ class Setting extends React.Component{
               </SettingItem>
               <SettingItem label="新密码" placeholder="请输入新密码" type="input" sign="newPassword"></SettingItem>
               <SettingItem label="确认新密码" placeholder="确认新密码" type="input" sign="confirmPassword"></SettingItem>
-              <div className="setting-submit"><Button type="primary" onClick={this.props.user.updatePassword}>保存修改</Button></div>
+              <div className="setting-submit"><Button type="primary" onClick={this.props.userSetting.updatePassword}>保存修改</Button></div>
             </TabPane>
           </Tabs>
         </div>

@@ -9,7 +9,7 @@ import { List, Spin, Divider, Tag } from 'antd'
 import {Pagination} from 'antd'
 import nookies from 'nookies'
 
-//@inject('global')
+@inject('boardSetting')
 @observer
 class PostList extends React.Component{
   static async getInitialProps ({ ctx}) {
@@ -31,7 +31,7 @@ class PostList extends React.Component{
   }
  
   constructor(props) {
-    console.log("cons")
+
     super(props)
     this.state = {
       filter: {
@@ -84,10 +84,9 @@ class PostList extends React.Component{
     })
   }
   render() {
-    const {  sort } = this.props.global
-    const {taglist}=this.props
+    const {  sort,taglist} = this.props.boardSetting
+
     const { filter, list, loading ,total} = this.state
-    console.log(this.state)
     return (
       <div>
         <PageHead title="论坛-列表页"></PageHead> 
