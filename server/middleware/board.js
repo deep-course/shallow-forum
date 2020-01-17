@@ -5,7 +5,7 @@ const boardService = require("../service/board_service");
 const userService = require("../service/user_service");
 const _ = require("lodash")
 const logger = util.getLogger(__filename);
-
+const xss=require('xss');
 async function getPost(ctx, next) {
     logger.debug("getPost");
     let postslug = "";
@@ -109,7 +109,8 @@ async function checkEditPost(ctx, next) {
         return;
     }
     //判断内容
-    const { title, content, lableid, mainimage, imagelist } = ctx.request.body;
+    const { title, lableid, mainimage, imagelist } = ctx.request.body;
+    let{content}= ctx.request.body;
     if (!title || !content) {
         ctx.body = util.retError(-23, "标题，内容和类别不能为空");
         return;
@@ -118,6 +119,8 @@ async function checkEditPost(ctx, next) {
         ctx.body = util.retError(-24, "标题最多80个字");
         return;
     }
+    //xss
+    content=xss(content)
     ctx.state.editpost = {
         slug: post["slug"],
         title: title,
@@ -172,7 +175,8 @@ async function checkAddPost(ctx, next) {
 
 
     //判断内容
-    const { title, content, tags, boardid, lableid, url, mainimage, imagelist } = ctx.request.body;
+    const { title, tags, boardid, lableid, url, mainimage, imagelist } = ctx.request.body;
+    let {content}= ctx.request.body;
     if (!title || !content) {
         ctx.body = util.retError(-20, "标题，内容和类别不能为空");
         return;
@@ -225,6 +229,8 @@ async function checkAddPost(ctx, next) {
         ctx.body = util.retError(-26, "tag数量不匹配");
         return;
     }
+    //xss
+    content=xss(content)
     ctx.state.newpost = {
         title: title,
         content: content,
@@ -280,7 +286,7 @@ async function checkAddComment(ctx, next) {
     //TODO:添加权限判断
 
     //判断内容
-    const { content } = ctx.request.body;
+    let { content } = ctx.request.body;
     if (!content) {
         ctx.body = util.retError(2000, "回复内容不能为空");
         return false
@@ -296,7 +302,8 @@ async function checkAddComment(ctx, next) {
         ctx.body = util.retError(2000, "锁定，不能回复");
         return false
     }
-
+    //xss过滤
+    content=xss(content);
     ctx.state.newcomment = {
         postid: post.id,
         content: content
@@ -309,7 +316,8 @@ async function checkEditComment(ctx, next) {
     //TODO:添加权限判断
 
     //判断内容
-    const { content, commentid } = ctx.request.body;
+    const { commentid } = ctx.request.body;
+    let{content}= ctx.request.body;
     const { currentuser } = ctx.state;
     if (!content) {
         ctx.body = util.retError(2000, "回复内容不能为空");
@@ -330,7 +338,8 @@ async function checkEditComment(ctx, next) {
         ctx.body = util.retError(2000, "不能编辑");
         return;
     }
-
+    //xss
+    content=xss(content)
     ctx.state.editcomment = {
         id: comment["id"],
         content: content,

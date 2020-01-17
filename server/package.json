@@ -35,7 +35,8 @@
     "mysql2": "^1.6.5",
     "sharp": "^0.23.3",
     "svg-captcha": "^1.4.0",
-    "uuid": "^3.3.2"
+    "uuid": "^3.3.2",
+    "xss": "^1.0.6"
   },
   "devDependencies": {
     "apidoc": "^0.17.7",
