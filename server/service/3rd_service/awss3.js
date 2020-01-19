@@ -7,7 +7,7 @@ const ID = '';
 const SECRET = '';
 const BUCKET_NAME = '';
 const REGION='';
-
+const DOMAIN='';
 
 async function put(local, aws) {
     const s3 = new AWS.S3({
@@ -25,7 +25,14 @@ async function put(local, aws) {
         };
         const result = await s3.upload(params).promise();
         logger.debug(result);
-        return result.Location;
+        if (DOMAIN.length>0)
+        {
+            return DOMAIN+result.key;
+        }
+        else
+        {
+            return result.Location;
+        }
     } catch (error) {
         logger.error('aws upload err:', error);
         return "";
