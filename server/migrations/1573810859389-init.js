@@ -57,7 +57,7 @@ module.exports.up =  async function (next) {
   await promiseMysqlPool.query('DROP TABLE IF EXISTS `board_postimage`;');
   await promiseMysqlPool.query(`CREATE TABLE IF NOT EXISTS \`board_postimage\` (
     \`id\` int(10) unsigned NOT NULL AUTO_INCREMENT,
-    \`filename\` VARCHAR(100) NOT NULL COMMENT '加后缀的文件名',
+    \`filename\` VARCHAR(200) NOT NULL COMMENT '加后缀的文件名',
     \`hash\` CHAR(32) NOT NULL COMMENT '图片的md5值',
     \`post_id\` int(10) unsigned NOT NULL,
     \`user_id\` int(10) unsigned NOT NULL,
