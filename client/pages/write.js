@@ -8,7 +8,7 @@ import PageHead from '../components/PageHead'
 import User from '../components/User'
 import {boardDeleteImg, boardUploadImg, publishNewPost} from '../api'
 import {getToken} from '@utils/cookie';
-
+import {getTitle} from '@utils/page'
 import '../assets/pageStyle/write.less'
 import {action} from "mobx";
 
@@ -283,9 +283,10 @@ class Write extends React.Component {
         if (tags && taglistMap.get(tags)) {
             subTagList = taglistMap.get(tags);
         }
+        const pageTitle=getTitle("page","发布新文章");
         return (
             <>
-                <PageHead title="发布新帖"></PageHead>
+                <PageHead title={pageTitle}></PageHead>
                 <div className="write-container">
                     <div className="title">
                         <input className="input" value={title} onChange={this.handleTitle} type="text"

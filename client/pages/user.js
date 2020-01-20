@@ -5,7 +5,7 @@ import PageHead from '../components/PageHead'
 import ListItem from '../components/ListItem'
 import{userHomeList,userHomeInfo} from '../api'
 import '../assets/pageStyle/user.less'
-
+import {getTitle} from '@utils/page'
 const { TabPane } = Tabs;
 
 @observer
@@ -26,11 +26,11 @@ class User extends React.Component{
 
   render() {
     const {list1,list2,userinfo} = this.props;
-
+    const pageTitle=getTitle("user",userinfo.username);
 
     return (
       <>
-        <PageHead title="论坛-用户主页"></PageHead>
+        <PageHead title={pageTitle}></PageHead>
         {/* <div className="index-list">
           {list.map((data, index) => (
             <ListItem data={data} key={index}></ListItem>

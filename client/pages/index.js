@@ -7,7 +7,7 @@ import '../assets/pageStyle/index.less'
 import {getHomeList} from '../api'
 import InfiniteScroll from 'react-infinite-scroller'
 import {Divider, List, Spin} from 'antd'
-
+import {getTitle} from '@utils/page'
 import nookies from 'nookies'
 
 @inject('boardSetting',  "currentUser")
@@ -117,9 +117,10 @@ class Index extends React.Component {
         const {sort, taglist} = this.props.boardSetting
         const {filter, list, loading, hasMore, total} = this.state
         const loader = <div key="loading" className="demo-loading-container" key="none"><Spin/></div>;
+        const pageTitle=getTitle("home","");
         return (
             <div>
-                <PageHead title="论坛-首页"></PageHead>
+                <PageHead title={pageTitle}></PageHead>
 
                 <TagList taglist={taglist}></TagList>
 

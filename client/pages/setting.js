@@ -4,7 +4,7 @@ import { Tabs, Button } from 'antd';
 import PageHead from '../components/PageHead'
 import SettingItem from '../components/SettingItem'
 import '../assets/pageStyle/setting.less'
-
+import {getTitle} from '@utils/page'
 
 const { TabPane } = Tabs;
 
@@ -39,9 +39,10 @@ class Setting extends React.Component{
   }
 
   render() {
+    const pageTitle=getTitle("page","个人设置");
     return (
       <>
-        <PageHead title="个人设置"></PageHead>
+        <PageHead title={pageTitle}></PageHead>
         <div className="setting">
           <Tabs defaultActiveKey="1" onChange={this.changeTab}>
             <TabPane tab="个人资料" key="1">

@@ -7,7 +7,7 @@ import { getPostDetail, getCommentlist, addNewComment } from '../api'
 import moment from 'dayjs'
 import '../assets/pageStyle/detail.less'
 import nookies from 'nookies'
-//@inject('global')
+import {getTitle} from '@utils/page'
 @observer
 class PostDetail extends React.Component{
   static async getInitialProps ({ctx}) {
@@ -128,9 +128,10 @@ class PostDetail extends React.Component{
       commentList,
       commentBtnMore
     } = this.state
+    const pageTitle=getTitle("post",title);
     return (
       <>
-        <PageHead title={title}></PageHead>
+        <PageHead title={pageTitle}></PageHead>
         <div className="detail-wrapper">
             <Affix offsetTop={100}>
               <div className="detail-action">

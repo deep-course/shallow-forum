@@ -8,6 +8,7 @@ import { getPostList } from '../api'
 import { List, Spin, Divider, Tag } from 'antd'
 import {Pagination} from 'antd'
 import nookies from 'nookies'
+import {getTitle} from '@utils/page'
 
 @inject('boardSetting')
 @observer
@@ -33,6 +34,18 @@ class PostList extends React.Component{
   constructor(props) {
 
     super(props)
+    let tagname=[];
+    for (let i = 0; i <props.boardSetting.taglist.length ; i++) {
+      const item=props.boardSetting.taglist[i]
+      if (item.slug==props['main'])
+      {
+        tagname.push(item.name)
+      }
+      else if (item.slug==props['sub'] && item.tagpath==props['main']){
+        tagname.push(item.name)
+      }
+    }
+
     this.state = {
       filter: {
         sort: 1,
@@ -42,6 +55,7 @@ class PostList extends React.Component{
       list: props.postlist,
       total:props.total,
       loading: false,
+      tagname:tagname.join(" ")
     }
 
   }
@@ -86,10 +100,11 @@ class PostList extends React.Component{
   render() {
     const {  sort,taglist} = this.props.boardSetting
 
-    const { filter, list, loading ,total} = this.state
+    const { filter, list, loading ,total,tagname} = this.state
+    const pageTitle=getTitle("list",tagname)
     return (
       <div>
-        <PageHead title="论坛-列表页"></PageHead> 
+        <PageHead title={pageTitle}></PageHead>
 
       <TagList taglist={taglist} maintag={this.props.main} subtag={this.props.sub}></TagList>
 

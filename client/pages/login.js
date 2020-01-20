@@ -6,7 +6,7 @@ import PageHead from '../components/PageHead'
 import { setToken } from '@utils/cookie'
 import { login, getCaptcha, register, sendSms, resetSendSms, resetPassword } from '../api'
 import '../assets/pageStyle/login.less'
-
+import {getTitle} from '@utils/page'
 const { Search } = Input;
 
 // 表单map
@@ -266,9 +266,10 @@ class Login extends React.Component {
 
   render() {
     const state = this.state
+    const pageTitle=getTitle("page","登录");
     return (
       <>
-        <PageHead title="论坛-登录"></PageHead>
+        <PageHead title={pageTitle}></PageHead>
         <div className="login">
           <div className="wrapper">
             <h3 className="title">{ state.title }</h3>
