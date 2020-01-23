@@ -17,11 +17,17 @@ async function put(local, aws) {
     });
     try {
         const fileContent = fs.readFileSync(local);
+        let extn = aws.split('.').pop().toLowerCase();
+        let contentType = 'application/octet-stream';
+        if (extn == 'png' || extn == 'jpg' || extn == 'gif'||extn == 'jpeg') 
+            contentType = "image/" + extn;
         const params = {
             Bucket: BUCKET_NAME,
             Key: aws,
-            Body: fileContent
+            Body: fileContent,
+            ContentType: contentType,
             //ACL: 'public-read'
+            
         };
         const result = await s3.upload(params).promise();
         logger.debug(result);
