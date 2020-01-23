@@ -35,7 +35,7 @@ const modalMap = {
         { required: true, message: '请输入手机号!' },
         { pattern: /^1[0-9]{10}$/, message: '请输入正确手机号!' },
       ]},
-      { icon: 'safety-certificate', placeholder: '请输入验证码',  maxLength: 4, bind: 'token', rules: [
+      { icon: 'safety-certificate', placeholder: '请输入验证码',  maxLength: 6, bind: 'token', rules: [
         { required: true, message: '请输入验证码!' }
       ]},
       { icon: 'lock', placeholder: '请输入密码', maxLength: 30, bind: 'password', type: 'password', rules: [
@@ -52,7 +52,7 @@ const modalMap = {
         { required: true, message: '请输入手机号!' },
         { pattern: /^1[0-9]{10}$/, message: '请输入正确手机号!' },
       ]},
-      { icon: 'safety-certificate', placeholder: '请输入验证码', maxLength: 4, bind: 'token', rules: [
+      { icon: 'safety-certificate', placeholder: '请输入验证码', maxLength: 6, bind: 'token', rules: [
         { required: true, message: '请输入验证码!' }
       ]},
       { icon: 'lock', placeholder: '请输入密码', maxLength: 30, bind: 'password', type: 'password', rules: [
