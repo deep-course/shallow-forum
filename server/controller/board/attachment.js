@@ -34,7 +34,7 @@ async function uploadAttachment(ctx, next) {
         postid = post["id"]
     }
     const fileurl = await boardService.saveFile(file.path, format, currentuser["id"], postid);
-    if (fileurl && !_.isEmpty(fileurl)) {
+    if (fileurl && fileurl.length>0) {
         ctx.body = util.retOk({ url: fileurl });
 
     }
