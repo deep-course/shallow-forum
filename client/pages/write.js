@@ -2,6 +2,7 @@ import React from 'react'
 import {Badge, Button, Drawer, Icon, message, Tag, Upload} from 'antd'
 import marked from 'marked'
 import highlight from 'highlight.js'
+import axios from 'axios'
 import Router from 'next/router'
 import {inject, observer} from 'mobx-react'
 import PageHead from '../components/PageHead'
@@ -46,7 +47,7 @@ class Write extends React.Component {
             // 发布相关
             post: {
                 title: '',
-                lableid: '',
+                labelid: '',
                 tags: '',
                 imagelist: [],
                 mainimage: '',
@@ -101,10 +102,11 @@ class Write extends React.Component {
 
     // 手动markdown转换
     onHandleContentChange = () => {
+        const target =  document.querySelector('.write-wrapper')
         this.setState({
             post: {
                 ...this.state.post,
-                content: marked(e.target.innerText, {
+                content: marked(target.innerText, {
                     breaks: true,
                     renderer
                 })
@@ -119,11 +121,33 @@ class Write extends React.Component {
         this.hasContentChanged = false
     }
 
-    // todo 拖拽后上传
+    // 拖拽后上传
     handleDrop = (e) => {
         e.preventDefault();
         const file = e.dataTransfer.files[0];
-        console.log(file)
+        if (this.beforeUpload(file)) {
+            const fd = new FormData();
+            fd.append('file', file);
+            axios.defaults.withCredentials = true
+            axios({
+                method: 'post',
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                    ...getToken(),
+                },
+                url: boardUploadImg,
+                data: fd
+            }).then(res => {
+                this.setState({
+                    post: {
+                        ...this.state.post,
+                        imagelist: [...this.state.post.imagelist, res.data.data.url]
+                    }
+                })
+                getWriteArea().innerText += `\n![内容图片](${res.data.data.url})`
+                this.onHandleContentChange()
+            })
+        }
     }
 
     // 输入标题
@@ -199,8 +223,15 @@ class Write extends React.Component {
     // 删除内容图片
     deleteContentImg = (url, index) => {
         let temp = this.state.post.imagelist
+
+        // 删除编辑区图片信息
+        const deleteImgUrl = `![内容图片](${temp[index]})`
+        const target =  document.querySelector('.write-wrapper')
+        target.innerText = target.innerText.replace(deleteImgUrl, '')
+
         temp.splice(index, 1)
         this.setState({post: {...this.state.post, imagelist: temp}})
+        this.onHandleContentChange()
         this.deleteImg(url)
     }
 
@@ -290,7 +321,7 @@ class Write extends React.Component {
                 <div className="write-container">
                     <div className="title">
                         <input className="input" value={title} onChange={this.handleTitle} type="text"
-                               placeholder="请输入标题..."/>
+                            placeholder="请输入标题..."/>
                         <Button type="primary" onClick={() => this.operaDrawer('confirmShow', true)}>发布</Button>
                         <User></User>
                     </div>
@@ -351,7 +382,7 @@ class Write extends React.Component {
                                 {imagelist.map((v, i) => (
                                     <div className="write-content-img-item" key={i}>
                                         <Icon type="delete" className="write-delete-content-img"
-                                              onClick={() => this.deleteContentImg(v, i)}/>
+                                            onClick={() => this.deleteContentImg(v, i)}/>
                                         <img src={v}/>
                                     </div>
                                 ))}
@@ -385,7 +416,7 @@ class Write extends React.Component {
                                 {!!mainimage && (
                                     <div className="write-mainimage-wrapper">
                                         <Icon type="delete" className="write-delete-mainimage-img"
-                                              onClick={this.deleteMainimageImg}/>
+                                            onClick={this.deleteMainimageImg}/>
                                         <img src={mainimage} className="write-mainimage"/>
                                     </div>
                                 )}
