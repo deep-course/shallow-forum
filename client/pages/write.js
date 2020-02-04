@@ -7,7 +7,7 @@ import Router from 'next/router'
 import {inject, observer} from 'mobx-react'
 import PageHead from '../components/PageHead'
 import User from '../components/User'
-import {boardDeleteImg, boardUploadImg, publishNewPost} from '../api'
+import {boardDeleteImg, boardUploadImg, publishNewPost, getImgList} from '../api'
 import {getToken} from '@utils/cookie';
 import {getTitle} from '@utils/page'
 import '../assets/pageStyle/write.less'
@@ -57,12 +57,22 @@ class Write extends React.Component {
             },
             contentImgShow: false,
             confirmShow: false,
+
+            contentLoading: false,
+            mainLoading: false,
         }
         this.cacheValue()
     }
 
     componentDidMount() {
-
+        getImgList({}).then(res => {
+            this.setState({
+                post: {
+                    ...this.state.post,
+                    imagelist: [...res]
+                }
+            })
+        })
         // getWriteArea().innerText='asdasdasda'
 
     }
@@ -177,15 +187,18 @@ class Write extends React.Component {
     }
 
     // 上传前置校验
-    beforeUpload = (file) => {
+    beforeUpload = (file, type) => {
         const isJpgOrPng = file.type === 'image/jpeg' || file.type === 'image/png';
         if (!isJpgOrPng) {
             message.error('只能上传 JPG/PNG 文件!');
+            return ;
         }
         const isLt5M = file.size / 1024 / 1024 < 5;
         if (!isLt5M) {
             message.error('图片大小不能超过 5MB!');
+            return ;
         }
+        this.setState({ [type]: true })
         return isJpgOrPng && isLt5M;
     }
 
@@ -198,7 +211,8 @@ class Write extends React.Component {
                     post: {
                         ...this.state.post,
                         imagelist: [...this.state.post.imagelist, res.file.response.data.url]
-                    }
+                    },
+                    contentLoading: false,
                 })
                 // 插入图片
                 getWriteArea().innerText += `\n![内容图片](${res.file.response.data.url})`
@@ -210,7 +224,8 @@ class Write extends React.Component {
                         ...this.state.post,
                         mainimage: res.file.response.data.url,
                         imagelist: [...this.state.post.imagelist, res.file.response.data.url]
-                    }
+                    },
+                    mainLoading: false,
                 })
             }
         }
@@ -316,7 +331,7 @@ class Write extends React.Component {
     render() {
 
         //
-        const {confirmShow, contentImgShow,} = this.state
+        const {confirmShow, contentImgShow, contentLoading, mainLoading} = this.state
         const {title, labelid, tags, imagelist, mainimage, boardid, content, selectedTags} = this.state.post
         const {labellist} = this.props.boardSetting
         const {taglistMap, mainTagList} = this.getNewTagList();
@@ -370,9 +385,14 @@ class Write extends React.Component {
                             showUploadList={false}
                             action={boardUploadImg}
                             headers={getToken()}
-                            beforeUpload={this.beforeUpload}
+                            beforeUpload={file => this.beforeUpload(file, 'contentLoading')}
                             onChange={res => this.imgChange(res, 'content')}>
-                            <Icon type="file-image" className="upload-img upload-entry"/>
+                            {
+                                contentLoading && (<Icon type="loading"  className="upload-img upload-entry"/>)
+                            }
+                            {
+                                !contentLoading && (<Icon type="file-image" className="upload-img upload-entry"/>)
+                            }
                             <span className="upload-entry">上传图片</span>
                         </Upload>
                         {!!imagelist.length && (
@@ -418,11 +438,16 @@ class Write extends React.Component {
                                     showUploadList={false}
                                     action={boardUploadImg}
                                     headers={getToken()}
-                                    beforeUpload={this.beforeUpload}
+                                    beforeUpload={file => this.beforeUpload(file, 'mainLoading')}
                                     onChange={res => this.imgChange(res, 'mainimage')}>
                                     {!mainimage && (
                                         <div className="write-upload-cover">
-                                            <span>点击此处添加封面图片</span>
+                                            {
+                                                mainLoading && ( <Icon type="loading"/>)
+                                            }
+                                            {
+                                                !mainLoading && (<span>点击此处添加封面图片</span>)
+                                            }
                                         </div>
                                     )}
                                 </Upload>

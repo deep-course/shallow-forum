@@ -113,7 +113,6 @@ class Index extends React.Component {
 
 
     render() {
-
         const {sort, taglist} = this.props.boardSetting
         const {filter, list, loading, hasMore, total} = this.state
         const loader = <div key="loading" className="demo-loading-container" key="none"><Spin/></div>;

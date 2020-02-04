@@ -6,15 +6,33 @@
   padding: 8px 20px;
   overflow: hidden;
   background: #ffffff;
+  .index-sub-filter{
+    margin-top: 10px;
+    border-top: 1px solid rgba(0, 0, 0, 0.1);
+    padding-top: 10px;
+    margin-bottom: 0;
+    .index-filter-tab-item{
+      border-radius: 10px;
+      font-size: 12px;
+    }
+  }
+  ul{
+    overflow: hidden;
+  }
   .globalBorder;
   .index-filter-tab-item{
     float: left;
-    min-width: 60px;
+    min-width: 66px;
+    padding: 2px;
     margin-right: 30px;
     .flexCenter;
     .userCursor;
     &.current{
-      color: @themeColor;
+      background: @themeColor;
+      color: #ffffff;
+      a{
+        color: #ffffff;
+      }
     }
   }
 }

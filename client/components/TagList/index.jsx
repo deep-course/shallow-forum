@@ -38,31 +38,36 @@ class TagList extends Component {
     if (maintag && taglistMap.get(maintag)) {
       subTagList = taglistMap.get(maintag);
     }
+    console.log(maintag, subtag)
     return (
 
       <div>
-        <ul className="index-filter-tab">
-          {mainTagList.map((data, index) => (
-            <li
-              className={`index-filter-tab-item ${maintag == data.slug ? 'current' : ''}`}
-              key={data.slug}
-            ><a href={"/t/" + data.slug}>{data.name}</a></li>
-          ))}
-          <br />
-          {maintag && subTagList.length > 0 &&
-
-            subTagList.map(tag => (
+        <div className="index-filter-tab">
+          <ul className="index-main-filter">
+            {mainTagList.map((data, index) => (
               <li
-                className={`index-filter-tab-item ${subtag == tag.slug ? 'current' : ''}`}
-                key={tag.slug}
-              ><a href={"/t/"+maintag+"/" + tag.slug}>{tag.name}</a></li>
-            ))
-
-
+                className={`index-filter-tab-item ${maintag == data.slug ? 'current' : ''}`}
+                key={data.slug}
+              ><a href={"/t/" + data.slug}>{data.name}</a></li>
+            ))}
+          </ul>
+          {
+            subTagList.length > 0 && (
+              <ul className="index-sub-filter">
+                {
+                  maintag && subTagList.map(tag => (
+                    <li
+                      className={`index-filter-tab-item ${subtag == tag.slug ? 'current' : ''}`}
+                      key={tag.slug}>
+                      <a href={"/t/"+maintag+"/" + tag.slug}>{tag.name}</a>
+                    </li>
+                  ))
+                }
+              </ul>
+            )
           }
-        </ul>
+        </div>
       </div>
-
     )
   }
 }

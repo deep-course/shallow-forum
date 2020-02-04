@@ -47,10 +47,12 @@ export const updatePassword = (params,cookies={}) => http.post(basePreixUrl+'/ap
 export const getHomeList = (filter,cookies={}) => {
     //console.log(cookies);
     return http.get(basePreixUrl+'/api/home', filter, getToken(cookies))
-  
 }
 
 /** board */
+
+// 显示图片列表
+export const getImgList = (params, cookies={}) => http.get(basePreixUrl+'/api/board/showattachments', params, getToken(cookies))
 
 // 获取论坛设置
 export const getBoardSet = (cookies={}) => http.get(basePreixUrl+'/api/board/boardsetting',{},getToken(cookies))

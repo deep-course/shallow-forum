@@ -11,6 +11,7 @@ class SettingItem extends Component {
   state = {
     tempCon: '',            // 过度内容
     inputStatus: false,     // 输入框状态 false-未聚焦  true-聚焦
+    loading: false,
   }
 
   componentDidMount() {
@@ -74,16 +75,20 @@ class SettingItem extends Component {
     const isJpgOrPng = file.type === 'image/jpeg' || file.type === 'image/png';
     if (!isJpgOrPng) {
       message.error('只能上传 JPG/PNG 文件!');
+      return;
     }
     const isLt2M = file.size / 1024 / 1024 < 2;
     if (!isLt2M) {
       message.error('图片大小不能超过 2MB!');
+      return ;
     }
+    this.setState({ loading: true })
     return isJpgOrPng && isLt2M;
   }
 
   imgChange = (res) => {
     if(res.file.status === 'done') {
+      this.setState({ loading: false })
       this.props.userSetting.setState({
         avatar: res.file.response.data.url
       })
@@ -100,6 +105,7 @@ class SettingItem extends Component {
       sign,
       userSetting
     } = this.props
+    const { loading } = this.state
     return (
       <div className={`${type === 'upload' ? 'setting-upload-item' : ''} setting-item`}>
         <span className="setting-item-label">{label}</span>
@@ -115,7 +121,12 @@ class SettingItem extends Component {
               beforeUpload={this.beforeUpload}
               onChange={this.imgChange}
             >
-              <Button type="primary">上传</Button>
+              {
+                loading && (<Icon type="loading"/>)
+              }
+              {
+                !loading && (<Button type="primary">上传</Button>)
+              }
             </Upload>
             <span className="setting-upload-tip">支持 jpg、png 格式大小 2M 以内的图片</span>
           </>
