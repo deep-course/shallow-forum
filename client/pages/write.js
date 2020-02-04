@@ -234,6 +234,7 @@ class Write extends React.Component {
     deleteImg = (fileurl) => {
         boardDeleteImg({fileurl}).then(res => {
             console.log(res)
+            message.info("删除成功")
         })
     }
     // 删除内容图片
@@ -347,7 +348,7 @@ class Write extends React.Component {
                     <div className="title">
                         <input className="input" value={title} onChange={this.handleTitle} type="text"
                             placeholder="请输入标题..."/>
-                        <Button type="primary" onClick={() => this.operaDrawer('confirmShow', true)}>发布</Button>
+                        <Button type="primary" onClick={() => this.operaDrawer('confirmShow', true)}>下一步：设置属性</Button>
                         <User></User>
                     </div>
                     <div className="content">
