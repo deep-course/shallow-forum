@@ -208,7 +208,8 @@ class Write extends React.Component {
                 this.setState({
                     post: {
                         ...this.state.post,
-                        mainimage: res.file.response.data.url
+                        mainimage: res.file.response.data.url,
+                        imagelist: [...this.state.post.imagelist, res.file.response.data.url]
                     }
                 })
             }
@@ -222,6 +223,7 @@ class Write extends React.Component {
     }
     // 删除内容图片
     deleteContentImg = (url, index) => {
+        this.setState({post: {...this.state.post, mainimage: ''}})
         let temp = this.state.post.imagelist
 
         // 删除编辑区图片信息
@@ -229,16 +231,24 @@ class Write extends React.Component {
         const target =  document.querySelector('.write-wrapper')
         target.innerText = target.innerText.replace(deleteImgUrl, '')
 
+        const mainTempImgUrl = temp[index]
         temp.splice(index, 1)
-        this.setState({post: {...this.state.post, imagelist: temp}})
-        this.onHandleContentChange()
+        this.setState({post: {...this.state.post, imagelist: temp, mainimage: mainTempImgUrl === this.state.post.mainimage ? '' : this.state.post.mainimage}})
+        setTimeout(() => {
+            this.onHandleContentChange()
+        }, 0)
         this.deleteImg(url)
     }
 
     // 删除主图
     deleteMainimageImg = () => {
-        this.deleteImg(this.state.post.mainimage)
+        // this.deleteImg(this.state.post.mainimage)
         this.setState({post: {...this.state.post, mainimage: ''}})
+    }
+
+    // 更换主图
+    chooseMainImg = url => {
+        this.setState({post: {...this.state.post, mainimage: this.state.post.mainimage === url ? '' : url}})
     }
 
     // 发布帖子
@@ -372,7 +382,7 @@ class Write extends React.Component {
                             </Badge>
                         )}
                         <Drawer
-                            title="文章内容图片"
+                            title="上传图片列表"
                             placement="left"
                             closable={false}
                             onClose={() => this.operaDrawer('contentImgShow', false)}
@@ -380,9 +390,12 @@ class Write extends React.Component {
                         >
                             <div className="write-content-img-wrapper">
                                 {imagelist.map((v, i) => (
-                                    <div className="write-content-img-item" key={i}>
+                                    <div className={v === mainimage ? 'write-content-img-item-main write-content-img-item' : 'write-content-img-item'} key={i}>
                                         <Icon type="delete" className="write-delete-content-img"
                                             onClick={() => this.deleteContentImg(v, i)}/>
+                                        {
+                                            v === mainimage && (<span className="write-delete-content-img-main-tip">封面主图</span>)
+                                        }
                                         <img src={v}/>
                                     </div>
                                 ))}

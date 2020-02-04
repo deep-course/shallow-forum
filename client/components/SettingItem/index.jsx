@@ -27,11 +27,11 @@ class SettingItem extends Component {
 
   // 输入框操作
   handleInput = (e) => {
-    const { user, sign } = this.props
+    const { userSetting, sign } = this.props
     if (this.props.type === 'saveInput') {
       this.setState({ tempCon: e.target.value })
     } else if (this.props.type === 'input') {
-      user.setState({ [sign]: e.target.value })
+      userSetting.setState({ [sign]: e.target.value })
     }
   }
 
@@ -85,8 +85,9 @@ class SettingItem extends Component {
   imgChange = (res) => {
     if(res.file.status === 'done') {
       this.props.userSetting.setState({
-        avatar: res.file.response.url
+        avatar: res.file.response.data.url
       })
+      this.props.userSetting.setUserAvatar(res.file.response.data.url)
     }
   }
 
