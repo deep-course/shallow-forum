@@ -1,7 +1,8 @@
 import axios from 'axios'
 import qs from 'qs'
 import {message} from 'antd'
-
+const isServer=typeof window === "undefined"
+const log=isServer?console.log:message.error
 const instance = axios.create({
     baseURL: '',
     timeout: 20000,
@@ -14,19 +15,19 @@ instance.interceptors.request.use(config => {
     }
     return config;
 }, err => {
-    message.error('请求超时！');
+    log('请求超时！');
     return Promise.reject(err);
 })
 
 // 请求结果处理
 instance.interceptors.response.use(res => {
     if (!(res.status === 200 && res.data.err === 0)) {
-        message.error(res.data.msg)
+        log(res.data.msg)
         return Promise.reject();
     }
     return Promise.resolve(res.data.data);
 }, err => {
-    message.error('服务异常')
+    log('服务异常')
     return Promise.reject(err);
 })
 
