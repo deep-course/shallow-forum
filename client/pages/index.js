@@ -87,7 +87,9 @@ class Index extends React.Component {
                 // 无结果 已加载全部
                 this.setState({hasMore: false})
             }
-            this.setState({loading: false})
+            this.setState({loading: false})  
+            
+            
         }, () => {
             this.setState({loading: false})
         })
@@ -95,7 +97,9 @@ class Index extends React.Component {
 
     //无限滚动加载
     handleInfiniteOnLoad = (page) => {
+       
         this.setState({loading: true})
+
         if (page > 10) {
             this.setState({hasMore: false})
         }
@@ -113,6 +117,7 @@ class Index extends React.Component {
 
 
     render() {
+        console.log(this.state)
         const {sort, taglist} = this.props.boardSetting
         const {filter, list, loading, hasMore, total} = this.state
         const loader = <div key="loading" className="demo-loading-container" key="none"><Spin/></div>;
@@ -135,7 +140,7 @@ class Index extends React.Component {
                 </div>
                 <div className="index-list">
                     <InfiniteScroll
-                        initialLoad={false}
+                        //initialLoad={false}
                         pageStart={1}
                         loader={loader}
                         loadMore={this.handleInfiniteOnLoad}
@@ -152,9 +157,7 @@ class Index extends React.Component {
                             }
                             }
                         >
-                            {loading && hasMore && (
-                                loader
-                            )}
+
                             {!hasMore && (
                                 <Divider key="none">到底了</Divider>
                             )}
