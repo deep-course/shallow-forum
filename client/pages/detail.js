@@ -154,6 +154,8 @@ class PostDetail extends React.Component{
                 <p className="detail-user-name">{user && user.username}</p>
                 <p className="detail-user-date">
                   <span>{moment(new Date(pubtime)).format('YYYY年MM月DD日')}</span>
+                  <span>{` · `}</span>
+                  <a href={`/write`}>编辑</a>
                 {/* <span className="detail-user-read">阅读量 {user && user.activate}</span> */}
                 </p>
               </div>
