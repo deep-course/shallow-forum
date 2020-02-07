@@ -38,7 +38,7 @@ class TagList extends Component {
     if (maintag && taglistMap.get(maintag)) {
       subTagList = taglistMap.get(maintag);
     }
-    console.log(maintag, subtag)
+    //console.log(maintag, subtag)
     return (
 
       <div>

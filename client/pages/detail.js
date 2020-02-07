@@ -16,7 +16,7 @@ class PostDetail extends React.Component{
       slug = ''
     } = ctx.query;
     const detail= await getPostDetail({postslug:slug},cookies)
-    console.log("detail:",detail);
+    //console.log("detail:",detail);
     return { slug, detail };
   }
 
