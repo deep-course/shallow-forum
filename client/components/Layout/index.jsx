@@ -30,7 +30,7 @@ class Layout extends Component {
               <div className="layout-header-wrapper">
                 <div className="layout-header-real-wrapper">
                   <div className="layout-header-logo">
-                    <img src="http://images.deephub.ai/logo.png" alt="logo"/>
+                    <img src="//images.deephub.ai/logo.png" alt="logo"/>
                   </div>
                   <ul className="layout-header-type">
                     <li className="layout-header-type-item">
