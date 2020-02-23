@@ -8,7 +8,7 @@ import Router from 'next/router'
 import {inject, observer} from 'mobx-react'
 import PageHead from '../components/PageHead'
 import User from '../components/User'
-import {getPostDetail, boardDeleteImg, boardUploadImg, publishNewPost, getImgList} from '../api'
+import {getPostDetail, boardDeleteImg, boardUploadImg, publishNewPost, getImgList, editpost} from '../api'
 import {getToken} from '@utils/cookie';
 import {getTitle} from '@utils/page'
 import nookies from 'nookies'
@@ -39,36 +39,34 @@ const getWriteArea = () => {
 
 @inject('boardSetting', "currentUser")
 @observer
-class Write extends React.Component {
+class Editor extends React.Component {
     static async getInitialProps ({ctx}) {
         const cookies=nookies.get(ctx)
         const {
           slug = ''
         } = ctx.query;
         const detail= await getPostDetail({postslug:slug},cookies)
-        console.log("---------------------");
-        console.log("detail:",detail);
-        return { slug, detail };
+        return { postslug: slug, detail };
     }
 
     constructor(props) {
-
         super(props)
-        //console.log(props.labellist)
-        const { slug, detail } = props;
+        const { postslug, detail } = props;
+        console.log(detail);
         const content = detail.comment ? detail.comment.content : "";
-        let md = h2m(content);
-        console.log(md);
+        const mdContent = h2m(content);
         this.state = {
+            mdContent,
             // 发布相关
             post: {
+                postslug,
                 title: detail.title,
-                labelid: '',
+                labelid: detail.label,
                 tags: '',
                 imagelist: [],
                 mainimage: '',
                 boardid: 0,
-                content: detail.comment ? detail.comment.content : "",      // 转换的dom内容
+                content: "",      // 转换的dom内容
                 selectedTags: []
             },
             contentImgShow: false,
@@ -81,6 +79,10 @@ class Write extends React.Component {
     }
 
     componentDidMount() {
+        const { mdContent } = this.state;
+        const target =  document.querySelector('.write-wrapper');
+        getWriteArea().innerText = mdContent
+        this.onHandleContentChange();
         getImgList({}).then(res => {
             this.setState({
                 post: {
@@ -313,6 +315,30 @@ class Write extends React.Component {
         })
     }
 
+    // 发布帖子
+    editpost = () => {
+        const {title, content, labelid} = this.state.post
+        console.log(this.state.post)
+        if (!title) {
+            message.error('请输入标题')
+            return;
+        }
+        if (!content) {
+            message.error('请输入内容')
+            return;
+        }
+        // if (!labelid) {
+        //     message.error('请选择标签')
+        //     return;
+        // }
+        editpost(this.state.post).then(res => {
+            message.success('更新成功！')
+            setTimeout(() => {
+                Router.replace('/')
+            }, 1000)
+        })
+    }
+
     //获取筛选器
     getNewTagList = () => {
         let taglistMap = new Map();
@@ -346,8 +372,6 @@ class Write extends React.Component {
     }
 
     render() {
-
-        //
         const {confirmShow, contentImgShow, contentLoading, mainLoading} = this.state
         const {title, labelid, tags, imagelist, mainimage, boardid, content, selectedTags} = this.state.post
         const {labellist} = this.props.boardSetting
@@ -364,7 +388,7 @@ class Write extends React.Component {
                     <div className="title">
                         <input className="input" value={title} onChange={this.handleTitle} type="text"
                             placeholder="请输入标题..."/>
-                        <Button type="primary" onClick={() => this.operaDrawer('confirmShow', true)}>下一步：设置属性</Button>
+                        <Button type="primary" onClick={this.editpost}>更新文章</Button>
                         <User></User>
                     </div>
                     <div className="content">
@@ -377,7 +401,7 @@ class Write extends React.Component {
                             ref={node => this.editContainer = node}
                             className="write">
                             <div
-                                value={'asdasdasd'}
+                                value={'asdfasdfadsfs'}
                                 onInput={this.onContentChange}
                                 ref={node => this.editWrap = node}
                                 className="write-wrapper"
@@ -502,9 +526,7 @@ class Write extends React.Component {
                         <div className="write-label write-block">
                             <h5 className="write-drawer-title">标签</h5>
                             <ul className="write-type-list">
-
                                 {Object.keys(labellist).length && Object.keys(labellist).map(key => (
-
                                     <li className={`write-type-list-item ${labelid == key ? 'current' : ''}`} key={key}
                                         onClick={() => this.chooseType(key, 'labelid')}>{labellist[key]}</li>
                                 ))}
@@ -520,4 +542,4 @@ class Write extends React.Component {
     }
 }
 
-export default Write
+export default Editor
