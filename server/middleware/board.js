@@ -94,7 +94,7 @@ async function getPostDetail(ctx, next) {
 }
 async function checkEditPost(ctx, next) {
     logger.debug("checkEditPost:", ctx.state);
-    const { post, currentuser } = ctx.state;
+    const { post, currentuser,comment } = ctx.state;
     if (!post) {
         ctx.body = util.retError(-20, "未找到信息")
         return;
