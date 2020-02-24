@@ -13,18 +13,18 @@ async function editPost(post, content, imagelist) {
 
         await conn.beginTransaction();
         //更新post
-        await conn.query("update `board_post` set `title`=?,`label`=?,`mainimage`=? where slug=?",
+        await conn.query("update `board_post` set `title`=?,`label`=?,`image`=? where slug=?",
             [
                 post["title"],
                 post["label"],
-                post["mainimage"],
+                post["image"],
                 post["slug"]
             ]);
         //更新comment 
         await conn.query("update `board_comment` set content=?,edituser_id=?,edittime=? where id=?", [
             content["content"],
-            content["edittime"],
             content["edituser_id"],
+            content["edittime"],
             content["comment_id"]
         ]);
 

@@ -151,7 +151,7 @@ async function editPost(ctx, next) {
         comment_id: editpost.comment_id
     };
     const result = await boardService.editPost(post, content, imagelist);
-    logger.debug("修改帖子返回:", postinfo)
+    logger.debug("修改帖子返回:", result)
     if (result) {
         ctx.body = util.retOk();
     }
