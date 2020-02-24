@@ -66,6 +66,9 @@ export const boardDeleteImg = (params,cookies={}) => http.post(basePreixUrl+'/ap
 // 发帖子
 export const publishNewPost = (params,cookies={}) => http.post(basePreixUrl+'/api/board/newpost', params, getToken(cookies))
 
+//编辑帖子
+export const editpost = (params,cookies={}) => http.post(basePreixUrl+'/api/board/editpost', params, getToken(cookies))
+
 // 帖子详情
 export const getPostDetail = (params,cookies={}) => 
 {

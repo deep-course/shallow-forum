@@ -59,6 +59,12 @@ router.get('/write', async ctx => {
     ctx.respond = false
 })
 
+//编辑帖子页面
+router.get('/editor/:slug', async ctx => {
+    await app.render(ctx.req, ctx.res, '/editor', ctx.params)
+    ctx.respond = false
+})
+
 //用户 /u/123456
 router.get('/u/:slug', async ctx => {
     await app.render(ctx.req, ctx.res, '/user', ctx.params.slug)
