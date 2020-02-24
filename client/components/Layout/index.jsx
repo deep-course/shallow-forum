@@ -12,7 +12,7 @@ const { Search } = Input
 @inject('currentUser')
 @observer
 class Layout extends Component {
-  noNeedLayoutRouterMap = ['/login', '/write']
+  noNeedLayoutRouterMap = ['/login', '/write','/edit']
   componentDidMount() {
     //this.props.user.getUserInfo()
     //this.props.global.getBoardSet()

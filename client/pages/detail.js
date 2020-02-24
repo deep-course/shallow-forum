@@ -8,6 +8,8 @@ import moment from 'dayjs'
 import '../assets/pageStyle/detail.less'
 import nookies from 'nookies'
 import {getTitle} from '@utils/page'
+
+@inject("currentUser")
 @observer
 class PostDetail extends React.Component{
   static async getInitialProps ({ctx}) {
@@ -128,6 +130,7 @@ class PostDetail extends React.Component{
       commentList,
       commentBtnMore
     } = this.state
+   const curruser=this.props.currentUser   
     const { slug } = this.props;
     const pageTitle=getTitle("post",title);
     return (
@@ -156,7 +159,11 @@ class PostDetail extends React.Component{
                 <p className="detail-user-date">
                   <span>{moment(new Date(pubtime)).format('YYYY年MM月DD日')}</span>
                   <span>{` · `}</span>
-                  <a href={`/editor/${slug}`}>编辑</a>
+                  {
+                  user.username==curruser.user.username && (<a href={`/edit/${slug}`} target="_blank">编辑</a>)
+                   
+                  }
+                  
                 {/* <span className="detail-user-read">阅读量 {user && user.activate}</span> */}
                 </p>
               </div>

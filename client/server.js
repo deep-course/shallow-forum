@@ -60,8 +60,8 @@ router.get('/write', async ctx => {
 })
 
 //编辑帖子页面
-router.get('/editor/:slug', async ctx => {
-    await app.render(ctx.req, ctx.res, '/editor', ctx.params)
+router.get('/edit/:slug', async ctx => {
+    await app.render(ctx.req, ctx.res, '/edit', ctx.params)
     ctx.respond = false
 })
 

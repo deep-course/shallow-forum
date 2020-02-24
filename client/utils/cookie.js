@@ -38,7 +38,7 @@ function setToken(token) {
  * 清除cookies只浏览器端调用
  */
 function clearToken() {
-    destroyCookie({}, 'token')
+    destroyCookie(null, 'token')
 }
 
 module.exports = {

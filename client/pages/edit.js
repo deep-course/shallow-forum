@@ -39,7 +39,7 @@ const getWriteArea = () => {
 
 @inject('boardSetting', "currentUser")
 @observer
-class Editor extends React.Component {
+class Edit extends React.Component {
     static async getInitialProps ({ctx}) {
         const cookies=nookies.get(ctx)
         const {
@@ -51,8 +51,8 @@ class Editor extends React.Component {
 
     constructor(props) {
         super(props)
-        const { postslug, detail } = props;
-        console.log(detail);
+
+        const { postslug, detail,} = props;
         const content = detail.comment ? detail.comment.content : "";
         const mdContent = h2m(content);
         this.state = {
@@ -67,7 +67,9 @@ class Editor extends React.Component {
                 mainimage: '',
                 boardid: 0,
                 content: "",      // 转换的dom内容
-                selectedTags: []
+                selectedTags: [],
+                user:detail.user
+             
             },
             contentImgShow: false,
             confirmShow: false,
@@ -81,7 +83,12 @@ class Editor extends React.Component {
     componentDidMount() {
         const { mdContent } = this.state;
         const target =  document.querySelector('.write-wrapper');
-        getWriteArea().innerText = mdContent
+        const area=getWriteArea()
+        if (!area)
+        {
+            return;
+        }
+        area.innerText = mdContent
         this.onHandleContentChange();
         getImgList({}).then(res => {
             this.setState({
@@ -372,6 +379,20 @@ class Editor extends React.Component {
     }
 
     render() {
+        //权限验证
+        try{
+            const curruser=this.props.currentUser.user;
+            const postuser=this.state.post.user.username;
+            if (!curruser.username && curruser!=postuser){
+                return (<>no user</>)
+            }
+        }
+        catch(exp)
+        {
+            console.log(exp)
+            return (<>user error</>)
+        }
+ 
         const {confirmShow, contentImgShow, contentLoading, mainLoading} = this.state
         const {title, labelid, tags, imagelist, mainimage, boardid, content, selectedTags} = this.state.post
         const {labellist} = this.props.boardSetting
@@ -389,7 +410,6 @@ class Editor extends React.Component {
                         <input className="input" value={title} onChange={this.handleTitle} type="text"
                             placeholder="请输入标题..."/>
                         <Button type="primary" onClick={this.editpost}>更新文章</Button>
-                        <User></User>
                     </div>
                     <div className="content">
                         <div
@@ -542,4 +562,4 @@ class Editor extends React.Component {
     }
 }
 
-export default Editor
+export default Edit
