@@ -171,7 +171,7 @@ class PostDetail extends React.Component{
             {/*<div className="detail-cover">
               <img src={image} alt="文章封面图"/>
     </div> */}
-            <h4 className="detail-title">{title}</h4>
+            <h1 className="detail-title">{title}</h1>
           </div>
           <div className="detail-content" dangerouslySetInnerHTML={{ __html: comment ? comment.content : ""}}>
           </div>
