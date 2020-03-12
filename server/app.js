@@ -60,6 +60,9 @@ app.use(static(
 //koa-body处理文件上传等,最大上传5M
 app.use(KoaBody({
   multipart: true,
+  formLimit:"10mb",
+  jsonLimit:"10mb",
+  textLimit:"10mb",
   formidable: {
       maxFileSize: 10*1024*1024,
       uploadDir :"./upload/" 
