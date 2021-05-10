@@ -28,7 +28,7 @@
     "koa-session": "^5.12.3",
     "koa-static": "^5.0.0",
     "koa-views": "^6.2.1",
-    "lodash": "^4.17.13",
+    "lodash": "^4.17.21",
     "log4js": "^4.1.1",
     "migrate": "^1.6.2",
     "moment": "^2.24.0",
