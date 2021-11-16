@@ -19,7 +19,7 @@
   "dependencies": {
     "@alicloud/pop-core": "^1.7.7",
     "ali-oss": "^6.3.0",
-    "aws-sdk": "^2.582.0",
+    "aws-sdk": "^2.814.0",
     "ejs": "^3.0.1",
     "koa": "^2.7.0",
     "koa-body": "^4.1.0",
