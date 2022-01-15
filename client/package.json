@@ -18,7 +18,7 @@
     "koa-router": "^7.4.0",
     "koa2-proxy-middleware": "0.0.4",
     "lodash": "^4.17.15",
-    "marked": "^0.7.0",
+    "marked": "^4.0.10",
     "mobx": "^5.15.0",
     "mobx-react": "^6.1.4",
     "next": "9.1.4",
